@@ -1,7 +1,7 @@
 #! /bin/bash 
-#picom &
 #nitrogen --restore &
 #urxvtd -q -o -f &
+compton &
 dunst &
-picom &
+ulauncher --hide-window --hide-window --no-window-shadow &
 flatpak run com.spotify.Client
