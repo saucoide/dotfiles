@@ -1,0 +1,30 @@
+;;;; Emacs Bookmark Format Version 1;;;; -*- coding: utf-8; mode: lisp-data -*-
+;;; This format is meant to be slightly human-readable;
+;;; nevertheless, you probably don't want to edit it.
+;;; -*- End Of Bookmark File Format Version Stamp -*-
+(("system-config"
+ (filename . "~/dotfiles/system.org")
+ (front-context-string . "#+STARTUP: conte")
+ (rear-context-string . "k system config\n")
+ (position . 94))
+("emacs-config"
+ (filename . "~/dotfiles/.config/emacs/config.org")
+ (front-context-string . " #+TITLE: Work E")
+ (rear-context-string)
+ (position . 1))
+("TODOs"
+ (filename . "~/org/todo.org")
+ (front-context-string . "* REVIEW zendesk")
+ (rear-context-string)
+ (position . 1))
+("NOTES"
+ (filename . "~/org/notes.org")
+ (front-context-string . "Questions\n\n- do ")
+ (rear-context-string . "ss\n#+end_src\n\n* ")
+ (position . 535))
+("org-capture-last-stored"
+ (filename . "~/org/todo.org")
+ (front-context-string . "* TODO create a ")
+ (rear-context-string)
+ (position . 1))
+)

@@ -1,0 +1,61 @@
+# this is needed to load the scripting additions, might need to run manually
+sudo yabai --load-sa
+yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+
+# ===== gaps ======
+gaps["top"]="4"
+gaps["bottom"]="4"
+gaps["left"]="4"
+gaps["right"]="4"
+gaps["inner"]="4"
+
+# ===== Tiling setting ======
+
+yabai -m config layout                      bsp
+
+yabai -m config top_padding                 "${gaps["top"]}"
+yabai -m config bottom_padding              "${gaps["bottom"]}"
+yabai -m config left_padding                "${gaps["left"]}"
+yabai -m config right_padding               "${gaps["right"]}"
+yabai -m config window_gap                  "${gaps["inner"]}"
+yabai -m config external_bar                all:25:0
+
+yabai -m config mouse_follows_focus         off
+yabai -m config focus_follows_mouse         off
+
+yabai -m config window_topmost              off
+yabai -m config window_opacity              off
+yabai -m config window_shadow               float
+
+yabai -m config window_border               on  # turn on when fixed 
+yabai -m config window_border_radius        5
+yabai -m config window_border_width         3
+yabai -m config active_window_border_color  0xff50fa7b
+yabai -m config normal_window_border_color  0xff282a36
+yabai -m config insert_feedback_color       0xff2d74da
+
+yabai -m config active_window_opacity       1.0
+yabai -m config normal_window_opacity       0.90
+yabai -m config split_ratio                 0.50
+
+yabai -m config auto_balance                off
+
+yabai -m config mouse_modifier              alt
+yabai -m config mouse_action1               move
+yabai -m config mouse_action2               resize
+
+
+# ===== Rules =======
+
+# These are misbehaving apps that freeze when managed
+yabai -m rule --add label="System Preferences" app="^System Preferences$" title=".*" manage=off
+yabai -m rule --add label="Flameshot" app="^Flameshot$" title=".*" manage=off
+yabai -m rule --add label="About This Mac" app="System Information" title="About This Mac" manage=off
+yabai -m rule --add label="Finder" app="^Finder$" manage=off
+yabai -m rule --add label="System Preferences" app="^System Preferences$" title=".*" manage=off
+yabai -m rule --add label="App Store" app="^App Store$" manage=off
+yabai -m rule --add label="Activity Monitor" app="^Activity Monitor$" manage=off
+yabai -m rule --add label="Calculator" app="^Calculator$" manage=off
+yabai -m rule --add label="Software Update" title="Software Update" manage=off
+yabai -m rule --add label="About This Mac" app="System Information" title="About This Mac" manage=off
+yabai -m rule --add app="^zoom.us" manage=off

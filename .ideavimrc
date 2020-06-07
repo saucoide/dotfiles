@@ -1,0 +1,167 @@
+" Don’t use Ex mode, use Q for formatting.
+map Q gq
+
+" SETTINGS
+set clipboard+=unnamed
+set clipboard+=ideaput
+set scrolloff=5
+set incsearch
+set which-key
+
+" Which-Key
+" to change the description, set a variable such as
+" let g:WhichKeyDesc_windows_close = "<leader>wc close"
+set timeoutlen=4000
+
+" NOTE: to find IDE Actions, shift+shift -> IdeaVim: Track Action Ids -> do it via gui and we get the command name
+" OR do :actionlist [regex pattern] to output a list
+
+
+" KEY BINDINGS
+let mapleader=" "
+
+" GUI toggles
+nnoremap <c-z> :action ToggleDistractionFreeMode<CR>
+
+" Leader key
+let g:WhichKeyDesc_prevtab = "<leader>⌫ previous buffer"
+nnoremap <leader><bs> :action PreviousTab<CR>
+
+" Window management
+let g:WhichKeyDesc_windows = "<leader>w windows"
+
+let g:WhichKeyDesc_windows_vsplit = "<leader>wv split sideways"
+nnoremap <leader>wv :action SplitVertically<CR>
+let g:WhichKeyDesc_windows_split = "<leader>ws split below"
+nnoremap <leader>ws :action SplitHorizontally<CR>
+let g:WhichKeyDesc_windows_close = "<leader>wc close"
+nnoremap <leader>wc :action Unsplit<CR>
+let g:WhichKeyDesc_windows_move = "<leader>ww move to other window"
+nnoremap <leader>ww :action MoveEditorToOppositeTabGroup<CR>
+let g:WhichKeyDesc_windows_left = "<leader>w← left"
+nnoremap <leader>w<Left> <c-w>h
+let g:WhichKeyDesc_windows_right = "<leader>w→ right"
+nnoremap <leader>w<Right> <c-w>l
+let g:WhichKeyDesc_windows_up = "<leader>w↑ up"
+nnoremap <leader>w<Up> <c-w>k
+let g:WhichKeyDesc_windows_down = "<leader>w↓ down"
+nnoremap <leader>w<Down> <c-w>j
+
+" Editor management (buffer)
+let g:WhichKeyDesc_buffer = "<leader>b buffer"
+
+nnoremap <s-TAB> :action NextTab<CR>
+let g:WhichKeyDesc_buffer_next = "<leader>bn next"
+nnoremap <Leader>bn :action NextTab<CR>
+let g:WhichKeyDesc_buffer_prev = "<leader>bp previous"
+nnoremap <Leader>bp :action PreviousTab<CR>
+let g:WhichKeyDesc_buffer_switcher = "<leader>bb switcher"
+nnoremap <leader>bb :action Switcher<CR>
+let g:WhichKeyDesc_buffer_kill = "<leader>bk kill"
+nnoremap <Leader>bk :action CloseContent<CR>
+let g:WhichKeyDesc_buffer_kill_all = "<leader>bK kill all"
+nnoremap <Leader>bK :action CloseAllEditors<CR>
+
+" Project
+let g:WhichKeyDesc_project = "<leader>p project"
+
+let g:WhichKeyDesc_project_kill_all_buffers = "<leader>pk kill all"
+nnoremap <Leader>pk :action CloseAllEditors<CR>
+
+let g:WhichKeyDesc_project_close = "<leader>pc close"
+nnoremap <Leader>pc :action CloseProject<CR>
+
+" Code Editing
+let g:WhichKeyDesc_code = "<leader>c code"
+
+set ideajoin
+set idearefactormode=keep
+set commentary
+set incsearch
+
+vnoremap < <gv
+vnoremap > >gv
+nnoremap [[ :action MethodUp<CR>
+nnoremap ]] :action MethodDown<CR>
+noremap <c-/> :action CommentByLineComment<CR>
+nnoremap gb :action Back<CR>
+nnoremap gf :action Forward<CR>
+remap ge :action GotoNextError
+" nnoremap <c-a> :action GotoAction<CR>
+
+""" Debugging
+let g:WhichKeyDesc_code_breakpoint = "<leader>cb breakpoint toggle"
+map <leader>cb <Action>(ToggleLineBreakpoint)
+let g:WhichKeyDesc_code_actions = "<leader>ca actions"
+nnoremap <leader>ca :action Refactorings.QuickListPopupAction<CR>
+let g:WhichKeyDesc_code_next_error = "<leader>cn next error"
+nnoremap <leader>cn :action GotoNextError<CR>
+let g:WhichKeyDesc_code_prev_error = "<leader>cp prev error"
+nnoremap <leader>cp :action GotoPreviousError<CR>
+
+""" Code Formatting
+let g:WhichKeyDesc_code_imports = "<leader>ci fix imports"
+nnoremap <leader>ci :action OptimizeImports<CR>
+let g:WhichKeyDesc_code_format_black = "<leader>cf format (black)"
+nmap <leader>cf :action Tool_External Tools_black<cr>
+let g:WhichKeyDesc_code_format = "<leader>c= format"
+noremap <leader>c=  :action ReformatCode<CR>
+command Black :action Tool_External Tools_black
+
+""" Code navigation
+let g:WhichKeyDesc_code_structure = "<leader>cs structure"
+nnoremap <leader>cs :action FileStructurePopup<CR>
+let g:WhichKeyDesc_code_refs = "<leader>cr references"
+nnoremap <leader>cr :action GotoImplementation<CR>
+let g:WhichKeyDesc_code_declaration = "<leader>cd declaration"
+nnoremap <leader>cd :action GotoDeclaration<CR>
+
+" Find
+let g:WhichKeyDesc_find = "<leader>f find"
+
+let g:WhichKeyDesc_find_file = "<leader>ff file"
+nnoremap <leader>ff :action GotoFile<CR>
+let g:WhichKeyDesc_find_file = "<leader>/ find in files"
+nnoremap <leader>/ :action FindInPath<CR>
+let g:WhichKeyDesc_find_file2 = "<leader>fp text in files"
+nnoremap <leader>fp :action FindInPath<CR>
+let g:WhichKeyDesc_find_recent_files = "<leader>fr recent files"
+nnoremap <leader>fr :action RecentFiles<CR>
+let g:WhichKeyDesc_find_recent_locations = "<leader>fl recent locations"
+nnoremap <leader>fl :action RecentLocations<CR>
+let g:WhichKeyDesc_find_database = "<leader>fd database"
+nnoremap <leader>fd :action GotoDatabaseObject<CR>
+
+" Other Windows (non-editor windows)
+set NERDTree
+let g:WhichKeyDesc_open = "<leader>o open/toggle"
+
+let g:WhichKeyDesc_open_kill2 = "<leader>⎋ kill last side-window"
+nnoremap <leader><esc> :action HideActiveWindow<CR>
+let g:WhichKeyDesc_open_kill = "<leader>ok kill last"
+nnoremap <leader>ok :action HideActiveWindow<CR>
+let g:WhichKeyDesc_open_kill_all_windows = "<leader>oK kill all"
+nnoremap <leader>ka :action HideAllWindows<CR>
+let g:WhichKeyDesc_kill = "<leader>k kill"
+let g:WhichKeyDesc_kill_all_windows = "<leader>ka all windows"
+nnoremap <leader>ka :action HideAllWindows<CR>
+
+let g:WhichKeyDesc_jump_last = "<leader>⇥ goto last side-window"
+nnoremap <leader><TAB> :action JumpToLastWindow<CR>
+
+
+let g:WhichKeyDesc_open_db = "<leader>od database"
+nnoremap <leader>od :action ActivateDatabaseToolWindow<CR>
+let g:WhichKeyDesc_open_project = "<leader>op project"
+nnoremap <leader>op :NERDTreeToggle<CR>
+
+let g:WhichKeyDesc_open_terminal = "<leader>ot terminal"
+nnoremap <leader>ot :action ActivateTerminalToolWindow<CR>
+let g:WhichKeyDesc_open_ipython = "<leader>oc ipython-console"
+nnoremap <leader>oc :action ActivatePythonConsoleToolWindow<CR>
+" nnoremap <leader>ot :action Terminal.OpenInTerminal<CR>
+
+
+" CONFIG SETTINGS
+nnoremap \e :e ~/.ideavimrc<CR>
+nnoremap \r :action IdeaVim.ReloadVimRc.reload<CR>
