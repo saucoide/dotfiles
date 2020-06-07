@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: headers
+# key: <headers
+# --
+
+#+TITLE: ${1:title}
+#+DESCRIPTION: ${2:description}
+#+AUTHOR: ${3:author}
+#+STARTUP: overview
+#+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup
+#+OPTIONS: toc:nil num:nil

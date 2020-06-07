@@ -1,0 +1,17 @@
+auto-save-list
+elpa
+fonts
+transient
+recentf*
+smex-items
+straight
+bookmarks
+org-roam.db
+projectile-bookmarks*
+projectile.cache
+network*
+.org*
+.dap*
+.lsp*
+projects
+eshell
