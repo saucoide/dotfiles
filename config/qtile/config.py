@@ -28,6 +28,8 @@ from libqtile import layout, bar, widget, hook
 from typing import List  # noqa: F401
 from libqtile.config import ScratchPad, DropDown
 
+import random
+import pathlib
 from mailwatcher import main as get_mails
 from inoreader_rss_counter import main as get_feeds
 
@@ -82,6 +84,11 @@ def bar_transition(col_from, col_to):
                           padding=0,
                           fontsize=25)
 
+def get_wallpaper():
+    wp_path = pathlib.Path.home() / ".config/qtile/wallpapers"
+    wallpapers = list(filter(lambda x: x.suffix in (".png",".jpg"), wp_path.glob("*")))
+    return random.choice(wallpapers)
+
 def open_htop(qtile):
     qtile.cmd_spawn(f'{MY_TERMINAL} -e htop')
 
@@ -117,7 +124,7 @@ groups = [Group(name, **kwargs) for name, kwargs in group_names.items()]
 keys = [
     ### BASICS
          
-         Key([mod], "r", lazy.spawncmd(),
+         Key([mod], "y", lazy.spawncmd(),
              desc='launch prompt'),
          #Key([mod] ,"space", lazy.spawn("krunner"),
              #desc='Launch krunner'),
@@ -195,8 +202,12 @@ keys = [
              desc='launch terminal'),
          Key(["control", "mod1"], "f", lazy.spawn("firefox"),
              desc='firefox'),
-         Key(["control", "mod1"], "y", lazy.spawn(MY_TERMINAL+" -e youtube-viewer"),
-             desc='youtube-viewer'),
+         Key(["control", "mod1"], "e", lazy.spawn("dolphin"),
+             desc='dolphin'),
+         Key(["control", "mod1"], "n", lazy.spawn("kate"),
+             desc='kate'),
+         #Key(["control", "mod1"], "y", lazy.spawn(MY_TERMINAL+" -e youtube-viewer"),
+             #desc='youtube-viewer'),
         
          ## general volume
          Key([], "XF86AudioRaiseVolume", lazy.spawn("amixer -D pulse -q sset Master 5%+")),
@@ -215,6 +226,10 @@ for number, group in enumerate(groups, start=1):
     keys.append(Key([mod, "shift"], NUMPAD[number], lazy.window.togroup(group.name, switch_group=True)))
     keys.append(Key([mod, "control"], str(number), lazy.window.togroup(group.name, switch_group=False)))
     keys.append(Key([mod, "control"], NUMPAD[number], lazy.window.togroup(group.name, switch_group=False)))
+
+### TOGGLE LAST GROUP
+keys.append(Key([mod], "BackSpace", lazy.screen.toggle_group()))
+
 
 ##### ADDING DROPDOWN TERMINAL #####
     ### Appending group
@@ -309,7 +324,8 @@ def init_widgets_list():
                         other_current_screen_border = COLORS["background"],
                         other_screen_border = COLORS["background"],
                         foreground = COLORS["white"],
-                        background = COLORS["background"]
+                        background = COLORS["background"],
+                        disable_drag = True
                         ),
                widget.TextBox(text='⟋',
                           background = COLORS["background"],
@@ -342,6 +358,17 @@ def init_widgets_list():
                         txt_maximized = "🗖 ",
                         margin = 0,
                         padding = 5,
+                        ),
+                widget.CurrentLayoutIcon(
+                        custom_icon_paths=[os.path.expanduser("~/.config/qtile/icons")],
+                        background = COLORS["background"],
+                        padding = 0,
+                        scale=0.7
+                        ),
+               widget.CurrentLayout(
+                        foreground = COLORS["white"],
+                        background = COLORS["background"],
+                        padding = 5
                         ),
                bar_transition(COLORS["background"], COLORS["frost0"]),
                widget.GenPollText(
@@ -400,43 +427,30 @@ def init_widgets_list():
                         device = "pulse"                        
                         ),
                bar_transition(COLORS["frost0"], COLORS["frost1"]),
-               widget.CurrentLayoutIcon(
-                        custom_icon_paths=[os.path.expanduser("~/.config/qtile/icons")],
-                        foreground = COLORS["background"],
-                        background = COLORS["frost1"],
-                        padding = 0,
-                        scale=0.7
-                        ),
-               widget.CurrentLayout(
-                        foreground = COLORS["white"],
-                        background = COLORS["frost1"],
-                        padding = 5
-                        ),
-               bar_transition(COLORS["frost1"], COLORS["frost2"]),
                widget.CheckUpdates(
                         update_interval = 1800,
                         foreground = COLORS["white"],
-                        background = COLORS["frost2"],
+                        background = COLORS["frost1"],
                         color_have_updates = COLORS["aurora0"],
                         display_format = '{updates} ⟳',
                         distro = "Ubuntu",
                         execute = "plasma-discover --mode Update"
                         ),
-               bar_transition(COLORS["frost2"], COLORS["frost3"]),
+               bar_transition(COLORS["frost1"], COLORS["frost2"]),
                 widget.Systray(
-                        background=COLORS["frost3"],
+                        background=COLORS["frost2"],
                         padding = 5
                         ),
-               bar_transition(COLORS["frost3"], COLORS["frost1"]),
+               #bar_transition(COLORS["frost2"], COLORS["frost3"]),
                widget.Clock(
                         foreground = COLORS["white"],
-                        background = COLORS["frost1"],
+                        background = COLORS["frost2"],
                         format="%d-%b-%Y [%H:%M] ",
                         padding = 2
                         ),
-               #bar_transition(COLORS["frost1"], COLORS["frost2"]),
+               #bar_transition(COLORS["frost3"], COLORS["frost0"]),
                widget.QuickExit(
-                        background = COLORS["frost2"],
+                        background = COLORS["frost3"],
                         countdown_format = "[{}s]",
                         default_text = "[⏼]" # ⏻ ⏼ ⏽ ⭘ ⏾
                    )
@@ -447,7 +461,7 @@ def init_widgets_list():
 
 def init_screens():
     return [Screen(top=bar.Bar(widgets=init_widgets_list(), opacity=0.95, size=20),
-                    wallpaper = '~/.wallpaper/nordic.jpg',
+                    wallpaper = get_wallpaper(),
                     wallpaper_mode = 'fill')
             ]
 
@@ -458,6 +472,10 @@ if __name__ in ["config", "__main__"]:
 
 
 ##### FLOATING WINDOWS #####
+
+float_theme = {"border_width": 1,
+               "border_focus": COLORS["background"]
+               }
 
 floating_layout = layout.Floating(float_rules=[
                     {'wmclass': 'confirm'},
@@ -477,7 +495,8 @@ floating_layout = layout.Floating(float_rules=[
                     {'wmclass': 'krunner'},
                     {'wmclass': 'ssh-askpass'}  # ssh-askpass
                     ],
-                    **layout_theme)
+                    **float_theme
+                    )
 
 auto_fullscreen = True
 focus_on_window_activation = "smart"
