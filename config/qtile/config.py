@@ -33,10 +33,14 @@ import pathlib
 from mailwatcher import main as get_mails
 from inoreader_rss_counter import main as get_feeds
 
-##### DEFINING CONSTANTS #####
+##### DEFINING CONSTANTS & DEFAULT PROGRAMS #####
 
 mod = "mod4"   # mod key to SUPER/WINDOWS
-MY_TERMINAL = "konsole"
+TRANS_FONT_SIZE = 40  # font size used for the separator effect on the bar, adjust for different resolutions
+
+MY_TERMINAL = "termite"
+TEXT_EDITOR = "kate"
+
 MY_CONFIG = "/home/saucoide/.config/qtile/config.py"
 
 ## Numpad keys ##
@@ -95,8 +99,9 @@ def bar_transition(col_from, col_to):
     return widget.TextBox(text='◢',
                           background = col_from,
                           foreground = col_to,
-                          padding=0,
-                          fontsize=25)
+                          padding=-1,
+                          font="Ubuntu Mono derivative Powerline",
+                          fontsize=TRANS_FONT_SIZE)
 
 def get_wallpaper():
     wp_path = pathlib.Path.home() / ".config/qtile/wallpapers"
@@ -235,12 +240,12 @@ keys = [
          Key(["control", "mod1"], "f", lazy.spawn("firefox"),
              desc='firefox web browser'),
          
-         Key(["control", "mod1"], "e", lazy.spawn("dolphin"),
-             desc='dolphin'),
+         Key(["control", "mod1"], "e", lazy.spawn("nemo"),
+             desc='nemo'),
          Key(["control", "mod1"], "n", lazy.spawn("kate"),
              desc='text editor'),
          
-         Key([mod], "F12", lazy.spawn('rofi -show run'),
+         Key([mod], "space", lazy.spawn('rofi -show run'),
              desc='rofi'),
          
          #Key(["mod1", "control"], "a", lazy.spawn('xfce4-appfinder')),
@@ -505,13 +510,13 @@ def init_widgets_list():
                         padding = 2
                         ),
                # bar_transition(COLORS["frost3"], COLORS["frost0"]),
-               # widget.Battery(
-               #          font="Ubuntu Mono",
-               #          update_interval = 10,
-               #          fontsize = 12,
-               #          foreground = colors[5],
-               #          background = colors[1],
-	           #          ),
+               #widget.Battery(
+                        #font="Ubuntu Mono",
+                        #update_interval = 10,
+                        #fontsize = 12,
+                        #foreground = COLORS["white"],
+                        #background = COLORS["frost3"],
+	                    #),
                widget.QuickExit(
                         background = COLORS["frost3"],
                         countdown_format = "[{}s]",
