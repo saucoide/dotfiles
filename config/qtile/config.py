@@ -40,6 +40,8 @@ TRANS_FONT_SIZE = 40  # font size used for the separator effect on the bar, adju
 
 MY_TERMINAL = "termite"
 TEXT_EDITOR = "kate"
+FILE_MANAGER = "nemo"
+EMAIL_CLIENT = "kmail"
 
 MY_CONFIG = "/home/saucoide/.config/qtile/config.py"
 
@@ -118,7 +120,7 @@ def open_audio_settings(qtile):
     qtile.cmd_spawn("pavucontrol-qt")
     
 def open_mail(qtile):
-    qtile.cmd_spawn("kmail")
+    qtile.cmd_spawn(EMAIL_CLIENT)
 
 def open_feeds(qtile):
     qtile.cmd_spawn("firefox --new-window https://www.inoreader.com")
@@ -145,8 +147,6 @@ keys = [
          
          Key([mod], "y", lazy.spawncmd(),
              desc='launch prompt'),
-         #Key([mod] ,"space", lazy.spawn("krunner"),
-             #desc='Launch krunner'),
          Key([mod], "k", lazy.window.kill(),
              desc='Kill active window'),
          Key([mod], "q", lazy.window.kill(),
@@ -155,6 +155,7 @@ keys = [
              desc='Restart Qtile'),
          Key([mod, "shift"], "q", lazy.shutdown(),
              desc='Shutdown Qtile'),
+         #Key([mod], "x", lazy.spawn('arcolinux-logout')), # TODO    replace with oblogout?
 
     ### WINDOW CONTROL
          
@@ -219,8 +220,7 @@ keys = [
              desc='switch to MAX layout'),
          #Key([mod, "shift"], "m", lazy.to_layout_index(3),
              #desc='switch to TREETAB layout'),
-         
-         
+                  
          Key([mod, "control"], "f", float_to_front,
              desc='switch to FLOATING layout'),
 
@@ -232,33 +232,37 @@ keys = [
          Key([mod], "Return", lazy.layout.toggle_split(),lazy.layout.flip(),
              desc = "Switch between Stack/Tile modes"),
 
-    ### APPLICATION LAUNCHING (CONTROL + ALT + KEY) // alt+super+key?
-         Key(["control", "mod1"], "t", lazy.spawn(MY_TERMINAL),
-             desc='terminal'),
-         Key([mod], "KP_Enter", lazy.spawn(MY_TERMINAL),
-             desc='terminal'),
-         Key(["control", "mod1"], "f", lazy.spawn("firefox"),
-             desc='firefox web browser'),
-         
-         Key(["control", "mod1"], "e", lazy.spawn("nemo"),
-             desc='nemo'),
-         Key(["control", "mod1"], "n", lazy.spawn("kate"),
-             desc='text editor'),
+    ### APPLICATION LAUNCHING
+
+         ## Super + Key
          
          Key([mod], "space", lazy.spawn('rofi -show run'),
-             desc='rofi'),
+             desc='Launch rofi'),
          
-         #Key(["mod1", "control"], "a", lazy.spawn('xfce4-appfinder')),
-         
-         
-         Key([mod], "e", lazy.spawn('dolphin'),
-             desc='file manager'),
+         Key([mod], "e", lazy.spawn(FILE_MANAGER),
+             desc='Launch file manager'),
          
          Key([mod], "Escape", lazy.spawn('xkill'),
-             desc = 'click to kill window'),
+             desc = 'Click to kill window'),
+
+        ## (CONTROL + ALT + KEY) // alt+super+key?
+        
+         Key(["control", "mod1"], "t", lazy.spawn(MY_TERMINAL),
+             desc='terminal'),
          
+         Key([mod], "KP_Enter", lazy.spawn(MY_TERMINAL),
+             desc='terminal'),
+         
+         Key(["control", "mod1"], "f", lazy.spawn("firefox"),
+             desc='Launch firefox'),
+         
+         Key(["control", "mod1"], "e", lazy.spawn(FILE_MANAGER),
+             desc='Launch file manager'),
+         
+         Key(["control", "mod1"], "n", lazy.spawn(TEXT_EDITOR),
+             desc='Launch text editor'),
+                  
          #Key([mod], "v", lazy.spawn('pavucontrol')),    # this is pulseaudio volume control, migth want to bind it to something
-         #Key([mod], "x", lazy.spawn('arcolinux-logout')),
          
          #Key(["control", "mod1"], "y", lazy.spawn(MY_TERMINAL+" -e youtube-viewer"),
              #desc='youtube-viewer'),
