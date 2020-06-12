@@ -6,7 +6,7 @@
 ########## Variables
 
 dotfiles=~/dotfiles            # dotfiles directory
-backup=~/test_backup        # dotfiles backup directory
+backup=~/dotfiles_old        # dotfiles backup directory
 files="gitconfig compton.conf config/qtile config/dunst config/ulauncher"           # list of files/folders to symlink in homedir
 
 ##########
@@ -25,7 +25,7 @@ echo "...done"
 for file in $files; do
     
     echo "Moving any existing dotfiles from ~ to $olddir"
-    mv ~/$file $backup
+    mv ~/.$file $backup
     echo "...done"
     
     echo "Creating symlink to $file in home directory."
