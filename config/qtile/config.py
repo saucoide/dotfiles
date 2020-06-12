@@ -59,6 +59,7 @@ COLORS = {
           "active_background":"#434c5e",    # background for current group
           "group_highlight":"#ff5555",      # border line color for current group
           "border_line":"#8d62a9",          # border line color for other tab and odd widgets
+          "border_focus":"#5e81ac",
           "win_name":"#81a1c1",             # current window name
           "frost0":"#5e81ac",               # Theme colors (nord)
           "frost1":"#81a1c1",
@@ -66,6 +67,19 @@ COLORS = {
           "frost3":"#8fbcbb",
           "aurora0":"#bf616a",
     }
+
+# arco colors / to check TODO
+def init_colors():
+    return [["#2F343F", "#2F343F"], # color 0
+            ["#2F343F", "#2F343F"], # color 1
+            ["#c0c5ce", "#c0c5ce"], # color 2
+            ["#fba922", "#fba922"], # color 3
+            ["#3384d0", "#3384d0"], # color 4
+            ["#f3f4f5", "#f3f4f5"], # color 5
+            ["#cd1f3f", "#cd1f3f"], # color 6
+            ["#62FF00", "#62FF00"], # color 7
+            ["#6790eb", "#6790eb"], # color 8
+            ["#a9a9a9", "#a9a9a9"]] # color 9
 
 
 ##### DEFINING MY FUNCTIONS #####
@@ -130,6 +144,8 @@ keys = [
              #desc='Launch krunner'),
          Key([mod], "k", lazy.window.kill(),
              desc='Kill active window'),
+         Key([mod], "q", lazy.window.kill(),
+             desc='Kill active window'),
          Key([mod, "shift"], "r", lazy.restart(),
              desc='Restart Qtile'),
          Key([mod, "shift"], "q", lazy.shutdown(),
@@ -147,6 +163,10 @@ keys = [
          Key([mod], "Left", lazy.layout.right(),
              desc = "Switch focus to window to the right"),
          
+         ## Toggle Fullscreen
+         Key([mod], "f", lazy.window.toggle_fullscreen(),
+             desc = "Toggle fullscreen for the current window"),
+         
          ## Move
          Key([mod, "shift"], "Down", lazy.layout.shuffle_down(),
              desc = "Move window down"),
@@ -158,13 +178,23 @@ keys = [
              desc = "Move window right"),
          
          ## Resize
-         Key([mod, "control"], "Down", lazy.layout.grow_down(),
+         Key([mod, "control"], "Down",
+             lazy.layout.grow_down(),
+             lazy.layout.shrink(),
              desc = "Increase size down"),
-         Key([mod, "control"], "Up", lazy.layout.grow_up(),
+         Key([mod, "control"], "Up",
+             lazy.layout.grow_up(),
+             lazy.layout.grow(),
              desc = "Increase size up"),
-         Key([mod, "control"], "Left", lazy.layout.grow_left(), lazy.layout.shrink(),
+         Key([mod, "control"], "Left", 
+             lazy.layout.grow_left(),
+             lazy.layout.shrink(),
+             lazy.layout.decrease_ratio(),
              desc = "Increase size left"),
-         Key([mod, "control"], "Right", lazy.layout.grow_right(), lazy.layout.grow(),
+         Key([mod, "control"], "Right",
+             lazy.layout.grow_right(),
+             lazy.layout.grow(),
+             lazy.layout.increase_ratio(),
              desc = "Increase size right"),
          
          # Float
@@ -186,7 +216,7 @@ keys = [
              #desc='switch to TREETAB layout'),
          
          
-         Key([mod], "f", float_to_front,
+         Key([mod, "control"], "f", float_to_front,
              desc='switch to FLOATING layout'),
 
          ## Reset sizes
@@ -199,19 +229,45 @@ keys = [
 
     ### APPLICATION LAUNCHING (CONTROL + ALT + KEY) // alt+super+key?
          Key(["control", "mod1"], "t", lazy.spawn(MY_TERMINAL),
-             desc='launch terminal'),
+             desc='terminal'),
+         Key([mod], "KP_Enter", lazy.spawn(MY_TERMINAL),
+             desc='terminal'),
          Key(["control", "mod1"], "f", lazy.spawn("firefox"),
-             desc='firefox'),
+             desc='firefox web browser'),
+         
          Key(["control", "mod1"], "e", lazy.spawn("dolphin"),
              desc='dolphin'),
          Key(["control", "mod1"], "n", lazy.spawn("kate"),
-             desc='kate'),
+             desc='text editor'),
+         
+         Key([mod], "F12", lazy.spawn('rofi -show run'),
+             desc='rofi'),
+         
+         #Key(["mod1", "control"], "a", lazy.spawn('xfce4-appfinder')),
+         
+         
+         Key([mod], "e", lazy.spawn('dolphin'),
+             desc='file manager'),
+         
+         Key([mod], "Escape", lazy.spawn('xkill'),
+             desc = 'click to kill window'),
+         
+         #Key([mod], "v", lazy.spawn('pavucontrol')),    # this is pulseaudio volume control, migth want to bind it to something
+         #Key([mod], "x", lazy.spawn('arcolinux-logout')),
+         
          #Key(["control", "mod1"], "y", lazy.spawn(MY_TERMINAL+" -e youtube-viewer"),
              #desc='youtube-viewer'),
         
-         ## general volume
+         ## Volume & Media keys
          Key([], "XF86AudioRaiseVolume", lazy.spawn("amixer -D pulse -q sset Master 5%+")),
          Key([], "XF86AudioLowerVolume", lazy.spawn("amixer -D pulse -q sset Master 5%-")),
+         Key([], "XF86AudioMute", lazy.spawn("amixer -D pulse -q set Master toggle")),
+         
+         Key([], "XF86AudioPlay", lazy.spawn("playerctl play-pause")),
+         Key([], "XF86AudioNext", lazy.spawn("playerctl next")),
+         Key([], "XF86AudioPrev", lazy.spawn("playerctl previous")),
+         Key([], "XF86AudioStop", lazy.spawn("playerctl stop")),
+
 ]
 
 
@@ -250,7 +306,7 @@ keys.extend([Key([], "F4", lazy.group["scratchpad"].dropdown_toggle("term"))])
     ### DEFAULT LAYOUT THEME SETTINGS #####
 layout_theme = {"border_width": 2,
                 "margin": 3,
-                "border_focus": "8fbcbb",
+                "border_focus": COLORS["frost1"],
                 "border_normal": "1D2330"
                 }
 
@@ -448,7 +504,14 @@ def init_widgets_list():
                         format="%d-%b-%Y [%H:%M] ",
                         padding = 2
                         ),
-               #bar_transition(COLORS["frost3"], COLORS["frost0"]),
+               # bar_transition(COLORS["frost3"], COLORS["frost0"]),
+               # widget.Battery(
+               #          font="Ubuntu Mono",
+               #          update_interval = 10,
+               #          fontsize = 12,
+               #          foreground = colors[5],
+               #          background = colors[1],
+	           #          ),
                widget.QuickExit(
                         background = COLORS["frost3"],
                         countdown_format = "[{}s]",
@@ -477,6 +540,14 @@ float_theme = {"border_width": 1,
                "border_focus": COLORS["background"]
                }
 
+floating_types = ["notification", "toolbar", "splash", "dialog"]
+
+@hook.subscribe.client_new
+def set_floating(window):
+    if (window.window.get_wm_transient_for()
+            or window.window.get_wm_type() in floating_types):
+        window.floating = True
+
 floating_layout = layout.Floating(float_rules=[
                     {'wmclass': 'confirm'},
                     {'wmclass': 'dialog'},
@@ -493,7 +564,13 @@ floating_layout = layout.Floating(float_rules=[
                     {'wname': 'pinentry'},  # GPG key password entry
                     {'wmclass': 'ulauncher'},
                     {'wmclass': 'krunner'},
-                    {'wmclass': 'ssh-askpass'}  # ssh-askpass
+                    {'wmclass': 'ssh-askpass'},  # ssh-askpass
+                    {'wmclass': 'Arcolinux-tweak-tool.py'}, 
+                    {'wmclass': 'Arandr'},
+                    {'wmclass': 'arcolinux-logout'},
+                    {'wname': 'branchdialog'},
+                    {'wname': 'Open File'},
+                    {'wname': 'pinentry'},
                     ],
                     **float_theme
                     )
