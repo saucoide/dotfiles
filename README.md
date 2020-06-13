@@ -2,5 +2,5 @@
 
     ## Requirements
         
-        - powerline-fonts
-        - 
+        - awesome-terminal-fonts
+        - dunst
