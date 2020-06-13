@@ -1,1 +1,6 @@
 # dotfiles
+
+    ## Requirements
+        
+        - powerline-fonts
+        - 

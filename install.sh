@@ -7,7 +7,7 @@
 
 dotfiles=~/dotfiles            # dotfiles directory
 backup=~/dotfiles_old        # dotfiles backup directory
-files="gitconfig compton.conf config/qtile config/dunst config/ulauncher"           # list of files/folders to symlink in homedir
+files="gitconfig compton.conf config/qtile config/dunst"           # list of files/folders to symlink in homedir
 
 ##########
 
