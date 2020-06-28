@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-# A customized config.py for Qtile window manager (http://www.qtile.org)     
-# Modified by sauco, based on a version by Derek Taylor  (http://www.gitlab.com/dwt1/ )
+# Author: saucoide
+# configuration file for a customized  Qtile window manager (http://www.qtile.org)     
+# based on a version by Derek Taylor  (http://www.gitlab.com/dwt1/ )
 #
 # The following comments are the copyright and licensing information from the default
 # qtile config. Copyright (c) 2010 Aldo Cortesi, 2010, 2014 dequis, 2012 Randall Ma,
@@ -14,7 +15,7 @@
 # permit persons to whom the Software is furnished to do so, subject to the following
 # conditions:
 #
-# The above copyright notice and this permission notice shall be included in all copies
+# The above copyright notice and this permission notice shall be includ ed in all copies
 # or substantial portions of the Software.
 
 ##### IMPORTS #####
@@ -36,11 +37,11 @@ from inoreader_rss_counter import main as get_feeds
 ##### DEFINING CONSTANTS & DEFAULT PROGRAMS #####
 
 mod = "mod4"   # mod key to SUPER/WINDOWS
-TRANS_FONT_SIZE = 40  # font size used for the separator effect on the bar, adjust for different resolutions
+TRANS_FONT_SIZE = 60  # font size used for the separator effect on the bar, adjust for different resolutions
 
 MY_TERMINAL = "termite"
 TEXT_EDITOR = "kate"
-FILE_MANAGER = "nemo"
+FILE_MANAGER = "thunar"
 EMAIL_CLIENT = "kmail"
 
 MY_CONFIG = "/home/saucoide/.config/qtile/config.py"
@@ -101,7 +102,7 @@ def bar_transition(col_from, col_to):
     return widget.TextBox(text='◢',
                           background = col_from,
                           foreground = col_to,
-                          padding=-1,
+                          padding=-5,
                           font="Ubuntu Mono derivative Powerline",
                           fontsize=TRANS_FONT_SIZE)
 
@@ -117,13 +118,16 @@ def open_ksysguard(qtile):
     qtile.cmd_spawn("ksysguard")
 
 def open_audio_settings(qtile):
-    qtile.cmd_spawn("pavucontrol-qt")
+    qtile.cmd_spawn("pavucontrol")
     
 def open_mail(qtile):
     qtile.cmd_spawn(EMAIL_CLIENT)
 
 def open_feeds(qtile):
     qtile.cmd_spawn("firefox --new-window https://www.inoreader.com")
+
+def toggle_calendar(qtile):
+    qtile.cmd_spawn(f'{MY_TERMINAL} -e calcurse')
 
 ##### GROUPS #####
 # fin the wm_class etc using xprop | grep WM_CLASS or similar
@@ -443,13 +447,12 @@ def init_widgets_list():
                    mouse_callbacks = {'Button1':open_mail}
                    ),
                bar_transition(COLORS["frost0"], COLORS["frost1"]),
-               widget.Image(
-                        filename = r"~/.config/qtile/icons/rss.png",
+               widget.TextBox(
+                        text = "",
+                        foreground = COLORS["white"],
                         background = COLORS["frost1"],
-                        margin = 3,
-                        scale=True,
-                        mouse_callbacks={'Button1': open_feeds}
-                        ),
+                        mouse_callbacks = {'Button1': open_feeds}
+                   ),
                widget.GenPollText(
                    background = COLORS["frost1"],
                    func = get_feeds,
@@ -475,11 +478,12 @@ def init_widgets_list():
                widget.ThermalSensor(
                         foreground=COLORS["white"],
                         background=COLORS["frost3"],
-                        padding = 0
+                        padding = 0,
+                        update_interval = 10,
                         ),
                bar_transition(COLORS["frost3"], COLORS["frost0"]),
                widget.TextBox(
-                        text = "🕪",
+                        text = "",
                         foreground = COLORS["white"],
                         background = COLORS["frost0"],
                         mouse_callbacks = {'Button1': open_audio_settings}
@@ -502,16 +506,17 @@ def init_widgets_list():
                         execute = "plasma-discover --mode Update"
                         ),
                bar_transition(COLORS["frost1"], COLORS["frost2"]),
-                widget.Systray(
-                        background=COLORS["frost2"],
-                        padding = 5
-                        ),
+                #widget.Systray(
+                        #background=COLORS["frost2"],
+                        #padding = 5
+                        #),
                #bar_transition(COLORS["frost2"], COLORS["frost3"]),
                widget.Clock(
                         foreground = COLORS["white"],
                         background = COLORS["frost2"],
                         format="%d-%b-%Y [%H:%M] ",
-                        padding = 2
+                        padding = 2,
+                        mouse_callbacks = {'Button1': toggle_calendar}
                         ),
                # bar_transition(COLORS["frost3"], COLORS["frost0"]),
                #widget.Battery(
