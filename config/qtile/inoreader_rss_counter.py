@@ -1,5 +1,6 @@
 #!/home/saucoide/saucoidenv/bin/python
 import requests
+import keyring
 from pathlib import Path
 
 def main():
@@ -7,12 +8,10 @@ def main():
     BASE_URL = "https://www.inoreader.com/reader/api/0"
     LOGIN_URL = "https://www.inoreader.com/accounts/ClientLogin"
 
-    cstore = Path.home() / ".config/.userdata/.inoreader/cstore"
-    store = {key:val.rstrip() for key,val in (line.split(":") for line in open(cstore))}
-    EMAIL = store["U"]
-    PW = store["P"]
-    APP_ID = store["APPID"]
-    APP_KEY = store["APPKEY"]
+    EMAIL = keyring.get_password("Passwords", 'ino_user')
+    PW = keyring.get_password("Passwords", 'ino_pw')
+    APP_ID = keyring.get_password("Passwords", 'ino_id')
+    APP_KEY = keyring.get_password("Passwords", 'ino_key')
     
 
     resp = requests.post(LOGIN_URL, data={'Email':EMAIL,'Passwd':PW})

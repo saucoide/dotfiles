@@ -1,13 +1,12 @@
 #!/home/saucoide/saucoidenv/bin/python
 import imaplib
+import keyring
 from pathlib import Path
 
 def main():
 
-    cstore = Path.home() / ".config/.userdata/.mailwatcher/cstore"
-    store = {key:val.rstrip() for key,val in (line.split("=") for line in open(cstore))}
-    EMAIL = store["U"]
-    PW = store["P"]
+    EMAIL = keyring.get_password('Passwords', 'email_user')
+    PW = keyring.get_password('Passwords', 'email_pw')
     SMTP_SERVER = "imap.gmail.com"
     SMTP_PORT = 993
 
