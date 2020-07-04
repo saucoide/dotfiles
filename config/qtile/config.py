@@ -43,6 +43,7 @@ MY_TERMINAL = "termite"
 TEXT_EDITOR = "kate"
 FILE_MANAGER = "thunar"
 EMAIL_CLIENT = "kmail"
+SYS_MONITOR = "xfce4-taskmanager"
 
 MY_CONFIG = "/home/saucoide/.config/qtile/config.py"
 
@@ -75,20 +76,6 @@ COLORS = {
           "aurora0":"#bf616a",
     }
 
-# arco colors / to check TODO
-def init_colors():
-    return [["#2F343F", "#2F343F"], # color 0
-            ["#2F343F", "#2F343F"], # color 1
-            ["#c0c5ce", "#c0c5ce"], # color 2
-            ["#fba922", "#fba922"], # color 3
-            ["#3384d0", "#3384d0"], # color 4
-            ["#f3f4f5", "#f3f4f5"], # color 5
-            ["#cd1f3f", "#cd1f3f"], # color 6
-            ["#62FF00", "#62FF00"], # color 7
-            ["#6790eb", "#6790eb"], # color 8
-            ["#a9a9a9", "#a9a9a9"]] # color 9
-
-
 ##### DEFINING MY FUNCTIONS #####
 
 @lazy.function
@@ -114,8 +101,8 @@ def get_wallpaper():
 def open_htop(qtile):
     qtile.cmd_spawn(f'{MY_TERMINAL} -e htop')
 
-def open_ksysguard(qtile):
-    qtile.cmd_spawn("ksysguard")
+def open_sys_monitor(qtile):
+    qtile.cmd_spawn(SYS_MONITOR)
 
 def open_audio_settings(qtile):
     qtile.cmd_spawn("pavucontrol")
@@ -129,6 +116,12 @@ def open_feeds(qtile):
 def toggle_calendar(qtile):
     qtile.cmd_spawn(f'{MY_TERMINAL} -e calcurse')
 
+def logout(qtile):
+    qtile.cmd_spawn("arcolinux-logout")
+
+def open_pamac(qtile):
+    qtile.cmd_spawn("pamac-manager")
+    
 ##### GROUPS #####
 # fin the wm_class etc using xprop | grep WM_CLASS or similar
 
@@ -137,7 +130,7 @@ group_names = {"SYS": {'layout': 'columns'},
                "WWW": {'layout': 'columns'},
                "DEV": {'layout': 'columns'},
                "MUS": {'layout': 'max', "matches":[Match(title=["Spotify Free"])]},
-               "VID": {'layout': 'max', "matches":[Match(wm_class=["smplayer"])]},
+               "VID": {'layout': 'columns', "matches":[Match(wm_class=["smplayer"])]},
                "VMS": {'layout': 'max'},
                "DOC": {'layout': 'columns'},
                "MAX": {'layout': 'max'}}
@@ -465,14 +458,14 @@ def init_widgets_list():
                         background = COLORS["frost2"],
                         padding = 0,
                         format = "CPU {load_percent}% | ",
-                        mouse_callbacks={'Button1': open_htop, 'Button3': open_ksysguard}
+                        mouse_callbacks={'Button1': open_htop, 'Button3': open_sys_monitor}
                         ),
                widget.Memory(
                         foreground = COLORS["white"],
                         background = COLORS["frost2"],
                         format = 'RAM {MemUsed}M/{MemTotal}M',
                         padding = 0,
-                        mouse_callbacks={'Button1': open_htop, 'Button3': open_ksysguard}
+                        mouse_callbacks={'Button1': open_htop, 'Button3': open_sys_monitor}
                         ),
                bar_transition(COLORS["frost2"], COLORS["frost3"]),
                widget.ThermalSensor(
@@ -502,8 +495,8 @@ def init_widgets_list():
                         background = COLORS["frost1"],
                         color_have_updates = COLORS["aurora0"],
                         display_format = '{updates} ⟳',
-                        distro = "Ubuntu",
-                        execute = "plasma-discover --mode Update"
+                        distro = "Arch_checkupdates",
+                        mouse_callbacks = {'Button1': open_pamac}
                         ),
                bar_transition(COLORS["frost1"], COLORS["frost2"]),
                 #widget.Systray(
@@ -526,11 +519,16 @@ def init_widgets_list():
                         #foreground = COLORS["white"],
                         #background = COLORS["frost3"],
 	                    #),
-               widget.QuickExit(
+               widget.TextBox(
+                        text = "[⏻]",
                         background = COLORS["frost3"],
-                        countdown_format = "[{}s]",
-                        default_text = "[⏼]" # ⏻ ⏼ ⏽ ⭘ ⏾
-                   )
+                        mouse_callbacks = {'Button1': logout}
+                   ),
+               #widget.QuickExit(
+                        #background = COLORS["frost3"],
+                        #countdown_format = "[{}s]",
+                        #default_text = "[⏼]" # ⏻ ⏼ ⏽ ⭘ ⏾
+                   #)
               ]
     return widgets_list
 
