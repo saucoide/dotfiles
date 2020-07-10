@@ -7,7 +7,7 @@
 
 dotfiles=~/dotfiles            # dotfiles directory
 backup=~/dotfiles_old        # dotfiles backup directory
-files="gitconfig config/qtile config/dunst config/termite"           # list of files/folders to symlink in homedir
+files="gitconfig config/qtile config/dunst config/termite config/rofi"           # list of files/folders to symlink in homedir
 
 ##########
 

@@ -233,9 +233,12 @@ keys = [
 
          ## Super + Key
          
-         Key([mod], "space", lazy.spawn('rofi -show run'),
-             desc='Launch rofi'),
-         
+         Key([mod], "space", lazy.spawn('rofi -show drun'),
+             desc='Launch rofi drun'),
+
+          Key([mod], "r", lazy.spawn('rofi -show run'),
+             desc='Launch rofi run'),        
+
          Key([mod], "e", lazy.spawn(FILE_MANAGER),
              desc='Launch file manager'),
          

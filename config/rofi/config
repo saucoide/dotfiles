@@ -1,0 +1,3 @@
+rofi.show-icons: true
+rofi.modi: window,drun,run,ssh
+rofi.theme: /home/saucoide/.config/rofi/themes/simple_nord.rasi
