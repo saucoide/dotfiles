@@ -366,12 +366,21 @@ extension_defaults = widget_defaults.copy()   # ???
 def init_widgets_list():
     
     widgets_list = [
-               widget.Sep(
-                        linewidth = 0,
-                        padding = 6,
-                        foreground = COLORS["white"],
-                        background = COLORS["background"]
-                        ),
+
+              widget.Image(
+                        filename = "~/.config/qtile/icons/arcolinux.png",
+                        background =  COLORS["background"],
+                        margin = 2,
+                        #margin_x = 0,
+                        #margin_y = 0,
+                        mouse_callbacks = {'Button1': lambda x: x.cmd_spawn('rofi -show drun')}
+                   ),
+             #widget.Sep(
+                        #linewidth = 0,
+                        #padding = 0+,
+                        #foreground = COLORS["white"],
+                        #background = COLORS["background"]
+                        #),
                widget.GroupBox(font="Ubuntu Bold",
                         fontsize = 9,
                         margin_y = 3,
