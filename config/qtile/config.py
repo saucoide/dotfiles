@@ -131,9 +131,9 @@ group_names = {"SYS": {'layout': 'columns'},
                "DEV": {'layout': 'columns'},
                "MUS": {'layout': 'max', "matches":[Match(title=["Spotify Free"])]},
                "VID": {'layout': 'columns', "matches":[Match(wm_class=["smplayer"])]},
-               "VMS": {'layout': 'max'},
-               "DOC": {'layout': 'columns'},
-               "MAX": {'layout': 'max'}}
+               "NTS": {'layout': 'max'},
+               "DOC": {'layout': 'columns', 'matches': [Match(wm_class=["Joplin"])]},
+               "VMS": {'layout': 'max'}}
 
 groups = [Group(name, **kwargs) for name, kwargs in group_names.items()]
 
