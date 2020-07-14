@@ -4,3 +4,4 @@
         
         - awesome-terminal-fonts
         - dunst
+        - rofi
