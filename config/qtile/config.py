@@ -98,6 +98,9 @@ def get_wallpaper():
     wallpapers = list(filter(lambda x: x.suffix in (".png",".jpg"), wp_path.glob("*")))
     return random.choice(wallpapers)
 
+def open_power_settings():
+    qtile.cmd_spawn(f'xfce4-power-manager-settings')
+
 def open_htop(qtile):
     qtile.cmd_spawn(f'{MY_TERMINAL} -e htop')
 
@@ -354,7 +357,7 @@ prompt = "{0}@{1}: ".format(os.environ["USER"], socket.gethostname())
 ##### DEFAULT WIDGET SETTINGS #####
 widget_defaults = dict(
     font="Ubuntu Mono derivative Powerline",
-    fontsize = 12,
+    fontsize = 10,
     padding = 2,
     background=COLORS["white"]
 )
@@ -382,7 +385,7 @@ def init_widgets_list():
                         #background = COLORS["background"]
                         #),
                widget.GroupBox(font="Ubuntu Bold",
-                        fontsize = 9,
+                        fontsize = 8,
                         margin_y = 3,
                         margin_x = 0,
                         padding_y = 5,
@@ -406,13 +409,6 @@ def init_widgets_list():
                           foreground = COLORS["frost1"],
                           padding=0,
                           fontsize=50),
-               widget.Prompt(
-                        prompt=prompt,
-                        font="Ubuntu Mono",
-                        padding=10,
-                        foreground = COLORS["group_highlight"],
-                        background = COLORS["active_background"]
-                        ),
                widget.Sep(
                         linewidth = 0,
                         padding = 2,
@@ -458,12 +454,6 @@ def init_widgets_list():
                         background = COLORS["frost1"],
                         mouse_callbacks = {'Button1': open_feeds}
                    ),
-               widget.GenPollText(
-                   background = COLORS["frost1"],
-                   func = get_feeds,
-                   update_interval = 600,
-                   mouse_callbacks={'Button1': open_feeds}
-                   ),
                bar_transition(COLORS["frost1"], COLORS["frost2"]),
                widget.CPU(
                         foreground = COLORS["white"],
@@ -475,7 +465,7 @@ def init_widgets_list():
                widget.Memory(
                         foreground = COLORS["white"],
                         background = COLORS["frost2"],
-                        format = 'RAM {MemUsed}M/{MemTotal}M',
+                        format = '{MemUsed}M/{MemTotal}M',
                         padding = 0,
                         mouse_callbacks={'Button1': open_htop, 'Button3': open_sys_monitor}
                         ),
@@ -519,18 +509,21 @@ def init_widgets_list():
                widget.Clock(
                         foreground = COLORS["white"],
                         background = COLORS["frost2"],
-                        format="%d-%b-%Y [%H:%M] ",
+                        format="%d-%b [%H:%M] ",
                         padding = 2,
                         mouse_callbacks = {'Button1': toggle_calendar}
                         ),
+               widget.Battery(
+                        update_interval = 60,
+                        foreground = COLORS["white"],
+                        background = COLORS["frost3"],
+                        charge_char = "",
+                        discharge_char = "",
+                        full_char = "",
+                        format = "{char} {percent:2.0%}({min:02d}m) {watt:.2f}W",
+                        mouse_callbacks = {'Button1': open_power_settings}
+                        ),
                # bar_transition(COLORS["frost3"], COLORS["frost0"]),
-               #widget.Battery(
-                        #font="Ubuntu Mono",
-                        #update_interval = 10,
-                        #fontsize = 12,
-                        #foreground = COLORS["white"],
-                        #background = COLORS["frost3"],
-	                    #),
                widget.TextBox(
                         text = "[⏻]",
                         background = COLORS["frost3"],
