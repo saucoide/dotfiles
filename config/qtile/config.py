@@ -131,8 +131,8 @@ group_names = {"SYS": {'layout': 'columns'},
                "DEV": {'layout': 'columns'},
                "MUS": {'layout': 'max', "matches":[Match(title=["Spotify Free"])]},
                "VID": {'layout': 'columns', "matches":[Match(wm_class=["smplayer"])]},
-               "NTS": {'layout': 'max'},
-               "DOC": {'layout': 'columns', 'matches': [Match(wm_class=["Joplin"])]},
+               "NTS": {'layout': 'max', 'matches': [Match(wm_class=["Joplin"])]},
+               "DOC": {'layout': 'columns'},
                "VMS": {'layout': 'max'}}
 
 groups = [Group(name, **kwargs) for name, kwargs in group_names.items()]
@@ -256,8 +256,8 @@ keys = [
          Key(["control", "mod1"], "f", lazy.spawn("firefox"),
              desc='Launch firefox'),
          
-         Key(["control", "mod1"], "e", lazy.spawn(FILE_MANAGER),
-             desc='Launch file manager'),
+         Key(["control", "mod1"], "e", lazy.spawn(f"{MY_TERMINAL} -e vifm"),
+             desc='Launch vifm'),
          
          Key(["control", "mod1"], "n", lazy.spawn(TEXT_EDITOR),
              desc='Launch text editor'),
