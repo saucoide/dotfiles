@@ -459,7 +459,7 @@ def init_widgets_list():
                         foreground = COLORS["white"],
                         background = COLORS["frost2"],
                         padding = 0,
-                        format = "CPU {load_percent}% | ",
+                        format = "{load_percent:02.0f}% | ",
                         mouse_callbacks={'Button1': open_htop, 'Button3': open_sys_monitor}
                         ),
                widget.Memory(
@@ -477,51 +477,51 @@ def init_widgets_list():
                         update_interval = 10,
                         ),
                bar_transition(COLORS["frost3"], COLORS["frost0"]),
-               widget.TextBox(
-                        text = "",
-                        foreground = COLORS["white"],
-                        background = COLORS["frost0"],
-                        mouse_callbacks = {'Button1': open_audio_settings}
-                   ),
-               widget.Volume(
-                        foreground = COLORS["white"],
-                        background = COLORS["frost0"],
-                        padding = 0,
-                        volume_app = "pulseaudio",
-                        device = "pulse"                        
-                        ),
-               bar_transition(COLORS["frost0"], COLORS["frost1"]),
+#              widget.TextBox(
+#                       text = "",
+#                       foreground = COLORS["white"],
+#                       background = COLORS["frost0"],
+#                       mouse_callbacks = {'Button1': open_audio_settings}
+#                  ),
+#              widget.Volume(
+#                       foreground = COLORS["white"],
+#                       background = COLORS["frost0"],
+#                       padding = 0,
+#                       volume_app = "pulseaudio",
+#                       device = "pulse"                        
+#                       ),
                widget.CheckUpdates(
                         update_interval = 1800,
                         foreground = COLORS["white"],
-                        background = COLORS["frost1"],
+                        background = COLORS["frost0"],
                         color_have_updates = COLORS["aurora0"],
                         display_format = '{updates} ⟳',
                         distro = "Arch_checkupdates",
                         mouse_callbacks = {'Button1': open_pamac}
                         ),
-               bar_transition(COLORS["frost1"], COLORS["frost2"]),
-                #widget.Systray(
-                        #background=COLORS["frost2"],
-                        #padding = 5
-                        #),
-               #bar_transition(COLORS["frost2"], COLORS["frost3"]),
-               widget.Clock(
-                        foreground = COLORS["white"],
-                        background = COLORS["frost2"],
-                        format="%d-%b [%H:%M] ",
-                        padding = 2,
-                        mouse_callbacks = {'Button1': toggle_calendar}
+               bar_transition(COLORS["frost0"], COLORS["frost1"]),
+               widget.Systray(
+                        background=COLORS["frost1"],
+                        padding = 5
                         ),
+               bar_transition(COLORS["frost1"], COLORS["frost2"]),
                widget.Battery(
                         update_interval = 60,
                         foreground = COLORS["white"],
-                        background = COLORS["frost3"],
+                        background = COLORS["frost2"],
                         charge_char = "",
                         discharge_char = "",
                         full_char = "",
                         format = "{char} {percent:2.0%}({min:02d}m) {watt:.2f}W",
                         mouse_callbacks = {'Button1': open_power_settings}
+                        ),
+               bar_transition(COLORS["frost2"], COLORS["frost3"]),
+               widget.Clock(
+                        foreground = COLORS["white"],
+                        background = COLORS["frost3"],
+                        format="%d-%b [%H:%M] ",
+                        padding = 1,
+                        mouse_callbacks = {'Button1': toggle_calendar}
                         ),
                # bar_transition(COLORS["frost3"], COLORS["frost0"]),
                widget.TextBox(
@@ -529,11 +529,6 @@ def init_widgets_list():
                         background = COLORS["frost3"],
                         mouse_callbacks = {'Button1': logout}
                    ),
-               #widget.QuickExit(
-                        #background = COLORS["frost3"],
-                        #countdown_format = "[{}s]",
-                        #default_text = "[⏼]" # ⏻ ⏼ ⏽ ⭘ ⏾
-                   #)
               ]
     return widgets_list
 
