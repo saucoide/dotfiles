@@ -1,0 +1,252 @@
+#+TITLE: Doom Emacs Config
+#+AUTHOR: saucoide
+#+DESCRIPTION: doom emacs literate config
+#+STARTUP: content
+
+* TABLE OF CONTENTS :toc:
+- [[#about][ABOUT]]
+- [[#basics][BASICS]]
+- [[#dired][DIRED]]
+- [[#doom-theme][DOOM THEME]]
+- [[#evaluate-elisp-expressions][EVALUATE ELISP EXPRESSIONS]]
+- [[#fonts][FONTS]]
+- [[#ivy][IVY]]
+  - [[#ivy-posframe][IVY-POSFRAME]]
+  - [[#ivy-keybindings][IVY KEYBINDINGS]]
+- [[#line-settings][LINE SETTINGS]]
+- [[#neotree][NEOTREE]]
+- [[#org-mode][ORG MODE]]
+- [[#window-management][WINDOW MANAGEMENT]]
+
+* ABOUT
+my doom emcas config, originally based on [[https://gitlab.com/dwt1/dotfiles][DT's config]]
+
+* BASICS
+Undo behavior, 80mb & more granular behavior
+#+BEGIN_SRC emacs-lisp
+(setq undo-limit 80000000         ; Raise undo-limit to 80Mb
+      evil-want-fine-undo t)       ; By default while in insert all changes are one big blob. Be more granular
+#+END_SRC
+
+* DIRED
+Dired is the file manager within Emacs.  Below, I setup keybindings for image previews (peep-dired).  Doom Emacs does not use 'SPC d' for any of its keybindings, so I've chosen the format of 'SPC d' plus 'key'.
+
+| COMMAND                                   | DESCRIPTION                                     | KEYBINDING |
+|-------------------------------------------+-------------------------------------------------+------------|
+| dired                                     | /Open dired file manager/                       | SPC d d    |
+| dired-jump                                | /Jump to current directory in dired/            | SPC d j    |
+| (in dired) peep-dired                     | /Toggle image previews within dired/            | SPC d p    |
+| (in dired) dired-view-file                | /View file in dired/                            | SPC d v    |
+| (in dired) dired-up-directory             | Go up in the directory tree                     | h          |
+| (in dired) dired-find-file                | Go down in the directory tree (or open if file) | l          |
+| (in peep-dired-mode) peep-dired-next-file | /Move to next file in peep-dired-mode/          | j          |
+| (in peep-dired-mode) peep-dired-prev-file | /Move to previous file in peep-dired-mode/      | k          |
+
+#+BEGIN_SRC emacs-lisp
+(map! :leader
+      :desc "Dired"
+      "d d" #'dired
+      :leader
+      :desc "Dired jump to current"
+      "d j" #'dired-jump
+      (:after dired
+        (:map dired-mode-map
+         :leader
+         :desc "Peep-dired image previews"
+         "d p" #'peep-dired
+         :leader
+         :desc "Dired view file"
+         "d v" #'dired-view-file)))
+;; Make 'h' and 'l' go back and forward in dired. Much faster to navigate the directory structure!
+(evil-define-key 'normal dired-mode-map
+  (kbd "h") 'dired-up-directory
+  (kbd "l") 'dired-open-file) ; use dired-find-file instead if not using dired-open package
+;; If peep-dired is enabled, you will get image previews as you go up/down with 'j' and 'k'
+(evil-define-key 'normal peep-dired-mode-map
+  (kbd "j") 'peep-dired-next-file
+  (kbd "k") 'peep-dired-prev-file)
+(add-hook 'peep-dired-hook 'evil-normalize-keymaps)
+;; Get file icons in dired
+(add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
+;; With dired-open plugin, you can launch external programs for certain extensions
+;; For example, I set all .png files to open in 'sxiv' and all .mp4 files to open in 'mpv'
+(setq dired-open-extensions '(("gif" . "sxiv")
+                              ("jpg" . "sxiv")
+                              ("png" . "sxiv")
+                              ("mkv" . "mpv")
+                              ("mp4" . "mpv")))
+#+END_SRC
+
+* DOOM THEME
+Setting the theme to doom-dracula.  To try out new themes, I set a keybinding for counsel-load-theme with 'SPC h t'.
+
+#+BEGIN_SRC emacs-lisp
+(setq doom-theme 'doom-dracula)
+(map! :leader
+      :desc "Load new theme"
+      "h t" #'counsel-load-theme)
+#+END_SRC
+
+* EVALUATE ELISP EXPRESSIONS
+Changing some keybindings from their defaults to better fit with Doom Emacs, and to avoid conflicts with my window managers which sometimes use the control key in their keybindings.  By default, Doom Emacs does not use 'SPC e' for anything, so I choose to use the format 'SPC e' plus 'key' for these (I also use 'SPC e' for 'eww' keybindings).
+
+| COMMAND         | DESCRIPTION                                    | KEYBINDING |
+|-----------------+------------------------------------------------+------------|
+| eval-buffer     | /Evaluate elisp in buffer/                       | SPC e b    |
+| eval-defun      | /Evaluate the defun containing or after point/   | SPC e d    |
+| eval-expression | /Evaluate an elisp expression/                   | SPC e e    |
+| eval-last-sexp  | /Evaluate elisp expression before point/         | SPC e l    |
+| eval-region     | /Evaluate elisp in region/                       | SPC e r    |
+
+#+Begin_src emacs-lisp
+(map! :leader
+      :desc "Evaluate elisp in buffer"
+      "e b" #'eval-buffer
+      :leader
+      :desc "Evaluate defun"
+      "e d" #'eval-defun
+      :leader
+      :desc "Evaluate elisp expression"
+      "e e" #'eval-expression
+      :leader
+      :desc "Evaluate last sexpression"
+      "e l" #'eval-last-sexp
+      :leader
+      :desc "Evaluate elisp in region"
+      "e r" #'eval-region)
+#+END_SRC
+
+* FONTS
+Settings related to fonts within Doom Emacs:
++ 'doom-font' -- standard monospace font that is used for most things in Emacs.
++ 'doom-variable-pitch-font' -- variable font which is useful in some Emacs plugins.
++ 'doom-big-font' -- used in doom-big-font-mode; useful for presentations.
++ 'font-lock-comment-face' -- for comments.
++ 'font-lock-keyword-face' -- for keywords with special significance, like ‘for’ and ‘if’ in C.
+
+#+BEGIN_SRC emacs-lisp
+;;(setq doom-font (font-spec :family "SauceCodePro Nerd Font Mono" :size 15)
+;;      doom-variable-pitch-font (font-spec :family "Ubuntu" :size 15)
+;;      doom-big-font (font-spec :family "SauceCodePro Nerd Font Mono" :size 24))
+;;(after! doom-themes
+;;  (setq doom-themes-enable-bold t
+;;        doom-themes-enable-italic t))
+;;(custom-set-faces!
+;;  '(font-lock-comment-face :slant italic)
+;;  '(font-lock-keyword-face :slant italic))
+#+END_SRC
+
+* IVY
+Ivy is a generic completion mechanism for Emacs.
+
+** IVY-POSFRAME
+Ivy-posframe is an ivy extension, which lets ivy use posframe to show its candidate menu.  Some of the settings below involve:
++ ivy-posframe-display-functions-alist -- sets the display position for specific programs
++ ivy-posframe-height-alist -- sets the height of the list displayed for specific programs
+
+Available functions (positions) for 'ivy-posframe-display-functions-alist'
++ ivy-posframe-display-at-frame-center
++ ivy-posframe-display-at-window-center
++ ivy-posframe-display-at-frame-bottom-left
++ ivy-posframe-display-at-window-bottom-left
++ ivy-posframe-display-at-frame-bottom-window-center
++ ivy-posframe-display-at-point
++ ivy-posframe-display-at-frame-top-center
+
+=NOTE:= If the setting for 'ivy-posframe-display' is set to 'nil' (false), anything that is set to 'ivy-display-function-fallback' will just default to their normal position in Doom Emacs (usually a bottom split).  However, if this is set to 't' (true), then the fallback position will be centered in the window.
+
+#+BEGIN_SRC emacs-lisp
+(require 'ivy-posframe)
+(setq ivy-posframe-display-functions-alist
+      '((swiper                     . ivy-posframe-display-at-point)
+        (complete-symbol            . ivy-posframe-display-at-point)
+        (counsel-M-x                . ivy-display-function-fallback)
+        (counsel-esh-history        . ivy-posframe-display-at-window-center)
+        (counsel-describe-function  . ivy-display-function-fallback)
+        (counsel-describe-variable  . ivy-display-function-fallback)
+        (counsel-find-file          . ivy-display-function-fallback)
+        (counsel-recentf            . ivy-display-function-fallback)
+        (counsel-register           . ivy-posframe-display-at-frame-bottom-window-center)
+        (dmenu                      . ivy-posframe-display-at-frame-top-center)
+        (nil                        . ivy-posframe-display))
+      ivy-posframe-height-alist
+      '((swiper . 20)
+        (dmenu . 20)
+        (t . 10)))
+(ivy-posframe-mode 1) ; 1 enables posframe-mode, 0 disables it.
+#+END_SRC
+
+** IVY KEYBINDINGS
+By default, Doom Emacs does not use 'SPC v', so the format I use for these bindings is 'SPC v' plus 'key'.
+
+#+BEGIN_SRC emacs-lisp
+(map! :leader
+      :desc "Ivy push view"
+      "v p" #'ivy-push-view
+      :leader
+      :desc "Ivy switch view"
+      "v s" #'ivy-switch-view)
+#+END_SRC
+
+* LINE SETTINGS
+I have toggled display-line-numbers-type so I have line numbers displayed.  Doom Emacs uses 'SPC t' for "toggle" commands, so I choose 'SPC t t' for toggle-truncate-lines.
+
+#+BEGIN_SRC emacs-lisp
+(setq display-line-numbers-type t)
+(map! :leader
+      :desc "Toggle truncate lines"
+      "t t" #'toggle-truncate-lines)
+#+END_SRC
+
+* NEOTREE
+Neotree is a file tree viewer.  When you open neotree, it jumps to the current file thanks to neo-smart-open.  The neo-window-fixed-size setting makes the neotree width be adjustable.  Doom Emacs had no keybindings set for neotree.  Since Doom Emacs uses 'SPC t' for 'toggle' keybindings, I used 'SPC t n' for toggle-neotree.
+
+#+BEGIN_SRC emacs-lisp
+(after! neotree
+  (setq neo-smart-open t
+        neo-window-fixed-size nil))
+(after! doom-themes
+  (setq doom-neotree-enable-variable-pitch t))
+(map! :leader
+      :desc "Toggle neotree file viewer"
+      "t n" #'neotree-toggle)
+#+END_SRC
+
+* ORG MODE
+Note that I wrapped most of this in (after! org).  Without this, my settings might be evaluated too early, which will result in my settings being overwritten by Doom's defaults.  I have also enabled org-journal by adding (+journal) to the org section of my Doom Emacs init.el.
+
+#+BEGIN_SRC emacs-lisp
+(after! org
+  (require 'org-bullets)  ; Nicer bullets in org-mode
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+  (setq org-directory "~/org/"
+        org-agenda-files '("~/org/agenda.org")
+        )
+ )
+#+END_SRC
+
+* WINDOW MANAGEMENT
+Allow using the arrow keys for window management
+
+#+BEGIN_SRC emacs-lisp
+(map! :map evil-window-map
+      "SPC" #'rotate-layout
+      ;; Navigation
+      "<left>"     #'evil-window-left
+      "<down>"     #'evil-window-down
+      "<up>"       #'evil-window-up
+      "<right>"    #'evil-window-right
+      ;; Swapping windows
+      "C-<left>"       #'+evil/window-move-left
+      "C-<down>"       #'+evil/window-move-down
+      "C-<up>"         #'+evil/window-move-up
+      "C-<right>"      #'+evil/window-move-right)
+#+END_SRC
+
+prefer horizontal splits when opening a new buffer
+
+#+BEGIN_SRC emacs-lisp
+(defun prefer-horizontal-split ()
+  (set-variable 'split-height-threshold nil t)
+  (set-variable 'split-width-threshold 40 t)) ; make this as low as needed
+#+END_SRC
