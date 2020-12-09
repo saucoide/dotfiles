@@ -42,7 +42,7 @@ TRANS_FONT_SIZE = 60  # font size used for the separator effect on the bar, adju
 MY_TERMINAL = "termite"
 TEXT_EDITOR = "kate"
 FILE_MANAGER = "thunar"
-EMAIL_CLIENT = "kmail"
+EMAIL_CLIENT = "evolution"
 SYS_MONITOR = "xfce4-taskmanager"
 
 MY_CONFIG = "/home/saucoide/.config/qtile/config.py"
