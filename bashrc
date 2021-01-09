@@ -71,7 +71,7 @@ alias update='sudo pacman -Syyu'
 
 # yay as aur helper - updates everything
 alias pksyua="yay -Syu --noconfirm"
-alias upall="yay -Syu --noconfirm"
+alias upall="yay -Syu"
 
 #ps
 alias psa="ps auxf"

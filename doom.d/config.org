@@ -17,6 +17,7 @@
 - [[#neotree][NEOTREE]]
 - [[#org-mode][ORG MODE]]
 - [[#window-management][WINDOW MANAGEMENT]]
+- [[#e-mail][E-MAIL]]
 
 * ABOUT
 my doom emcas config, originally based on [[https://gitlab.com/dwt1/dotfiles][DT's config]]
@@ -81,7 +82,7 @@ Dired is the file manager within Emacs.  Below, I setup keybindings for image pr
 Setting the theme to doom-dracula.  To try out new themes, I set a keybinding for counsel-load-theme with 'SPC h t'.
 
 #+BEGIN_SRC emacs-lisp
-(setq doom-theme 'doom-dracula)
+(setq doom-theme 'doom-palenight)
 (map! :leader
       :desc "Load new theme"
       "h t" #'counsel-load-theme)
@@ -219,9 +220,16 @@ Note that I wrapped most of this in (after! org).  Without this, my settings mig
 (after! org
   (require 'org-bullets)  ; Nicer bullets in org-mode
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
-  (setq org-directory "~/org/"
-        org-agenda-files '("~/org/agenda.org")
-        )
+  (setq org-directory "~/org/")
+;;        org-agenda-files '("~/org/agenda.org")
+;;        org-default-notes-file (expand-file-name "notes.org" org-directory)
+;;        )
+  (org-babel-do-load-languages
+    'org-babel-load-languages
+    '((emacs-lisp . nil)
+      (python . t)
+      (sh . t)
+      (sqlite . t)))
  )
 #+END_SRC
 
@@ -249,4 +257,54 @@ prefer horizontal splits when opening a new buffer
 (defun prefer-horizontal-split ()
   (set-variable 'split-height-threshold nil t)
   (set-variable 'split-width-threshold 40 t)) ; make this as low as needed
+#+END_SRC
+
+* E-MAIL
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
+
+  ;; This is set to 't' to avoid mail syncing issues when using mbsync
+
+  (setq user-mail-address "saucoide@gmail.com")
+
+  (setq mu4e-change-filenames-when-moving t)
+  (setq mu4e-view-auto-mark-as-read nil)
+  (setq mu4e-view-html-plaintext-ratio-heuristic most-positive-fixnum)
+  (add-hook 'mu4e-view-mode-hook #'visual-line-mode)
+ ;; (setq mu4e-view-use-gnus t)
+
+  ;; I find it very annoying when the reply to a thread un-archives all other emails
+  (setq mu4e-headers-include-related nil)
+
+  ;; US date format is no good
+  (setq mu4e-headers-date-format "%Y/%m/%d")
+
+  ;; Refresh mail using isync every 10 minutes
+  (setq mu4e-update-interval 600)
+  (setq mu4e-get-mail-command "mbsync -a")
+  (setq mu4e-maildir "~/mail/gmail")
+
+  (setq mu4e-drafts-folder "/[Gmail]/Drafts")
+  (setq mu4e-sent-folder   "/[Gmail]/Sent Mail")
+  (setq mu4e-refile-folder "/[Gmail]/All Mail")
+  (setq mu4e-trash-folder  "/[Gmail]/Bin")
+
+  (setq mu4e-maildir-shortcuts
+    '((:maildir "/Inbox"    :key ?i)
+      (:maildir "/ReadInbox" :key ?r)
+      (:maildir "/[Gmail]/Sent Mail" :key ?s)
+      (:maildir "/[Gmail]/Bin"     :key ?t)
+      (:maildir "/[Gmail]/Drafts"    :key ?d)
+      (:maildir "/[Gmail]/All Mail"  :key ?a)))
+
+  (setq mu4e-bookmarks
+    '(
+     ;; (:name "Unread messages" :query "flag:unread AND NOT flag:trashed" :key ?i)
+     ;; (:name "Today's messages" :query "date:today..now AND NOT flag:trashed" :key ?t)
+      (:name "Inbox" :query "maildir:/Inbox" :key ?b)
+      (:name "ReadInbox" :query "maildir:/ReadInbox" :key ?r)
+      (:name "with Attachments" :query "flag:attach" :key ?a)
+     ;; (:name "Last 7 days" :query "date:7d..now AND NOT flag:trashed" :key ?w)
+      ))
+
 #+END_SRC
