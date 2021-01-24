@@ -1,18 +1,18 @@
 /**
  * ROFI Nord Color theme
- * User: saucoide 
+ * User: saucoide
  **/
-* {
+ * {
     theme-color:                 #81A1C1;
     dark-blue:                   #5E81AC;
-    red:                         #BF616A; 
+    red:                         #BF616A;
     blue:                        #88C0D0;
     purple:                      #B48EAD;
     foreground:                  #D8DEE9;
     background:                  #2E3440;
     lightbg:                     #3B4252;
     lightfg:                     #D8DEE9;
- 
+
     background-color:            rgba ( 0, 0, 0, 0 % );
     separatorcolor:              @theme-color;
     border-color:                @lightbg;
@@ -120,7 +120,7 @@ scrollbar {
     padding:      0;
     handle-width: 10px ;
     border:       0;
-    handle-color: #4C566A; 
+    handle-color: #4C566A;
 }
 sidebar {
     border-color: var(separatorcolor);

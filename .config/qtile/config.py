@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 #
+# Generated from ~/dotfiles/system.org
 # Author: saucoide
-# configuration file for a customized  Qtile window manager (http://www.qtile.org)     
+# configuration file for a customized  Qtile window manager (http://www.qtile.org)
 # based on a version by Derek Taylor  (http://www.gitlab.com/dwt1/ )
 #
 # The following comments are the copyright and licensing information from the default
@@ -40,9 +41,10 @@ mod = "mod4"   # mod key to SUPER/WINDOWS
 TRANS_FONT_SIZE = 60  # font size used for the separator effect on the bar, adjust for different resolutions
 
 MY_TERMINAL = "termite"
-TEXT_EDITOR = "kate"
+TEXT_EDITOR = "emacs"
+EMAIL_CLIENT = "emacs"
 FILE_MANAGER = "thunar"
-EMAIL_CLIENT = "evolution"
+BROWSER = "firefox"
 SYS_MONITOR = "xfce4-taskmanager"
 
 MY_CONFIG = "/home/saucoide/.config/qtile/config.py"
@@ -106,22 +108,22 @@ def open_sys_monitor(qtile):
 
 def open_audio_settings(qtile):
     qtile.cmd_spawn("pavucontrol")
-    
+
 def open_mail(qtile):
     qtile.cmd_spawn(EMAIL_CLIENT)
 
 def open_feeds(qtile):
-    qtile.cmd_spawn("firefox --new-window https://www.inoreader.com")
+    qtile.cmd_spawn(f"{BROWSER} --new-window https://www.inoreader.com")
 
 def toggle_calendar(qtile):
-    qtile.cmd_spawn(f'{MY_TERMINAL} -e calcurse')
+    qtile.cmd_spawn(f'{MY_TERMINAL} -e cal')
 
 def logout(qtile):
     qtile.cmd_spawn("arcolinux-logout")
 
 def open_pamac(qtile):
     qtile.cmd_spawn("pamac-manager")
-    
+
 ##### GROUPS #####
 # fin the wm_class etc using xprop | grep WM_CLASS or similar
 
@@ -131,7 +133,7 @@ group_names = {"SYS": {'layout': 'columns'},
                "DEV": {'layout': 'columns'},
                "MUS": {'layout': 'max', "matches":[Match(title=["Spotify Free"])]},
                "VID": {'layout': 'columns', "matches":[Match(wm_class=["smplayer"])]},
-               "NTS": {'layout': 'max', 'matches': [Match(wm_class=["Joplin"])]},
+               "NTS": {'layout': 'max'},
                "DOC": {'layout': 'columns'},
                "VMS": {'layout': 'max'}}
 
@@ -141,7 +143,7 @@ groups = [Group(name, **kwargs) for name, kwargs in group_names.items()]
 ##### KEYBINDINGS #####
 keys = [
     ### BASICS
-         
+
          Key([mod], "y", lazy.spawncmd(),
              desc='launch prompt'),
          Key([mod], "k", lazy.window.kill(),
@@ -152,10 +154,10 @@ keys = [
              desc='Restart Qtile'),
          Key([mod, "shift"], "q", lazy.shutdown(),
              desc='Shutdown Qtile'),
-         #Key([mod], "x", lazy.spawn('arcolinux-logout')), # TODO    replace with oblogout?
+         #Key([mod], "x", lazy.spawn('arcolinux-logout')),
 
     ### WINDOW CONTROL
-         
+
          ## Focus
          Key([mod], "Down", lazy.layout.down(),
              desc = "Switch focus to window below"),
@@ -165,11 +167,11 @@ keys = [
              desc = "Switch focus to window to the right"),
          Key([mod], "Left", lazy.layout.right(),
              desc = "Switch focus to window to the right"),
-         
+
          ## Toggle Fullscreen
          Key([mod], "f", lazy.window.toggle_fullscreen(),
              desc = "Toggle fullscreen for the current window"),
-         
+
          ## Move
          Key([mod, "shift"], "Down", lazy.layout.shuffle_down(),
              desc = "Move window down"),
@@ -179,7 +181,7 @@ keys = [
              desc = "Move window left"),
          Key([mod, "shift"], "Right", lazy.layout.shuffle_right(),
              desc = "Move window right"),
-         
+
          ## Resize
          Key([mod, "control"], "Down",
              lazy.layout.grow_down(),
@@ -189,7 +191,7 @@ keys = [
              lazy.layout.grow_up(),
              lazy.layout.grow(),
              desc = "Increase size up"),
-         Key([mod, "control"], "Left", 
+         Key([mod, "control"], "Left",
              lazy.layout.grow_left(),
              lazy.layout.shrink(),
              lazy.layout.decrease_ratio(),
@@ -199,13 +201,13 @@ keys = [
              lazy.layout.grow(),
              lazy.layout.increase_ratio(),
              desc = "Increase size right"),
-         
+
          # Float
          Key([mod, "shift"], "f", lazy.window.toggle_floating(),
              desc='toggle floating'),
 
     ### LAYOUT CONTROL
-        
+
          ## Switching layouts
          Key([mod], "Tab", lazy.next_layout(),
              desc='Toggle through layouts'),
@@ -217,14 +219,14 @@ keys = [
              desc='switch to MAX layout'),
          #Key([mod, "shift"], "m", lazy.to_layout_index(3),
              #desc='switch to TREETAB layout'),
-                  
+
          Key([mod, "control"], "f", float_to_front,
              desc='switch to FLOATING layout'),
 
          ## Reset sizes
          Key([mod], "n", lazy.layout.normalize(),
              desc='normalize window size ratios'),
-         
+
         ## Layout specific
          Key([mod], "Return", lazy.layout.toggle_split(),lazy.layout.flip(),
              desc = "Switch between Stack/Tile modes"),
@@ -232,46 +234,43 @@ keys = [
     ### APPLICATION LAUNCHING
 
          ## Super + Key
-         
+
          Key([mod], "space", lazy.spawn('rofi -show drun'),
              desc='Launch rofi drun'),
 
           Key([mod], "r", lazy.spawn('rofi -show run'),
-             desc='Launch rofi run'),        
+             desc='Launch rofi run'),
 
          Key([mod], "e", lazy.spawn(FILE_MANAGER),
              desc='Launch file manager'),
-         
+
          Key([mod], "Escape", lazy.spawn('xkill'),
              desc = 'Click to kill window'),
 
         ## (CONTROL + ALT + KEY) // alt+super+key?
-        
+
          Key(["control", "mod1"], "t", lazy.spawn(MY_TERMINAL),
              desc='terminal'),
-         
+
          Key([mod], "KP_Enter", lazy.spawn(MY_TERMINAL),
              desc='terminal'),
-         
-         Key(["control", "mod1"], "f", lazy.spawn("firefox"),
-             desc='Launch firefox'),
-         
+
+         Key(["control", "mod1"], "f", lazy.spawn(f"{BROWSER}"),
+             desc='Launch browser'),
+
          Key(["control", "mod1"], "e", lazy.spawn(f"{MY_TERMINAL} -e vifm"),
              desc='Launch vifm'),
-         
+
          Key(["control", "mod1"], "n", lazy.spawn(TEXT_EDITOR),
              desc='Launch text editor'),
-                  
+
          #Key([mod], "v", lazy.spawn('pavucontrol')),    # this is pulseaudio volume control, migth want to bind it to something
-         
-         #Key(["control", "mod1"], "y", lazy.spawn(MY_TERMINAL+" -e youtube-viewer"),
-             #desc='youtube-viewer'),
-        
+
          ## Volume & Media keys
          Key([], "XF86AudioRaiseVolume", lazy.spawn("amixer -D pulse -q sset Master 5%+")),
          Key([], "XF86AudioLowerVolume", lazy.spawn("amixer -D pulse -q sset Master 5%-")),
          Key([], "XF86AudioMute", lazy.spawn("amixer -D pulse -q set Master toggle")),
-         
+
          Key([], "XF86AudioPlay", lazy.spawn("playerctl play-pause")),
          Key([], "XF86AudioNext", lazy.spawn("playerctl next")),
          Key([], "XF86AudioPrev", lazy.spawn("playerctl previous")),
@@ -364,7 +363,7 @@ extension_defaults = widget_defaults.copy()   # ???
 ##### WIDGETS #####
 
 def init_widgets_list():
-    
+
     widgets_list = [
 
               widget.Image(
@@ -498,7 +497,7 @@ def init_widgets_list():
                         background = COLORS["frost0"],
                         padding = 0,
                         volume_app = "pulseaudio",
-                        device = "pulse"                        
+                        device = "pulse"
                         ),
                bar_transition(COLORS["frost0"], COLORS["frost1"]),
                widget.CheckUpdates(
@@ -589,7 +588,7 @@ floating_layout = layout.Floating(float_rules=[
                     {'wmclass': 'ulauncher'},
                     {'wmclass': 'krunner'},
                     {'wmclass': 'ssh-askpass'},  # ssh-askpass
-                    {'wmclass': 'Arcolinux-tweak-tool.py'}, 
+                    {'wmclass': 'Arcolinux-tweak-tool.py'},
                     {'wmclass': 'Arandr'},
                     {'wmclass': 'arcolinux-logout'},
                     {'wname': 'branchdialog'},

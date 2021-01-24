@@ -18,6 +18,8 @@
 - [[#org-mode][ORG MODE]]
 - [[#window-management][WINDOW MANAGEMENT]]
 - [[#e-mail][E-MAIL]]
+  - [[#recieving-emails---mu4e][Recieving emails - mu4e]]
+  - [[#sending-emails][Sending Emails]]
 
 * ABOUT
 my doom emcas config, originally based on [[https://gitlab.com/dwt1/dotfiles][DT's config]]
@@ -260,6 +262,9 @@ prefer horizontal splits when opening a new buffer
 #+END_SRC
 
 * E-MAIL
+
+** Recieving emails - mu4e
+
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
 
@@ -307,4 +312,35 @@ prefer horizontal splits when opening a new buffer
      ;; (:name "Last 7 days" :query "date:7d..now AND NOT flag:trashed" :key ?w)
       ))
 
+#+END_SRC
+
+** Sending Emails
+
+*** SMTP
+
+We need to setup SMTP to send emails
+
+#+BEGIN_SRC emacs-lisp
+
+(setq smtpmail-smtp-server "smtp.gmail.com"
+      smtpmail-smtp-service 465
+      smtpmail-stream-type 'ssl)
+
+(setq message-send-mail-function 'smtpmail-send-it)
+
+#+END_SRC
+
+*** Formatting
+
+mu4e is going to send emails in plaintext by default, including the proper character limit per line.
+Setting this variable makes it so text will wrap better on other email clients
+
+#+BEGIN_SRC emacs-lisp
+(setq mu4e-compose-format-flowed t)
+#+END_SRC
+
+Signature
+
+#+BEGIN_SRC emacs-lisp
+(setq mu4e-compose-signature "Thanks\nsauco")
 #+END_SRC

@@ -1,4 +1,5 @@
-#!/home/saucoide/saucoidenv/bin/python
+# Generated from ~/dotfiles/system.org
+
 import imaplib
 import keyring
 from pathlib import Path

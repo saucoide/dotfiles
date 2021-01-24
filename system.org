@@ -1,0 +1,1958 @@
+#+TITLE: Desktop's configuration
+#+AUTHOR: Sauco
+#+DESCRIPTION: My desktop's configuration
+
+* Introduction
+
+I am using Arcolinux with Qtile as my desktop environment.
+
+It is a literate config written in org-mode, use =org-babel-tangle= to
+write the code blocks to their location.
+
+My emacs configuration is in a separate [[emacs_config.org][]] file.
+
+I then use GNU Stow to symlink everything inside =~/dotfiles= into the home directory by
+
+#+BEGIN_SRC bash
+stow .
+#+END_SRC
+
+* Terminal
+
+I am using termite as my terminal
+
+** bashrc
+
+#+BEGIN_SRC conf :tangle .bashrc
+#
+# Generated from ~/dotfiles/system.org
+#
+
+#Ibus settings if you need them
+#type ibus-setup in terminal to change settings and start the daemon
+#delete the hashtags of the next lines and restart
+#export GTK_IM_MODULE=ibus
+#export XMODIFIERS=@im=dbus
+#export QT_IM_MODULE=ibus
+
+# If not running interactively, don't do anything
+[[ $- != *i* ]] && return
+
+export HISTCONTROL=ignoreboth:erasedups
+
+# PS1='\u@\h:\W\$ '
+PS1='\[\e[31m\]\u\[\e[34m\]@\h:\[\e[32m\]\w$ \[\e[0m\]'
+
+# PATH
+
+if [ -d "$HOME/.bin" ] ;
+  then PATH="$HOME/.bin:$PATH"
+fi
+
+if [ -d "$HOME/.local/bin" ] ;
+  then PATH="$HOME/.local/bin:$PATH"
+fi
+
+export PATH=/home/saucoide/.local/bin:$PATH
+export PATH=/home/saucoide/.emacs.d/bin:$PATH
+
+# ALIASES
+
+# list (exa is a replacement for ls)
+alias ls='exa --long --all --classify --color=always --group-directories-first'
+alias lsd='exa --long --all --classify --color=always --only-dirs'
+
+# fix obvious typos
+alias cd..='cd ..'
+
+## Colorize the grep command output for ease of use (good for log files)##
+alias grep='grep --color=auto'
+alias egrep='egrep --color=auto'
+alias fgrep='fgrep --color=auto'
+
+#readable output
+alias df='df --human-readable'
+
+#pacman unlock
+alias unlock="sudo rm /var/lib/pacman/db.lck"
+
+#free
+alias free="free -mt"
+
+#use all cores
+alias uac="sh ~/.bin/main/000*"
+
+#continue download
+alias wget="wget -c"
+
+#userlist
+alias userlist="cut -d: -f1 /etc/passwd"
+
+#merge new settings
+alias merge="xrdb -merge ~/.Xresources"
+
+# Aliases for software managment
+# pacman or pm
+alias pacman='sudo pacman --color auto'
+alias update='sudo pacman -Syyu'
+
+# yay as aur helper - updates everything
+alias upall="yay -Syu"
+
+#ps
+alias psa="ps auxf"
+alias psgrep="ps aux | grep -v grep | grep -i -e VSZ -e"
+
+#grub update
+alias update-grub="sudo grub-mkconfig -o /boot/grub/grub.cfg"
+
+#add new fonts
+alias update-fc='sudo fc-cache -fv'
+
+#copy/paste all content of /etc/skel over to home folder - backup of config created - beware
+alias skel='cp -Rf ~/.config ~/.config-backup-$(date +%Y.%m.%d-%H.%M.%S) && cp -rf /etc/skel/* ~'
+#backup contents of /etc/skel to hidden backup folder in home/user
+alias bupskel='cp -Rf /etc/skel ~/.skel-backup-$(date +%Y.%m.%d-%H.%M.%S)'
+
+#switch between bash and zsh
+alias tobash="sudo chsh $USER -s /bin/bash && echo 'Now log out.'"
+alias tozsh="sudo chsh $USER -s /bin/zsh && echo 'Now log out.'"
+
+#hardware info --short
+alias hw="hwinfo --short"
+
+#get fastest mirrors in your neighborhood
+alias mirror="sudo reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist"
+alias mirrord="sudo reflector --latest 50 --number 20 --sort delay --save /etc/pacman.d/mirrorlist"
+alias mirrors="sudo reflector --latest 50 --number 20 --sort score --save /etc/pacman.d/mirrorlist"
+alias mirrora="sudo reflector --latest 50 --number 20 --sort age --save /etc/pacman.d/mirrorlist"
+
+#mounting the folder Public for exchange between host and guest on virtualbox
+alias vbm="sudo mount -t vboxsf -o rw,uid=1000,gid=1000 Public /home/$USER/Public"
+
+#calendar
+alias cal="cal -y -m"
+
+#youtube-dl
+alias yta-best="youtube-dl --extract-audio --audio-format best "
+alias yta-mp3="youtube-dl --extract-audio --audio-format mp3 "
+alias yta-wav="youtube-dl --extract-audio --audio-format wav "
+alias ytv-best="youtube-dl -f bestvideo+bestaudio "
+
+#Recent Installed Packages
+alias rip="expac --timefmt='%Y-%m-%d %T' '%l\t%n %v' | sort | tail -200 | nl"
+alias riplong="expac --timefmt='%Y-%m-%d %T' '%l\t%n %v' | sort | tail -3000 | nl"
+
+#Cleanup orphaned packages
+alias cleanup='sudo pacman -Rns $(pacman -Qtdq)'
+
+#get the error messages from journalctl
+alias jctl="journalctl -p 3 -xb"
+
+#emacs for important configuration files
+#know what you do in these files
+alias elightdm="sudo emacs /etc/lightdm/lightdm.conf"
+alias epacman="sudo emacs /etc/pacman.conf"
+alias egrub="sudo emacs /etc/default/grub"
+alias eoblogout="sudo emacs /etc/oblogout.conf"
+alias bls="betterlockscreen -u /usr/share/backgrounds/arcolinux/"
+
+#shopt - shell options
+shopt -s autocd # change to named directory
+shopt -s cdspell # autocorrects cd misspellings
+shopt -s cmdhist # save multi-line commands in history as single line
+shopt -s dotglob
+shopt -s histappend # do not overwrite history
+shopt -s expand_aliases # expand aliases
+
+# # ex = EXtractor for all kinds of archives
+# # usage: ex <file>
+ex ()
+{
+  if [ -f $1 ] ; then
+    case $1 in
+      ,*.tar.bz2)   tar xjf $1   ;;
+      ,*.tar.gz)    tar xzf $1   ;;
+      ,*.bz2)       bunzip2 $1   ;;
+      ,*.rar)       unrar x $1   ;;
+      ,*.gz)        gunzip $1    ;;
+      ,*.tar)       tar xf $1    ;;
+      ,*.tbz2)      tar xjf $1   ;;
+      ,*.tgz)       tar xzf $1   ;;
+      ,*.zip)       unzip $1     ;;
+      ,*.Z)         uncompress $1;;
+      ,*.7z)        7z x $1      ;;
+      ,*.deb)       ar x $1      ;;
+      ,*.tar.xz)    tar xf $1    ;;
+      ,*.tar.zst)   unzstd $1    ;;
+      ,*)           echo "'$1' cannot be extracted via ex()" ;;
+    esac
+  else
+    echo "'$1' is not a valid file"
+  fi
+}
+
+vicd()
+{
+    local dst="$(command vifm --choose-dir - "$@")"
+    if [ -z "$dst" ]; then
+        echo 'Directory picking cancelled/failed'
+        return 1
+    fi
+    cd "$dst"
+}
+
+neofetch
+
+#+END_SRC
+
+** Termite
+
+#+BEGIN_SRC conf :tangle .config/termite/config
+#
+# Generated from ~/dotfiles/system.org
+#
+
+[options]
+#https://github.com/thestinger/termite/blob/master/config
+allow_bold = true
+audible_bell = false
+browser = xdg-open
+clickable_url = true
+cursor_blink = system
+cursor_shape = block
+dynamic_title = true
+filter_unmatched_urls = true
+font = Monospace 11
+#font = Hack Bold 10
+geometry = 900x650
+highlight = #2f2f2f
+icon_name = terminal
+modify_other_keys = false
+mouse_autohide = false
+scroll_on_output = false
+scroll_on_keystroke = true
+scrollback_lines = 15000
+size_hints = false
+search_wrap = true
+urgent_on_bell = true
+
+[hints]
+#font = Monospace 12
+#foreground = #dcdccc
+#background = #3f3f3f
+#active_foreground = #e68080
+#active_background = #3f3f3f
+#padding = 2
+#border = #3f3f3f
+#border_width = 10
+#roundness = 2.0
+
+############################################################
+#### You can change the color coding to your liking
+#### There is a folder themes in ~/config/termite/themes
+#### Copy/paste the colors from one of the 79+ templates to this one
+#### A backup of the original config termite is present
+############################################################
+#### Use websites to make the terminal your own
+#### https://terminal.sexy
+#### https://critical.ch/xterm/
+############################################################
+#### Nord Theme
+[colors]
+cursor = #d8dee9
+cursor_foreground = #2e3440
+
+foreground = #d8dee9
+foreground_bold = #d8dee9
+background = rgba(40, 42, 54, 0.99)
+
+highlight = #4c566a
+
+color0  = #3b4252
+color1  = #bf616a
+color2  = #a3be8c
+color3  = #ebcb8b
+color4  = #81a1c1
+color5  = #b48ead
+color6  = #88c0d0
+color7  = #e5e9f0
+color8  = #4c566a
+color9  = #bf616a
+color10 = #a3be8c
+color11 = #ebcb8b
+color12 = #81a1c1
+color13 = #b48ead
+color14 = #8fbcbb
+
+#+END_SRC
+
+* Rofi
+
+I use a custom rofi theme with nord colors
+
+** config
+
+#+BEGIN_SRC conf :tangle .config/rofi/config
+# Generated from ~/dotfiles/system.org
+rofi.show-icons: true
+rofi.modi: window,drun,run,ssh
+rofi.theme: ~/.config/rofi/themes/simple_nord.rasi
+#+END_SRC
+
+** simple_nord.rasi (theme)
+
+#+BEGIN_SRC conf :tangle .config/rofi/themes/simple_nord.rasi
+/**
+ * ROFI Nord Color theme
+ * User: saucoide
+ **/
+ * {
+    theme-color:                 #81A1C1;
+    dark-blue:                   #5E81AC;
+    red:                         #BF616A;
+    blue:                        #88C0D0;
+    purple:                      #B48EAD;
+    foreground:                  #D8DEE9;
+    background:                  #2E3440;
+    lightbg:                     #3B4252;
+    lightfg:                     #D8DEE9;
+
+    background-color:            rgba ( 0, 0, 0, 0 % );
+    separatorcolor:              @theme-color;
+    border-color:                @lightbg;
+
+    normal-background:           @background;
+    normal-foreground:           @foreground;
+    alternate-normal-background: @background;
+    alternate-normal-foreground: @foreground;
+    selected-normal-foreground:  @lightfg;
+    selected-normal-background:  @dark-blue;
+
+    active-background:           @background;
+    active-foreground:           @purple;
+    alternate-active-background: @lightbg;
+    alternate-active-foreground: @blue;
+    selected-active-background:  @blue;
+    selected-active-foreground:  @background;
+
+    urgent-background:           @background;
+    urgent-foreground:           @red;
+    alternate-urgent-foreground: @red;
+    alternate-urgent-background: @lightbg;
+    selected-urgent-background:  @red;
+    selected-urgent-foreground:  @background;
+
+    spacing:                     2;
+}
+element {
+    padding: 3px ;
+    spacing: 5px ;
+    border:  0;
+}
+element normal.normal {
+    background-color: var(normal-background);
+    text-color:       var(normal-foreground);
+}
+element normal.urgent {
+    background-color: var(urgent-background);
+    text-color:       var(urgent-foreground);
+}
+element normal.active {
+    background-color: var(active-background);
+    text-color:       var(active-foreground);
+}
+element selected.normal {
+    background-color: var(selected-normal-background);
+    text-color:       var(selected-normal-foreground);
+}
+element selected.urgent {
+    background-color: var(selected-urgent-background);
+    text-color:       var(selected-urgent-foreground);
+}
+element selected.active {
+    background-color: var(selected-active-background);
+    text-color:       var(selected-active-foreground);
+}
+element alternate.normal {
+    background-color: var(alternate-normal-background);
+    text-color:       var(alternate-normal-foreground);
+}
+element alternate.urgent {
+    background-color: var(alternate-urgent-background);
+    text-color:       var(alternate-urgent-foreground);
+}
+element alternate.active {
+    background-color: var(alternate-active-background);
+    text-color:       var(alternate-active-foreground);
+}
+element-text {
+    background-color: rgba ( 0, 0, 0, 0 % );
+    text-color:       inherit;
+}
+element-icon {
+    background-color: rgba ( 0, 0, 0, 0 % );
+    size:             1.2000ch ;
+    text-color:       inherit;
+}
+window {
+    padding:          5 1 5 5;
+    background-color: var(background);
+    border:           1;
+}
+mainbox {
+    padding: 0;
+    border:  0;
+}
+message {
+    padding:      1px ;
+    border-color: var(separatorcolor);
+    border:       2px dash 0px 0px ;
+}
+textbox {
+    text-color: var(foreground);
+}
+listview {
+    padding:      2px 0px 0px ;
+    scrollbar:    true;
+    border-color: var(separatorcolor);
+    spacing:      2px ;
+    fixed-height: 0;
+    border:       2px dash 0px 0px ;
+}
+scrollbar {
+    width:        10px ;
+    padding:      0;
+    handle-width: 10px ;
+    border:       0;
+    handle-color: #4C566A;
+}
+sidebar {
+    border-color: var(separatorcolor);
+    border:       2px dash 0px 0px ;
+}
+button {
+    spacing:    0;
+    text-color: var(normal-foreground);
+}
+button selected {
+    background-color: var(selected-normal-background);
+    text-color:       var(selected-normal-foreground);
+}
+
+num-filtered-rows, num-rows {
+    text-color: grey;
+    expand: false;
+}
+textbox-num-sep {
+    text-color: grey;
+    expand: false;
+    str: "/";
+}
+inputbar {
+    padding:    1px ;
+    spacing:    0px ;
+    text-color: var(normal-foreground);
+    children:   [ prompt,textbox-prompt-colon,entry, num-filtered-rows, textbox-num-sep, num-rows, case-indicator ];
+}
+case-indicator {
+    spacing:    0;
+    text-color: var(normal-foreground);
+}
+entry {
+    spacing:    0;
+    text-color: @red;
+    placeholder-color: grey;
+    placeholder: "Type to filter";
+}
+prompt {
+    spacing:    0;
+    text-color: @blue;
+}
+textbox-prompt-colon {
+    margin:     0px 0.3000em 0.0000em 0.0000em ;
+    expand:     false;
+    str:        ":";
+    text-color: inherit;
+}
+
+ #+END_SRC
+
+* Dunst (Notifications)
+
+I use dunst for simple notifications
+
+** dunstrc
+
+#+BEGIN_SRC conf :tangle .config/dunst/dunstrc
+# Generated from ~/dotfiles/system.org
+[global]
+    ### Display ###
+
+    # Which monitor should the notifications be displayed on.
+    monitor = 0
+
+    # Display notification on focused monitor.  Possible modes are:
+    #   mouse: follow mouse pointer
+    #   keyboard: follow window with keyboard focus
+    #   none: don't follow anything
+    #
+    # "keyboard" needs a window manager that exports the
+    # _NET_ACTIVE_WINDOW property.
+    # This should be the case for almost all modern window managers.
+    #
+    # If this option is set to mouse or keyboard, the monitor option
+    # will be ignored.
+    follow = mouse
+
+    # The geometry of the window:
+    #   [{width}]x{height}[+/-{x}+/-{y}]
+    # The geometry of the message window.
+    # The height is measured in number of notifications everything else
+    # in pixels.  If the width is omitted but the height is given
+    # ("-geometry x2"), the message window expands over the whole screen
+    # (dmenu-like).  If width is 0, the window expands to the longest
+    # message displayed.  A positive x is measured from the left, a
+    # negative from the right side of the screen.  Y is measured from
+    # the top and down respectively.
+    # The width can be negative.  In this case the actual width is the
+    # screen width minus the width defined in within the geometry option.
+    geometry = "300x5-10+30"
+
+    # Show how many messages are currently hidden (because of geometry).
+    indicate_hidden = yes
+
+    # Shrink window if it's smaller than the width.  Will be ignored if
+    # width is 0.
+    shrink = no
+
+    # The transparency of the window.  Range: [0; 100].
+    # This option will only work if a compositing window manager is
+    # present (e.g. xcompmgr, compiz, etc.).
+    transparency = 0.8
+
+    # The height of the entire notification.  If the height is smaller
+    # than the font height and padding combined, it will be raised
+    # to the font height and padding.
+    notification_height = 0
+
+    # Draw a line of "separator_height" pixel height between two
+    # notifications.
+    # Set to 0 to disable.
+    separator_height = 2
+
+    # Padding between text and separator.
+    padding = 8
+
+    # Horizontal padding.
+    horizontal_padding = 8
+
+    # Defines width in pixels of frame around the notification window.
+    # Set to 0 to disable.
+    frame_width = 1
+
+    # Defines color of the frame around the notification window.
+    frame_color = "#5e81ac"
+
+    # Define a color for the separator.
+    # possible values are:
+    #  * auto: dunst tries to find a color fitting to the background;
+    #  * foreground: use the same color as the foreground;
+    #  * frame: use the same color as the frame;
+    #  * anything else will be interpreted as a X color.
+    separator_color = frame
+
+    # Sort messages by urgency.
+    sort = yes
+
+    # Don't remove messages, if the user is idle (no mouse or keyboard input)
+    # for longer than idle_threshold seconds.
+    # Set to 0 to disable.
+    # A client can set the 'transient' hint to bypass this. See the rules
+    # section for how to disable this if necessary
+    idle_threshold = 120
+
+    ### Text ###
+
+    font = Monospace 8
+
+    # The spacing between lines.  If the height is smaller than the
+    # font height, it will get raised to the font height.
+    line_height = 0
+
+    # Possible values are:
+    # full: Allow a small subset of html markup in notifications:
+    #        <b>bold</b>
+    #        <i>italic</i>
+    #        <s>strikethrough</s>
+    #        <u>underline</u>
+    #
+    #        For a complete reference see
+    #        <https://developer.gnome.org/pango/stable/pango-Markup.html>.
+    #
+    # strip: This setting is provided for compatibility with some broken
+    #        clients that send markup even though it's not enabled on the
+    #        server. Dunst will try to strip the markup but the parsing is
+    #        simplistic so using this option outside of matching rules for
+    #        specific applications *IS GREATLY DISCOURAGED*.
+    #
+    # no:    Disable markup parsing, incoming notifications will be treated as
+    #        plain text. Dunst will not advertise that it has the body-markup
+    #        capability if this is set as a global setting.
+    #
+    # It's important to note that markup inside the format option will be parsed
+    # regardless of what this is set to.
+    markup = full
+
+    # The format of the message.  Possible variables are:
+    #   %a  appname
+    #   %s  summary
+    #   %b  body
+    #   %i  iconname (including its path)
+    #   %I  iconname (without its path)
+    #   %p  progress value if set ([  0%] to [100%]) or nothing
+    #   %n  progress value if set without any extra characters
+    #   %%  Literal %
+    # Markup is allowed
+    format = "<b>%s</b>\n%b"
+
+    # Alignment of message text.
+    # Possible values are "left", "center" and "right".
+    alignment = left
+
+    # Vertical alignment of message text and icon.
+    # Possible values are "top", "center" and "bottom".
+    vertical_alignment = center
+
+    # Show age of message if message is older than show_age_threshold
+    # seconds.
+    # Set to -1 to disable.
+    show_age_threshold = 60
+
+    # Split notifications into multiple lines if they don't fit into
+    # geometry.
+    word_wrap = yes
+
+    # When word_wrap is set to no, specify where to make an ellipsis in long lines.
+    # Possible values are "start", "middle" and "end".
+    ellipsize = middle
+
+    # Ignore newlines '\n' in notifications.
+    ignore_newline = no
+
+    # Stack together notifications with the same content
+    stack_duplicates = true
+
+    # Hide the count of stacked notifications with the same content
+    hide_duplicate_count = false
+
+    # Display indicators for URLs (U) and actions (A).
+    show_indicators = yes
+
+    ### Icons ###
+
+    # Align icons left/right/off
+    icon_position = left
+
+    # Scale small icons up to this size, set to 0 to disable. Helpful
+    # for e.g. small files or high-dpi screens. In case of conflict,
+    # max_icon_size takes precedence over this.
+    min_icon_size = 0
+
+    # Scale larger icons down to this size, set to 0 to disable
+    max_icon_size = 32
+
+    # Paths to default icons.
+    icon_path = /usr/share/icons/gnome/16x16/status/:/usr/share/icons/gnome/16x16/devices/
+
+    ### History ###
+
+    # Should a notification popped up from history be sticky or timeout
+    # as if it would normally do.
+    sticky_history = yes
+
+    # Maximum amount of notifications kept in history
+    history_length = 20
+
+    ### Misc/Advanced ###
+
+    # dmenu path.
+    dmenu = /usr/bin/dmenu -p dunst:
+
+    # Browser for opening urls in context menu.
+    browser = /usr/bin/firefox -new-tab
+
+    # Always run rule-defined scripts, even if the notification is suppressed
+    always_run_script = true
+
+    # Define the title of the windows spawned by dunst
+    title = Dunst
+
+    # Define the class of the windows spawned by dunst
+    class = Dunst
+
+    # Print a notification on startup.
+    # This is mainly for error detection, since dbus (re-)starts dunst
+    # automatically after a crash.
+    startup_notification = false
+
+    # Manage dunst's desire for talking
+    # Can be one of the following values:
+    #  crit: Critical features. Dunst aborts
+    #  warn: Only non-fatal warnings
+    #  mesg: Important Messages
+    #  info: all unimportant stuff
+    # debug: all less than unimportant stuff
+    verbosity = mesg
+
+    # Define the corner radius of the notification window
+    # in pixel size. If the radius is 0, you have no rounded
+    # corners.
+    # The radius will be automatically lowered if it exceeds half of the
+    # notification height to avoid clipping text and/or icons.
+    corner_radius = 0
+
+    ### Legacy
+
+    # Use the Xinerama extension instead of RandR for multi-monitor support.
+    # This setting is provided for compatibility with older nVidia drivers that
+    # do not support RandR and using it on systems that support RandR is highly
+    # discouraged.
+    #
+    # By enabling this setting dunst will not be able to detect when a monitor
+    # is connected or disconnected which might break follow mode if the screen
+    # layout changes.
+    force_xinerama = false
+
+    ### mouse
+
+    # Defines list of actions for each mouse event
+    # Possible values are:
+    # * none: Don't do anything.
+    # * do_action: If the notification has exactly one action, or one is marked as default,
+    #              invoke it. If there are multiple and no default, open the context menu.
+    # * close_current: Close current notification.
+    # * close_all: Close all notifications.
+    # These values can be strung together for each mouse event, and
+    # will be executed in sequence.
+    mouse_left_click = close_current
+    mouse_middle_click = do_action, close_current
+    mouse_right_click = close_all
+
+# Experimental features that may or may not work correctly. Do not expect them
+# to have a consistent behaviour across releases.
+[experimental]
+    # Calculate the dpi to use on a per-monitor basis.
+    # If this setting is enabled the Xft.dpi value will be ignored and instead
+    # dunst will attempt to calculate an appropriate dpi value for each monitor
+    # using the resolution and physical size. This might be useful in setups
+    # where there are multiple screens with very different dpi values.
+    per_monitor_dpi = false
+
+[shortcuts]
+
+    # Shortcuts are specified as [modifier+][modifier+]...key
+    # Available modifiers are "ctrl", "mod1" (the alt-key), "mod2",
+    # "mod3" and "mod4" (windows-key).
+    # Xev might be helpful to find names for keys.
+
+    # Close notification.
+    close = ctrl+space
+
+    # Close all notifications.
+    close_all = ctrl+shift+space
+
+    # Redisplay last message(s).
+    # On the US keyboard layout "grave" is normally above TAB and left
+    # of "1". Make sure this key actually exists on your keyboard layout,
+    # e.g. check output of 'xmodmap -pke'
+    history = ctrl+grave
+
+    # Context menu.
+    context = ctrl+shift+period
+
+[urgency_low]
+    # IMPORTANT: colors have to be defined in quotation marks.
+    # Otherwise the "#" and following would be interpreted as a comment.
+    background = "#2e3440"
+    foreground = "#888888"
+    timeout = 10
+    # Icon for notifications with low urgency, uncomment to enable
+    #icon = /path/to/icon
+
+[urgency_normal]
+    background = "#2e3440"
+    foreground = "#ffffff"
+    timeout = 10
+    # Icon for notifications with normal urgency, uncomment to enable
+    #icon = /path/to/icon
+
+[urgency_critical]
+    background = "#2e3440"
+    foreground = "#ffffff"
+    frame_color = "#ff0000"
+    timeout = 0
+    # Icon for notifications with critical urgency, uncomment to enable
+    #icon = /path/to/icon
+
+# Every section that isn't one of the above is interpreted as a rules to
+# override settings for certain messages.
+#
+# Messages can be matched by
+#    appname (discouraged, see desktop_entry)
+#    body
+#    category
+#    desktop_entry
+#    icon
+#    match_transient
+#    msg_urgency
+#    stack_tag
+#    summary
+#
+# and you can override the
+#    background
+#    foreground
+#    format
+#    frame_color
+#    fullscreen
+#    new_icon
+#    set_stack_tag
+#    set_transient
+#    timeout
+#    urgency
+#
+# Shell-like globbing will get expanded.
+#
+# Instead of the appname filter, it's recommended to use the desktop_entry filter.
+# GLib based applications export their desktop-entry name. In comparison to the appname,
+# the desktop-entry won't get localized.
+#
+# SCRIPTING
+# You can specify a script that gets run when the rule matches by
+# setting the "script" option.
+# The script will be called as follows:
+#   script appname summary body icon urgency
+# where urgency can be "LOW", "NORMAL" or "CRITICAL".
+#
+# NOTE: if you don't want a notification to be displayed, set the format
+# to "".
+# NOTE: It might be helpful to run dunst -print in a terminal in order
+# to find fitting options for rules.
+
+# Disable the transient hint so that idle_threshold cannot be bypassed from the
+# client
+#[transient_disable]
+#    match_transient = yes
+#    set_transient = no
+#
+# Make the handling of transient notifications more strict by making them not
+# be placed in history.
+#[transient_history_ignore]
+#    match_transient = yes
+#    history_ignore = yes
+
+# fullscreen values
+# show: show the notifications, regardless if there is a fullscreen window opened
+# delay: displays the new notification, if there is no fullscreen window active
+#        If the notification is already drawn, it won't get undrawn.
+# pushback: same as delay, but when switching into fullscreen, the notification will get
+#           withdrawn from screen again and will get delayed like a new notification
+#[fullscreen_delay_everything]
+#    fullscreen = delay
+#[fullscreen_show_critical]
+#    msg_urgency = critical
+#    fullscreen = show
+
+#[espeak]
+#    summary = "*"
+#    script = dunst_espeak.sh
+
+#[script-test]
+#    summary = "*script*"
+#    script = dunst_test.sh
+
+#[ignore]
+#    # This notification will not be displayed
+#    summary = "foobar"
+#    format = ""
+
+#[history-ignore]
+#    # This notification will not be saved in history
+#    summary = "foobar"
+#    history_ignore = yes
+
+#[skip-display]
+#    # This notification will not be displayed, but will be included in the history
+#    summary = "foobar"
+#    skip_display = yes
+
+#[signed_on]
+#    appname = Pidgin
+#    summary = "*signed on*"
+#    urgency = low
+#
+#[signed_off]
+#    appname = Pidgin
+#    summary = *signed off*
+#    urgency = low
+#
+#[says]
+#    appname = Pidgin
+#    summary = *says*
+#    urgency = critical
+#
+#[twitter]
+#    appname = Pidgin
+#    summary = *twitter.com*
+#    urgency = normal
+#
+#[stack-volumes]
+#    appname = "some_volume_notifiers"
+#    set_stack_tag = "volume"
+#
+# vim: ft=cfg
+
+#+END_SRC
+
+* Vim
+
+** vimrc
+
+#+BEGIN_SRC conf :tangle .vimrc
+set number
+set hlsearch
+set incsearch
+set wildmenu
+
+set ttimeout
+set ttimeoutlen=100
+
+set laststatus=2
+set splitbelow splitright
+
+set tabstop=4
+set shiftwidth=4
+
+"packadd! dracula
+syntax enable
+"colorscheme dracula
+
+filetype plugin indent on
+
+let g:lightline = {
+      \ 'colorscheme': 'nord',
+      \ }
+
+if has('mouse')
+  set mouse=a
+endif
+
+" CUSTOM COMMANDS
+
+:command W w
+:command Wq wq
+:command Q q
+
+" Add optional packages.
+"
+" The matchit plugin makes the % command work better, but it is not backwards
+" compatible.
+" The ! means the package won't be loaded right away but when plugins are
+" loaded during initialization.
+if has('syntax') && has('eval')
+  packadd! matchit
+endif
+
+#+END_SRC
+
+* Qtile
+
+My window manager is Qtile, the configuration is lenghty
+
+** autostart.sh
+
+#+BEGIN_SRC bash :tangle .config/qtile/autostart.sh
+#! /bin/bash
+
+# Generated from ~/dotfiles/system.org
+
+function run {
+  if ! pgrep $1 ;
+  then
+    $@&
+  fi
+}
+
+dunst &
+numlockx on &
+run nm-applet &
+blueberry-tray &
+run volumeicon &
+run xfce4-power-manager &
+run spotify
+hsetxkbmap -option "ctrl:nocaps" &
+
+picom --config $HOME/.config/picom/picom.conf &
+/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
+
+#+END_SRC
+
+** config.py
+
+#+BEGIN_SRC python :tangle .config/qtile/config.py
+# -*- coding: utf-8 -*-
+#
+# Generated from ~/dotfiles/system.org
+# Author: saucoide
+# configuration file for a customized  Qtile window manager (http://www.qtile.org)
+# based on a version by Derek Taylor  (http://www.gitlab.com/dwt1/ )
+#
+# The following comments are the copyright and licensing information from the default
+# qtile config. Copyright (c) 2010 Aldo Cortesi, 2010, 2014 dequis, 2012 Randall Ma,
+# 2012-2014 Tycho Andersen, 2012 Craig Barnes, 2013 horsik, 2013 Tao Sauvage
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this
+# software and associated documentation files (the "Software"), to deal in the Software
+# without restriction, including without limitation the rights to use, copy, modify,
+# merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to the following
+# conditions:
+#
+# The above copyright notice and this permission notice shall be includ ed in all copies
+# or substantial portions of the Software.
+
+##### IMPORTS #####
+import os
+import re
+import socket
+import subprocess
+from libqtile.config import Key, Screen, Group, Drag, Click, Match
+from libqtile.command import lazy
+from libqtile import layout, bar, widget, hook
+from typing import List  # noqa: F401
+from libqtile.config import ScratchPad, DropDown
+
+import random
+import pathlib
+from mailwatcher import main as get_mails
+from inoreader_rss_counter import main as get_feeds
+
+##### DEFINING CONSTANTS & DEFAULT PROGRAMS #####
+
+mod = "mod4"   # mod key to SUPER/WINDOWS
+TRANS_FONT_SIZE = 60  # font size used for the separator effect on the bar, adjust for different resolutions
+
+MY_TERMINAL = "termite"
+TEXT_EDITOR = "emacs"
+EMAIL_CLIENT = "emacs"
+FILE_MANAGER = "thunar"
+BROWSER = "firefox"
+SYS_MONITOR = "xfce4-taskmanager"
+
+MY_CONFIG = "/home/saucoide/.config/qtile/config.py"
+
+## Numpad keys ##
+NUMPAD = {  0: "KP_Insert",
+            1: "KP_End",
+            2: "KP_Down",
+            3: "KP_Next",
+            4: "KP_Left",
+            5: "KP_Begin",
+            6: "KP_Right",
+            7: "KP_Home",
+            8: "KP_Up",
+            9: "KP_Prior"
+    }
+
+## Colors ##
+COLORS = {
+          "white":"ffffff",
+          "background":"#2e3440",           # panel background
+          "active_background":"#434c5e",    # background for current group
+          "group_highlight":"#ff5555",      # border line color for current group
+          "border_line":"#8d62a9",          # border line color for other tab and odd widgets
+          "border_focus":"#5e81ac",
+          "win_name":"#81a1c1",             # current window name
+          "frost0":"#5e81ac",               # Theme colors (nord)
+          "frost1":"#81a1c1",
+          "frost2":"#88c0d0",
+          "frost3":"#8fbcbb",
+          "aurora0":"#bf616a",
+    }
+
+##### DEFINING MY FUNCTIONS #####
+
+@lazy.function
+def float_to_front(qtile):
+    for group in qtile.groups:
+        for window in group.windows:
+            if window.floating:
+                window.cmd_bring_to_front()
+
+def bar_transition(col_from, col_to):
+    return widget.TextBox(text='◢',
+                          background = col_from,
+                          foreground = col_to,
+                          padding=-5,
+                          font="Ubuntu Mono derivative Powerline",
+                          fontsize=TRANS_FONT_SIZE)
+
+def get_wallpaper():
+    wp_path = pathlib.Path.home() / ".config/qtile/wallpapers"
+    wallpapers = list(filter(lambda x: x.suffix in (".png",".jpg"), wp_path.glob("*")))
+    return random.choice(wallpapers)
+
+def open_htop(qtile):
+    qtile.cmd_spawn(f'{MY_TERMINAL} -e htop')
+
+def open_sys_monitor(qtile):
+    qtile.cmd_spawn(SYS_MONITOR)
+
+def open_audio_settings(qtile):
+    qtile.cmd_spawn("pavucontrol")
+
+def open_mail(qtile):
+    qtile.cmd_spawn(EMAIL_CLIENT)
+
+def open_feeds(qtile):
+    qtile.cmd_spawn(f"{BROWSER} --new-window https://www.inoreader.com")
+
+def toggle_calendar(qtile):
+    qtile.cmd_spawn(f'{MY_TERMINAL} -e cal')
+
+def logout(qtile):
+    qtile.cmd_spawn("arcolinux-logout")
+
+def open_pamac(qtile):
+    qtile.cmd_spawn("pamac-manager")
+
+##### GROUPS #####
+# fin the wm_class etc using xprop | grep WM_CLASS or similar
+
+group_names = {"SYS": {'layout': 'columns'},
+               "COM": {'layout': 'max'},
+               "WWW": {'layout': 'columns'},
+               "DEV": {'layout': 'columns'},
+               "MUS": {'layout': 'max', "matches":[Match(title=["Spotify Free"])]},
+               "VID": {'layout': 'columns', "matches":[Match(wm_class=["smplayer"])]},
+               "NTS": {'layout': 'max'},
+               "DOC": {'layout': 'columns'},
+               "VMS": {'layout': 'max'}}
+
+groups = [Group(name, **kwargs) for name, kwargs in group_names.items()]
+
+
+##### KEYBINDINGS #####
+keys = [
+    ### BASICS
+
+         Key([mod], "y", lazy.spawncmd(),
+             desc='launch prompt'),
+         Key([mod], "k", lazy.window.kill(),
+             desc='Kill active window'),
+         Key([mod], "q", lazy.window.kill(),
+             desc='Kill active window'),
+         Key([mod, "shift"], "r", lazy.restart(),
+             desc='Restart Qtile'),
+         Key([mod, "shift"], "q", lazy.shutdown(),
+             desc='Shutdown Qtile'),
+         #Key([mod], "x", lazy.spawn('arcolinux-logout')),
+
+    ### WINDOW CONTROL
+
+         ## Focus
+         Key([mod], "Down", lazy.layout.down(),
+             desc = "Switch focus to window below"),
+         Key([mod], "Up", lazy.layout.up(),
+             desc = "Switch focus to window above"),
+         Key([mod], "Right", lazy.layout.left(),
+             desc = "Switch focus to window to the right"),
+         Key([mod], "Left", lazy.layout.right(),
+             desc = "Switch focus to window to the right"),
+
+         ## Toggle Fullscreen
+         Key([mod], "f", lazy.window.toggle_fullscreen(),
+             desc = "Toggle fullscreen for the current window"),
+
+         ## Move
+         Key([mod, "shift"], "Down", lazy.layout.shuffle_down(),
+             desc = "Move window down"),
+         Key([mod, "shift"], "Up", lazy.layout.shuffle_up(),
+             desc = "Move window up"),
+         Key([mod, "shift"], "Left", lazy.layout.shuffle_left(),
+             desc = "Move window left"),
+         Key([mod, "shift"], "Right", lazy.layout.shuffle_right(),
+             desc = "Move window right"),
+
+         ## Resize
+         Key([mod, "control"], "Down",
+             lazy.layout.grow_down(),
+             lazy.layout.shrink(),
+             desc = "Increase size down"),
+         Key([mod, "control"], "Up",
+             lazy.layout.grow_up(),
+             lazy.layout.grow(),
+             desc = "Increase size up"),
+         Key([mod, "control"], "Left",
+             lazy.layout.grow_left(),
+             lazy.layout.shrink(),
+             lazy.layout.decrease_ratio(),
+             desc = "Increase size left"),
+         Key([mod, "control"], "Right",
+             lazy.layout.grow_right(),
+             lazy.layout.grow(),
+             lazy.layout.increase_ratio(),
+             desc = "Increase size right"),
+
+         # Float
+         Key([mod, "shift"], "f", lazy.window.toggle_floating(),
+             desc='toggle floating'),
+
+    ### LAYOUT CONTROL
+
+         ## Switching layouts
+         Key([mod], "Tab", lazy.next_layout(),
+             desc='Toggle through layouts'),
+         Key([mod], "c", lazy.to_layout_index(0),
+             desc='switch to COLUMNS layout'),
+         Key([mod], "t", lazy.to_layout_index(1),
+             desc='switch to MONADTALL layout'),
+         Key([mod], "m", lazy.to_layout_index(2),
+             desc='switch to MAX layout'),
+         #Key([mod, "shift"], "m", lazy.to_layout_index(3),
+             #desc='switch to TREETAB layout'),
+
+         Key([mod, "control"], "f", float_to_front,
+             desc='switch to FLOATING layout'),
+
+         ## Reset sizes
+         Key([mod], "n", lazy.layout.normalize(),
+             desc='normalize window size ratios'),
+
+        ## Layout specific
+         Key([mod], "Return", lazy.layout.toggle_split(),lazy.layout.flip(),
+             desc = "Switch between Stack/Tile modes"),
+
+    ### APPLICATION LAUNCHING
+
+         ## Super + Key
+
+         Key([mod], "space", lazy.spawn('rofi -show drun'),
+             desc='Launch rofi drun'),
+
+          Key([mod], "r", lazy.spawn('rofi -show run'),
+             desc='Launch rofi run'),
+
+         Key([mod], "e", lazy.spawn(FILE_MANAGER),
+             desc='Launch file manager'),
+
+         Key([mod], "Escape", lazy.spawn('xkill'),
+             desc = 'Click to kill window'),
+
+        ## (CONTROL + ALT + KEY) // alt+super+key?
+
+         Key(["control", "mod1"], "t", lazy.spawn(MY_TERMINAL),
+             desc='terminal'),
+
+         Key([mod], "KP_Enter", lazy.spawn(MY_TERMINAL),
+             desc='terminal'),
+
+         Key(["control", "mod1"], "f", lazy.spawn(f"{BROWSER}"),
+             desc='Launch browser'),
+
+         Key(["control", "mod1"], "e", lazy.spawn(f"{MY_TERMINAL} -e vifm"),
+             desc='Launch vifm'),
+
+         Key(["control", "mod1"], "n", lazy.spawn(TEXT_EDITOR),
+             desc='Launch text editor'),
+
+         #Key([mod], "v", lazy.spawn('pavucontrol')),    # this is pulseaudio volume control, migth want to bind it to something
+
+         ## Volume & Media keys
+         Key([], "XF86AudioRaiseVolume", lazy.spawn("amixer -D pulse -q sset Master 5%+")),
+         Key([], "XF86AudioLowerVolume", lazy.spawn("amixer -D pulse -q sset Master 5%-")),
+         Key([], "XF86AudioMute", lazy.spawn("amixer -D pulse -q set Master toggle")),
+
+         Key([], "XF86AudioPlay", lazy.spawn("playerctl play-pause")),
+         Key([], "XF86AudioNext", lazy.spawn("playerctl next")),
+         Key([], "XF86AudioPrev", lazy.spawn("playerctl previous")),
+         Key([], "XF86AudioStop", lazy.spawn("playerctl stop")),
+
+]
+
+
+### GROUP KEYBINDINGS
+for number, group in enumerate(groups, start=1):
+    #Mod+Num = Switch group/view
+    #Mod+Shift+Num = Send window to group & switch to it
+    #Mod+Control+Num = Send window to group
+    keys.append(Key([mod], str(number), lazy.group[group.name].toscreen()))
+    keys.append(Key([mod], NUMPAD[number], lazy.group[group.name].toscreen()))
+    keys.append(Key([mod, "shift"], str(number), lazy.window.togroup(group.name, switch_group=True)))
+    keys.append(Key([mod, "shift"], NUMPAD[number], lazy.window.togroup(group.name, switch_group=True)))
+    keys.append(Key([mod, "control"], str(number), lazy.window.togroup(group.name, switch_group=False)))
+    keys.append(Key([mod, "control"], NUMPAD[number], lazy.window.togroup(group.name, switch_group=False)))
+
+### TOGGLE LAST GROUP
+keys.append(Key([mod], "BackSpace", lazy.screen.toggle_group()))
+
+
+##### ADDING DROPDOWN TERMINAL #####
+    ### Appending group
+groups.append(ScratchPad("scratchpad", [DropDown("term",
+                                                "/usr/bin/konsole",
+                                                opacity=0.88,
+                                                height=0.33,
+                                                width=0.8)]
+                        )
+)
+
+    ### Setting the key binding
+keys.extend([Key([], "F4", lazy.group["scratchpad"].dropdown_toggle("term"))])
+
+
+##### THE LAYOUTS #####
+
+    ### DEFAULT LAYOUT THEME SETTINGS #####
+layout_theme = {"border_width": 2,
+                "margin": 3,
+                "border_focus": COLORS["frost1"],
+                "border_normal": "1D2330"
+                }
+
+    ### LAYOUTS
+layouts = [
+    layout.Columns(**layout_theme, border_focus_stack = "bf616a"),
+    layout.MonadTall(**layout_theme),
+    layout.Max(**layout_theme),
+    #layout.TreeTab(
+         #font = "Ubuntu",
+         #fontsize = 10,
+         #sections = ["FIRST", "SECOND"],
+         #section_fontsize = 11,
+         #bg_color = "141414",
+         #active_bg = "bf616a",
+         #active_fg = "000000",
+         #inactive_bg = "4c566a",
+         #inactive_fg = "a7a7a7",
+         #padding_y = 5,
+         #section_top = 10,
+         #panel_width = 150
+         #)
+    #layout.RatioTile(**layout_theme),
+    #layout.VerticalTile(**layout_theme),
+    #layout.Floating(**layout_theme),
+    #layout.Tile(shift_windows=True, **layout_theme)
+    #layout.MonadWide(**layout_theme),
+    #layout.Bsp(**layout_theme),
+    #layout.Stack(stacks=2, **layout_theme),
+]
+
+
+##### PROMPT FORMAT #####
+prompt = "{0}@{1}: ".format(os.environ["USER"], socket.gethostname())
+
+##### DEFAULT WIDGET SETTINGS #####
+widget_defaults = dict(
+    font="Ubuntu Mono derivative Powerline",
+    fontsize = 12,
+    padding = 2,
+    background=COLORS["white"]
+)
+
+extension_defaults = widget_defaults.copy()   # ???
+
+##### WIDGETS #####
+
+def init_widgets_list():
+
+    widgets_list = [
+
+              widget.Image(
+                        filename = "~/.config/qtile/icons/arcolinux.png",
+                        background =  COLORS["background"],
+                        margin = 2,
+                        #margin_x = 0,
+                        #margin_y = 0,
+                        mouse_callbacks = {'Button1': lambda x: x.cmd_spawn('rofi -show drun')}
+                   ),
+             #widget.Sep(
+                        #linewidth = 0,
+                        #padding = 0+,
+                        #foreground = COLORS["white"],
+                        #background = COLORS["background"]
+                        #),
+               widget.GroupBox(font="Ubuntu Bold",
+                        fontsize = 9,
+                        margin_y = 3,
+                        margin_x = 0,
+                        padding_y = 5,
+                        padding_x = 5,
+                        borderwidth = 3,
+                        active = COLORS["white"],
+                        inactive = COLORS["white"],
+                        rounded = False,
+                        highlight_color = COLORS['active_background'],
+                        highlight_method = "line",
+                        this_current_screen_border = COLORS["group_highlight"],
+                        this_screen_border = COLORS["border_line"],
+                        other_current_screen_border = COLORS["background"],
+                        other_screen_border = COLORS["background"],
+                        foreground = COLORS["white"],
+                        background = COLORS["background"],
+                        disable_drag = True
+                        ),
+               widget.TextBox(text='⟋',
+                          background = COLORS["background"],
+                          foreground = COLORS["frost1"],
+                          padding=0,
+                          fontsize=50),
+               widget.Prompt(
+                        prompt=prompt,
+                        font="Ubuntu Mono",
+                        padding=10,
+                        foreground = COLORS["group_highlight"],
+                        background = COLORS["active_background"]
+                        ),
+               widget.Sep(
+                        linewidth = 0,
+                        padding = 2,
+                        foreground = COLORS["white"],
+                        background = COLORS["background"]
+                        ),
+               widget.TaskList(
+                        background = COLORS["background"],
+                        foreground = "#d8dee9",
+                        font = "Ubuntu Mono",
+                        fontsize = 12,
+                        icon_size = 8,
+                        border = COLORS["active_background"],
+                        highlight_method = "block",
+                        max_title_width = 120,
+                        txt_floating = "🗗 ",
+                        txt_maximized = "🗖 ",
+                        margin = 0,
+                        padding = 5,
+                        ),
+                widget.CurrentLayoutIcon(
+                        custom_icon_paths=[os.path.expanduser("~/.config/qtile/icons")],
+                        background = COLORS["background"],
+                        padding = 0,
+                        scale=0.7
+                        ),
+               widget.CurrentLayout(
+                        foreground = COLORS["white"],
+                        background = COLORS["background"],
+                        padding = 5
+                        ),
+               bar_transition(COLORS["background"], COLORS["frost0"]),
+               widget.GenPollText(
+                   background = COLORS["frost0"],
+                   func = get_mails,
+                   update_interval = 600,
+                   mouse_callbacks = {'Button1':open_mail}
+                   ),
+               bar_transition(COLORS["frost0"], COLORS["frost1"]),
+               widget.TextBox(
+                        text = "",
+                        foreground = COLORS["white"],
+                        background = COLORS["frost1"],
+                        mouse_callbacks = {'Button1': open_feeds}
+                   ),
+               widget.GenPollText(
+                   background = COLORS["frost1"],
+                   func = get_feeds,
+                   update_interval = 600,
+                   mouse_callbacks={'Button1': open_feeds}
+                   ),
+               bar_transition(COLORS["frost1"], COLORS["frost2"]),
+               widget.CPU(
+                        foreground = COLORS["white"],
+                        background = COLORS["frost2"],
+                        padding = 0,
+                        format = "CPU {load_percent}% | ",
+                        mouse_callbacks={'Button1': open_htop, 'Button3': open_sys_monitor}
+                        ),
+               widget.Memory(
+                        foreground = COLORS["white"],
+                        background = COLORS["frost2"],
+                        format = 'RAM {MemUsed}M/{MemTotal}M',
+                        padding = 0,
+                        mouse_callbacks={'Button1': open_htop, 'Button3': open_sys_monitor}
+                        ),
+               bar_transition(COLORS["frost2"], COLORS["frost3"]),
+               widget.ThermalSensor(
+                        foreground=COLORS["white"],
+                        background=COLORS["frost3"],
+                        padding = 0,
+                        update_interval = 10,
+                        ),
+               bar_transition(COLORS["frost3"], COLORS["frost0"]),
+               widget.TextBox(
+                        text = "",
+                        foreground = COLORS["white"],
+                        background = COLORS["frost0"],
+                        mouse_callbacks = {'Button1': open_audio_settings}
+                   ),
+               widget.Volume(
+                        foreground = COLORS["white"],
+                        background = COLORS["frost0"],
+                        padding = 0,
+                        volume_app = "pulseaudio",
+                        device = "pulse"
+                        ),
+               bar_transition(COLORS["frost0"], COLORS["frost1"]),
+               widget.CheckUpdates(
+                        update_interval = 1800,
+                        foreground = COLORS["white"],
+                        background = COLORS["frost1"],
+                        color_have_updates = COLORS["aurora0"],
+                        display_format = '{updates} ⟳',
+                        distro = "Arch_checkupdates",
+                        mouse_callbacks = {'Button1': open_pamac}
+                        ),
+               bar_transition(COLORS["frost1"], COLORS["frost2"]),
+                #widget.Systray(
+                        #background=COLORS["frost2"],
+                        #padding = 5
+                        #),
+               #bar_transition(COLORS["frost2"], COLORS["frost3"]),
+               widget.Clock(
+                        foreground = COLORS["white"],
+                        background = COLORS["frost2"],
+                        format="%d-%b-%Y [%H:%M] ",
+                        padding = 2,
+                        mouse_callbacks = {'Button1': toggle_calendar}
+                        ),
+               # bar_transition(COLORS["frost3"], COLORS["frost0"]),
+               #widget.Battery(
+                        #font="Ubuntu Mono",
+                        #update_interval = 10,
+                        #fontsize = 12,
+                        #foreground = COLORS["white"],
+                        #background = COLORS["frost3"],
+	                    #),
+               widget.TextBox(
+                        text = "[⏻]",
+                        background = COLORS["frost3"],
+                        mouse_callbacks = {'Button1': logout}
+                   ),
+               #widget.QuickExit(
+                        #background = COLORS["frost3"],
+                        #countdown_format = "[{}s]",
+                        #default_text = "[⏼]" # ⏻ ⏼ ⏽ ⭘ ⏾
+                   #)
+              ]
+    return widgets_list
+
+##### SCREENS ##### (TRIPLE MONITOR SETUP)
+
+def init_screens():
+    return [Screen(top=bar.Bar(widgets=init_widgets_list(), opacity=0.95, size=20),
+                    wallpaper = get_wallpaper(),
+                    wallpaper_mode = 'fill')
+            ]
+
+if __name__ in ["config", "__main__"]:
+    screens = init_screens()
+    widgets_list = init_widgets_list()
+
+
+
+##### FLOATING WINDOWS #####
+
+float_theme = {"border_width": 1,
+               "border_focus": COLORS["background"]
+               }
+
+floating_types = ["notification", "toolbar", "splash", "dialog"]
+
+@hook.subscribe.client_new
+def set_floating(window):
+    if (window.window.get_wm_transient_for()
+            or window.window.get_wm_type() in floating_types):
+        window.floating = True
+
+floating_layout = layout.Floating(float_rules=[
+                    {'wmclass': 'confirm'},
+                    {'wmclass': 'dialog'},
+                    {'wmclass': 'download'},
+                    {'wmclass': 'error'},
+                    {'wmclass': 'file_progress'},
+                    {'wmclass': 'notification'},
+                    {'wmclass': 'splash'},
+                    {'wmclass': 'toolbar'},
+                    {'wmclass': 'confirmreset'},  # gitk
+                    {'wmclass': 'makebranch'},  # gitk
+                    {'wmclass': 'maketag'},  # gitk
+                    {'wname': 'branchdialog'},  # gitk
+                    {'wname': 'pinentry'},  # GPG key password entry
+                    {'wmclass': 'ulauncher'},
+                    {'wmclass': 'krunner'},
+                    {'wmclass': 'ssh-askpass'},  # ssh-askpass
+                    {'wmclass': 'Arcolinux-tweak-tool.py'},
+                    {'wmclass': 'Arandr'},
+                    {'wmclass': 'arcolinux-logout'},
+                    {'wname': 'branchdialog'},
+                    {'wname': 'Open File'},
+                    {'wname': 'pinentry'},
+                    ],
+                    ,**float_theme
+                    )
+
+auto_fullscreen = True
+focus_on_window_activation = "smart"
+
+##### DRAG FLOATING WINDOWS #####
+mouse = [
+    Drag([mod], "Button1", lazy.window.set_position_floating(),
+         start=lazy.window.get_position()),
+    Drag([mod], "Button3", lazy.window.set_size_floating(),
+         start=lazy.window.get_size()),
+    Click([mod], "Button2", lazy.window.bring_to_front())
+]
+
+dgroups_key_binder = None
+dgroups_app_rules = []  # type: List
+main = None
+follow_mouse_focus = True
+bring_front_click = False
+cursor_warp = False
+
+
+
+##### STARTUP APPLICATIONS #####
+@hook.subscribe.startup_once
+def start_once():
+    home = os.path.expanduser('~')
+    subprocess.call([home + '/.config/qtile/autostart.sh'])
+
+# XXX: Gasp! We're lying here. In fact, nobody really uses or cares about this
+# string besides java UI toolkits; you can see several discussions on the
+# mailing lists, GitHub issues, and other WM documentation that suggest setting
+# this string if your java app doesn't work correctly. We may as well just lie
+# and say that we're a working one by default.
+#
+# We choose LG3D to maximize irony: it is a 3D non-reparenting WM written in
+# java that happens to be on java's whitelist.
+wmname = "LG3D"
+
+#+END_SRC
+
+** inoreader_rss_counter.py
+
+One fo the bar widgets in my qtile config displays the number of unread RSS readers on my inoreader account, which is the result of this python script
+
+To get the password from kwallet it is using =keyring= so that dependency needs to be installed
+
+#+BEGIN_SRC python :tangle .config/qtile/inoreader_rss_counter.py
+# Generated from ~/dotfiles/system.org
+
+import requests
+import keyring
+from pathlib import Path
+
+def main():
+
+    BASE_URL = "https://www.inoreader.com/reader/api/0"
+    LOGIN_URL = "https://www.inoreader.com/accounts/ClientLogin"
+
+    EMAIL = keyring.get_password("Passwords", 'ino_user')
+    PW = keyring.get_password("Passwords", 'ino_pw')
+    APP_ID = keyring.get_password("Passwords", 'ino_id')
+    APP_KEY = keyring.get_password("Passwords", 'ino_key')
+
+
+    resp = requests.post(LOGIN_URL, data={'Email':EMAIL,'Passwd':PW})
+
+    content = {}
+    for line in resp.text.split('\n'):
+        if line:
+            key, val = line.split("=")
+            content[key] = val
+    token = content['Auth']
+
+    headers = {'Authorization': 'GoogleLogin auth=' + token,
+            'Appid': APP_ID,
+            'AppKey': APP_KEY}
+
+    resp = requests.get(BASE_URL + "/unread-count", headers=headers)
+    unreadcounts = resp.json()
+    unread = unreadcounts['unreadcounts'][0]['count']
+
+    return str(unread)
+
+
+if __name__ == "__main__":
+    main()
+
+#+END_SRC
+** mailwatcher.py
+
+Similarly i have a script to count unread emails
+
+#+BEGIN_SRC python :tangle .config/qtile/mailwatcher.py
+# Generated from ~/dotfiles/system.org
+
+import imaplib
+import keyring
+from pathlib import Path
+
+def main():
+
+    EMAIL = keyring.get_password('Passwords', 'email_user')
+    PW = keyring.get_password('Passwords', 'email_pw')
+    SMTP_SERVER = "imap.gmail.com"
+    SMTP_PORT = 993
+
+    mail = imaplib.IMAP4_SSL(SMTP_SERVER)
+    mail.login(EMAIL,PW)
+    mail.select("inbox")
+    _, mail_ids = mail.search(None,"UNSEEN")
+    unread = len(mail_ids[0].split())
+
+    return f"🖂 {unread}"
+
+if __name__ == "__main__":
+    main()
+
+#+END_SRC
+
+* Picom
+
+picom is a standalone compositor, we need it to use with qtile
+
+** picom.conf
+
+#+BEGIN_SRC conf :tangle .config/qtile/picom.conf
+# Generated from ~/dotfiles/system.org
+# Thank you code_nomad: http://9m.no/ꪯ鵞
+# and Arch Wiki contributors: https://wiki.archlinux.org/index.php/Compton
+
+#################################
+#
+# Backend
+#
+#################################
+
+# Backend to use: "xrender" or "glx".
+# GLX backend is typically much faster but depends on a sane driver.
+backend = "glx";
+#backend = "xrender"
+
+#################################
+#
+# GLX backend
+#
+#################################
+
+glx-no-stencil = true;
+
+# GLX backend: Copy unmodified regions from front buffer instead of redrawing them all.
+# My tests with nvidia-drivers show a 10% decrease in performance when the whole screen is modified,
+# but a 20% increase when only 1/4 is.
+# My tests on nouveau show terrible slowdown.
+glx-copy-from-front = false;
+
+# GLX backend: Use MESA_copy_sub_buffer to do partial screen update.
+# My tests on nouveau shows a 200% performance boost when only 1/4 of the screen is updated.
+# May break VSync and is not available on some drivers.
+# Overrides --glx-copy-from-front.
+# glx-use-copysubbuffermesa = true;
+
+# GLX backend: Avoid rebinding pixmap on window damage.
+# Probably could improve performance on rapid window content changes, but is known to break things on some drivers (LLVMpipe).
+# Recommended if it works.
+# glx-no-rebind-pixmap = true;
+
+# GLX backend: GLX buffer swap method we assume.
+# Could be undefined (0), copy (1), exchange (2), 3-6, or buffer-age (-1).
+# undefined is the slowest and the safest, and the default value.
+# copy is fastest, but may fail on some drivers,
+# 2-6 are gradually slower but safer (6 is still faster than 0).
+# Usually, double buffer means 2, triple buffer means 3.
+# buffer-age means auto-detect using GLX_EXT_buffer_age, supported by some drivers.
+# Useless with --glx-use-copysubbuffermesa.
+# Partially breaks --resize-damage.
+# Defaults to undefined.
+#glx-swap-method = "undefined";
+
+#################################
+#
+# Shadows
+#
+#################################
+
+# Enabled client-side shadows on windows.
+shadow = false;
+# The blur radius for shadows. (default 12)
+shadow-radius = 5;
+# The left offset for shadows. (default -15)
+shadow-offset-x = -5;
+# The top offset for shadows. (default -15)
+shadow-offset-y = -5;
+# The translucency for shadows. (default .75)
+shadow-opacity = 0.5;
+
+log-level = "warn";
+#change your username here
+#log-file = "/home/erik/.config/compton.log";
+
+# Set if you want different colour shadows
+# shadow-red = 0.0;
+# shadow-green = 0.0;
+# shadow-blue = 0.0;
+
+# The shadow exclude options are helpful if you have shadows enabled. Due to the way compton draws its shadows, certain applications will have visual glitches
+# (most applications are fine, only apps that do weird things with xshapes or argb are affected).
+# This list includes all the affected apps I found in my testing. The "! name~=''" part excludes shadows on any "Unknown" windows, this prevents a visual glitch with the XFWM alt tab switcher.
+shadow-exclude = [
+    "! name~=''",
+    "name = 'Notification'",
+    "name = 'Plank'",
+    "name = 'Docky'",
+    "name = 'Kupfer'",
+    "name = 'xfce4-notifyd'",
+    "name *= 'VLC'",
+    "name *= 'compton'",
+    "name *= 'Chromium'",
+    "name *= 'Chrome'",
+    "class_g = 'Firefox' && argb",
+    "class_g = 'Conky'",
+    "class_g = 'Kupfer'",
+    "class_g = 'Synapse'",
+    "class_g ?= 'Notify-osd'",
+    "class_g ?= 'Cairo-dock'",
+    "class_g = 'Cairo-clock'",
+    "class_g ?= 'Xfce4-notifyd'",
+    "class_g ?= 'Xfce4-power-manager'",
+    "_GTK_FRAME_EXTENTS@:c",
+    "_NET_WM_STATE@:32a *= '_NET_WM_STATE_HIDDEN'"
+];
+# Avoid drawing shadow on all shaped windows (see also: --detect-rounded-corners)
+shadow-ignore-shaped = false;
+
+#################################
+#
+# Opacity
+#
+#################################
+
+inactive-opacity = 1;
+active-opacity = 1;
+frame-opacity = 1;
+inactive-opacity-override = false;
+
+# Dim inactive windows. (0.0 - 1.0)
+# inactive-dim = 0.2;
+# Do not let dimness adjust based on window opacity.
+# inactive-dim-fixed = true;
+# Blur background of transparent windows. Bad performance with X Render backend. GLX backend is preferred.
+# blur-background = true;
+# Blur background of opaque windows with transparent frames as well.
+# blur-background-frame = true;
+# Do not let blur radius adjust based on window opacity.
+blur-background-fixed = false;
+blur-background-exclude = [
+    "window_type = 'dock'",
+    "window_type = 'desktop'",
+    "_GTK_FRAME_EXTENTS@:c"
+];
+
+#################################
+#
+# Fading
+#
+#################################
+
+# Fade windows during opacity changes.
+fading = false;
+# The time between steps in a fade in milliseconds. (default 10).
+fade-delta = 4;
+# Opacity change between steps while fading in. (default 0.028).
+fade-in-step = 0.03;
+# Opacity change between steps while fading out. (default 0.03).
+fade-out-step = 0.03;
+# Fade windows in/out when opening/closing
+# no-fading-openclose = true;
+
+# Specify a list of conditions of windows that should not be faded.
+fade-exclude = [ ];
+
+#################################
+#
+# Other
+#
+#################################
+
+# Try to detect WM windows and mark them as active.
+mark-wmwin-focused = true;
+# Mark all non-WM but override-redirect windows active (e.g. menus).
+mark-ovredir-focused = true;
+# Use EWMH _NET_WM_ACTIVE_WINDOW to determine which window is focused instead of using FocusIn/Out events.
+# Usually more reliable but depends on a EWMH-compliant WM.
+use-ewmh-active-win = true;
+# Detect rounded corners and treat them as rectangular when --shadow-ignore-shaped is on.
+detect-rounded-corners = true;
+
+# Detect _NET_WM_OPACITY on client windows, useful for window managers not passing _NET_WM_OPACITY of client windows to frame windows.
+# This prevents opacity being ignored for some apps.
+# For example without this enabled my xfce4-notifyd is 100% opacity no matter what.
+detect-client-opacity = true;
+
+# Specify refresh rate of the screen.
+# If not specified or 0, compton will try detecting this with X RandR extension.
+refresh-rate = 0;
+
+# Vertical synchronization: match the refresh rate of the monitor
+# this breaks transparency in virtualbox - put a "#" before next line to fix that
+vsync = true;
+
+# Enable DBE painting mode, intended to use with VSync to (hopefully) eliminate tearing.
+# Reported to have no effect, though.
+dbe = false;
+
+# Limit compton to repaint at most once every 1 / refresh_rate second to boost performance.
+# This should not be used with --vsync drm/opengl/opengl-oml as they essentially does --sw-opti's job already,
+# unless you wish to specify a lower refresh rate than the actual value.
+#sw-opti = true;
+
+# Unredirect all windows if a full-screen opaque window is detected, to maximize performance for full-screen windows, like games.
+# Known to cause flickering when redirecting/unredirecting windows.
+unredir-if-possible = false;
+
+# Specify a list of conditions of windows that should always be considered focused.
+focus-exclude = [ ];
+
+# Use WM_TRANSIENT_FOR to group windows, and consider windows in the same group focused at the same time.
+detect-transient = true;
+# Use WM_CLIENT_LEADER to group windows, and consider windows in the same group focused at the same time.
+# WM_TRANSIENT_FOR has higher priority if --detect-transient is enabled, too.
+detect-client-leader = true;
+
+#################################
+#
+# Window type settings
+#
+#################################
+
+wintypes:
+{
+  tooltip = { fade = true; shadow = true; opacity = 0.9; focus = true;};
+  dock = { shadow = false; }
+  dnd = { shadow = false; }
+  popup_menu = { opacity = 0.9; }
+  dropdown_menu = { opacity = 0.9; }
+};
+
+######################
+#
+# XSync
+# See: https://github.com/yshui/compton/commit/b18d46bcbdc35a3b5620d817dd46fbc76485c20d
+#
+######################
+
+# Use X Sync fence to sync clients' draw calls. Needed on nvidia-drivers with GLX backend for some users.
+xrender-sync-fence = true;
+
+#+END_SRC

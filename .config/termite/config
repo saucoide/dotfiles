@@ -1,3 +1,7 @@
+#
+# Generated from ~/dotfiles/system.org
+#
+
 [options]
 #https://github.com/thestinger/termite/blob/master/config
 allow_bold = true
@@ -43,6 +47,7 @@ urgent_on_bell = true
 #### https://terminal.sexy
 #### https://critical.ch/xterm/
 ############################################################
+#### Nord Theme
 [colors]
 cursor = #d8dee9
 cursor_foreground = #2e3440
@@ -68,4 +73,3 @@ color11 = #ebcb8b
 color12 = #81a1c1
 color13 = #b48ead
 color14 = #8fbcbb
-color15 = #eceff4

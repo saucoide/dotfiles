@@ -1,4 +1,5 @@
-#!/home/saucoide/saucoidenv/bin/python
+# Generated from ~/dotfiles/system.org
+
 import requests
 import keyring
 from pathlib import Path
@@ -12,7 +13,7 @@ def main():
     PW = keyring.get_password("Passwords", 'ino_pw')
     APP_ID = keyring.get_password("Passwords", 'ino_id')
     APP_KEY = keyring.get_password("Passwords", 'ino_key')
-    
+
 
     resp = requests.post(LOGIN_URL, data={'Email':EMAIL,'Passwd':PW})
 
@@ -23,7 +24,7 @@ def main():
             content[key] = val
     token = content['Auth']
 
-    headers = {'Authorization': 'GoogleLogin auth=' + token, 
+    headers = {'Authorization': 'GoogleLogin auth=' + token,
             'Appid': APP_ID,
             'AppKey': APP_KEY}
 
