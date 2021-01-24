@@ -47,7 +47,7 @@ FILE_MANAGER = "thunar"
 BROWSER = "firefox"
 SYS_MONITOR = "xfce4-taskmanager"
 
-MY_CONFIG = "/home/saucoide/.config/qtile/config.py"
+MY_CONFIG = "~/.config/qtile/config.py"
 
 ## Numpad keys ##
 NUMPAD = {  0: "KP_Insert",
@@ -66,15 +66,15 @@ NUMPAD = {  0: "KP_Insert",
 COLORS = {
           "white":"ffffff",
           "background":"#2e3440",           # panel background
-          "active_background":"#434c5e",    # background for current group
+          "active_background":"#3B4252",    # background for current group
           "group_highlight":"#ff5555",      # border line color for current group
           "border_line":"#8d62a9",          # border line color for other tab and odd widgets
           "border_focus":"#5e81ac",
           "win_name":"#81a1c1",             # current window name
           "frost0":"#5e81ac",               # Theme colors (nord)
           "frost1":"#81a1c1",
-          "frost2":"#88c0d0",
-          "frost3":"#8fbcbb",
+          "frost2":"#434C5E",
+          "frost3":"#4C566A",
           "aurora0":"#bf616a",
     }
 
@@ -298,7 +298,7 @@ keys.append(Key([mod], "BackSpace", lazy.screen.toggle_group()))
 ##### ADDING DROPDOWN TERMINAL #####
     ### Appending group
 groups.append(ScratchPad("scratchpad", [DropDown("term",
-                                                "/usr/bin/konsole",
+                                                "/usr/bin/termite",
                                                 opacity=0.88,
                                                 height=0.33,
                                                 width=0.8)]
@@ -622,8 +622,8 @@ cursor_warp = False
 ##### STARTUP APPLICATIONS #####
 @hook.subscribe.startup_once
 def start_once():
-    home = os.path.expanduser('~')
-    subprocess.call([home + '/.config/qtile/autostart.sh'])
+    autostart = pathlib.Path.home() / ".config/qtile/autostart.sh"
+    subprocess.call([autostart])
 
 # XXX: Gasp! We're lying here. In fact, nobody really uses or cares about this
 # string besides java UI toolkits; you can see several discussions on the
