@@ -19,7 +19,10 @@
 - [[#window-management][WINDOW MANAGEMENT]]
 - [[#e-mail][E-MAIL]]
   - [[#recieving-emails---mu4e][Recieving emails - mu4e]]
+  - [[#auth-sources][Auth Sources]]
   - [[#sending-emails][Sending Emails]]
+  - [[#email-formatting][Email Formatting]]
+  - [[#composing-emails-with-org-msg][Composing emails with org-msg]]
 
 * ABOUT
 my doom emcas config, originally based on [[https://gitlab.com/dwt1/dotfiles][DT's config]]
@@ -266,17 +269,18 @@ prefer horizontal splits when opening a new buffer
 ** Recieving emails - mu4e
 
 #+BEGIN_SRC emacs-lisp
+
   (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
 
   ;; This is set to 't' to avoid mail syncing issues when using mbsync
-
-  (setq user-mail-address "saucoide@gmail.com")
-
   (setq mu4e-change-filenames-when-moving t)
   (setq mu4e-view-auto-mark-as-read nil)
-  (setq mu4e-view-html-plaintext-ratio-heuristic most-positive-fixnum)
-  (add-hook 'mu4e-view-mode-hook #'visual-line-mode)
- ;; (setq mu4e-view-use-gnus t)
+
+
+  ;; Refresh mail using isync every 10 minutes
+  (setq mu4e-update-interval 600)
+  (setq mu4e-get-mail-command "mbsync -a")
+  (setq mu4e-maildir "~/mail/gmail")
 
   ;; I find it very annoying when the reply to a thread un-archives all other emails
   (setq mu4e-headers-include-related nil)
@@ -284,16 +288,31 @@ prefer horizontal splits when opening a new buffer
   ;; US date format is no good
   (setq mu4e-headers-date-format "%Y/%m/%d")
 
-  ;; Refresh mail using isync every 10 minutes
-  (setq mu4e-update-interval 600)
-  (setq mu4e-get-mail-command "mbsync -a")
-  (setq mu4e-maildir "~/mail/gmail")
+  ;; When html emails are very large compared to the text one, mu4e blocks
+  ;; toggling between plaintext and html which is annoying
+  (setq mu4e-view-html-plaintext-ratio-heuristic most-positive-fixnum)
+
+  (add-hook 'mu4e-view-mode-hook #'visual-line-mode)
+ ;; (setq mu4e-view-use-gnus t)
+
+
+  ;; Account settings
+  (setq user-full-name "saucoide")
+  (setq user-mail-address "saucoide@gmail.com")
 
   (setq mu4e-drafts-folder "/[Gmail]/Drafts")
   (setq mu4e-sent-folder   "/[Gmail]/Sent Mail")
   (setq mu4e-refile-folder "/[Gmail]/All Mail")
   (setq mu4e-trash-folder  "/[Gmail]/Bin")
 
+  ;; For sending emails
+  (setq message-send-mail-function 'smtpmail-send-it)
+  (setq smtpmail-smtp-server "smtp.gmail.com")
+  (setq smtpmail-smtp-user "saucoide@gmail.com")
+  (setq smtpmail-smtp-service 587)
+  (setq smtpmail-stream-type 'starttls)
+
+  ;; Shortcuts
   (setq mu4e-maildir-shortcuts
     '((:maildir "/Inbox"    :key ?i)
       (:maildir "/ReadInbox" :key ?r)
@@ -302,45 +321,74 @@ prefer horizontal splits when opening a new buffer
       (:maildir "/[Gmail]/Drafts"    :key ?d)
       (:maildir "/[Gmail]/All Mail"  :key ?a)))
 
+  ;; Bookmarks
   (setq mu4e-bookmarks
     '(
      ;; (:name "Unread messages" :query "flag:unread AND NOT flag:trashed" :key ?i)
      ;; (:name "Today's messages" :query "date:today..now AND NOT flag:trashed" :key ?t)
       (:name "Inbox" :query "maildir:/Inbox" :key ?b)
       (:name "ReadInbox" :query "maildir:/ReadInbox" :key ?r)
-      (:name "with Attachments" :query "flag:attach" :key ?a)
+     ;; (:name "with Attachments" :query "flag:attach" :key ?a)
      ;; (:name "Last 7 days" :query "date:7d..now AND NOT flag:trashed" :key ?w)
       ))
 
 #+END_SRC
 
+** Auth Sources
+
+#+BEGIN_SRC elisp
+(auth-source-pass-enable)
+(setq auth-sources '(password-store))
+#+END_SRC
+
 ** Sending Emails
-
-*** SMTP
-
-We need to setup SMTP to send emails
 
 #+BEGIN_SRC emacs-lisp
 
-(setq smtpmail-smtp-server "smtp.gmail.com"
-      smtpmail-smtp-service 465
-      smtpmail-stream-type 'ssl)
+;; don't keep message buffers around
+(setq message-kill-buffer-on-exit t)
 
-(setq message-send-mail-function 'smtpmail-send-it)
+;; (setq mu4e-sent-messages-behavior 'delete)
 
 #+END_SRC
 
-*** Formatting
+** Email Formatting
 
 mu4e is going to send emails in plaintext by default, including the proper character limit per line.
 Setting this variable makes it so text will wrap better on other email clients
 
 #+BEGIN_SRC emacs-lisp
-(setq mu4e-compose-format-flowed t)
+;; (setq mu4e-compose-format-flowed t)
 #+END_SRC
 
 Signature
 
 #+BEGIN_SRC emacs-lisp
-(setq mu4e-compose-signature "Thanks\nsauco")
+;; (setq mu4e-compose-signature "Thanks\nsauco")
+#+END_SRC
+
+** Composing emails with org-msg
+
+=org-msg= lets you write emails in org-mode, and will htmlize it before sending, we can preview how the email look like etc.
+
+
+#+BEGIN_SRC elisp
+;; (setq mail-user-agent 'mu4e-user-agent)
+
+;; (require 'org-msg)
+ (setq org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t"
+       org-msg-startup "hidestars indent inlineimages"
+       org-msg-greeting-fmt ""
+       org-msg-greeting-name-limit 3
+       org-msg-default-alternatives '(text html)
+       org-msg-convert-citation t
+       org-msg-signature "
+
+
+ #+begin_signature
+ thanks,
+ --
+ sauco
+ #+end_signature")
+;; (org-msg-mode) ;; im leaving it disabled for now as i dont really use
 #+END_SRC
