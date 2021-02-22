@@ -1,6 +1,7 @@
 #+TITLE: Desktop's configuration
 #+AUTHOR: Sauco
 #+DESCRIPTION: My desktop's configuration
+#+STARTUP: content
 
 * Introduction
 
@@ -1032,6 +1033,7 @@ import os
 import re
 import socket
 import subprocess
+from libqtile import qtile
 from libqtile.config import Key, Screen, Group, Drag, Click, Match
 from libqtile.command import lazy
 from libqtile import layout, bar, widget, hook
@@ -1089,7 +1091,7 @@ COLORS = {
 ##### DEFINING MY FUNCTIONS #####
 
 @lazy.function
-def float_to_front(qtile):
+def float_to_front():
     for group in qtile.groups:
         for window in group.windows:
             if window.floating:
@@ -1108,28 +1110,28 @@ def get_wallpaper():
     wallpapers = list(filter(lambda x: x.suffix in (".png",".jpg"), wp_path.glob("*")))
     return random.choice(wallpapers)
 
-def open_htop(qtile):
+def open_htop():
     qtile.cmd_spawn(f'{MY_TERMINAL} -e htop')
 
-def open_sys_monitor(qtile):
+def open_sys_monitor():
     qtile.cmd_spawn(SYS_MONITOR)
 
-def open_audio_settings(qtile):
+def open_audio_settings():
     qtile.cmd_spawn("pavucontrol")
 
-def open_mail(qtile):
+def open_mail():
     qtile.cmd_spawn(EMAIL_CLIENT)
 
-def open_feeds(qtile):
+def open_feeds():
     qtile.cmd_spawn(f"{BROWSER} --new-window https://www.inoreader.com")
 
-def toggle_calendar(qtile):
-    qtile.cmd_spawn(f'{MY_TERMINAL} -e cal')
+def toggle_calendar():
+    qtile.cmd_spawn(f'{MY_TERMINAL} -e cal;bash') # TODO find something better for this
 
-def logout(qtile):
+def logout():
     qtile.cmd_spawn("arcolinux-logout")
 
-def open_pamac(qtile):
+def open_pamac():
     qtile.cmd_spawn("pamac-manager")
 
 ##### GROUPS #####
@@ -1139,8 +1141,8 @@ group_names = {"SYS": {'layout': 'columns'},
                "COM": {'layout': 'max'},
                "WWW": {'layout': 'columns'},
                "DEV": {'layout': 'columns'},
-               "MUS": {'layout': 'max', "matches":[Match(title=["Spotify Free"])]},
-               "VID": {'layout': 'columns', "matches":[Match(wm_class=["smplayer"])]},
+               "MUS": {'layout': 'max', "matches":[Match(title="Spotify Free")]},
+               "VID": {'layout': 'columns', "matches":[Match(wm_class="smplayer")]},
                "NTS": {'layout': 'max'},
                "DOC": {'layout': 'columns'},
                "VMS": {'layout': 'max'}}
