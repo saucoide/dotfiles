@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 # Generated from ~/dotfiles/system.org
 
