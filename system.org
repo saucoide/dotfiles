@@ -1066,8 +1066,6 @@ from libqtile.config import ScratchPad, DropDown
 
 import random
 import pathlib
-from mailwatcher import main as get_mails
-from inoreader_rss_counter import main as get_feeds
 
 ##### DEFINING CONSTANTS & DEFAULT PROGRAMS #####
 
@@ -1145,9 +1143,6 @@ def open_audio_settings():
 
 def open_mail():
     qtile.cmd_spawn(EMAIL_CLIENT)
-
-def open_feeds():
-    qtile.cmd_spawn(f"{BROWSER} --new-window https://www.inoreader.com")
 
 def toggle_calendar():
     qtile.cmd_spawn(f'{MY_TERMINAL} -e cal;bash') # TODO find something better for this
@@ -1481,25 +1476,7 @@ def init_widgets_list():
                         padding = 5
                         ),
                bar_transition(COLORS["background"], COLORS["frost0"]),
-               widget.GenPollText(
-                   background = COLORS["frost0"],
-                   func = get_mails,
-                   update_interval = 600,
-                   mouse_callbacks = {'Button1':open_mail}
-                   ),
                bar_transition(COLORS["frost0"], COLORS["frost1"]),
-               widget.TextBox(
-                        text = "",
-                        foreground = COLORS["white"],
-                        background = COLORS["frost1"],
-                        mouse_callbacks = {'Button1': open_feeds}
-                   ),
-               widget.GenPollText(
-                   background = COLORS["frost1"],
-                   func = get_feeds,
-                   update_interval = 600,
-                   mouse_callbacks={'Button1': open_feeds}
-                   ),
                bar_transition(COLORS["frost1"], COLORS["frost2"]),
                widget.CPU(
                         foreground = COLORS["white"],
@@ -1518,12 +1495,6 @@ def init_widgets_list():
                         mouse_callbacks={'Button1': open_htop, 'Button3': open_sys_monitor}
                         ),
                bar_transition(COLORS["frost2"], COLORS["frost3"]),
-               widget.ThermalSensor(
-                        foreground=COLORS["white"],
-                        background=COLORS["frost3"],
-                        padding = 0,
-                        update_interval = 10,
-                        ),
                bar_transition(COLORS["frost3"], COLORS["frost0"]),
                widget.TextBox(
                         text = "",
@@ -1670,85 +1641,6 @@ def start_once():
 # We choose LG3D to maximize irony: it is a 3D non-reparenting WM written in
 # java that happens to be on java's whitelist.
 wmname = "LG3D"
-
-#+END_SRC
-
-** inoreader_rss_counter.py
-
-One fo the bar widgets in my qtile config displays the number of unread RSS readers on my inoreader account, which is the result of this python script
-
-To get the password from kwallet it is using =keyring= so that dependency needs to be installed
-
-#+BEGIN_SRC python :tangle .config/qtile/inoreader_rss_counter.py
-# Generated from ~/dotfiles/system.org
-
-import requests
-import keyring
-from pathlib import Path
-
-def main():
-
-    BASE_URL = "https://www.inoreader.com/reader/api/0"
-    LOGIN_URL = "https://www.inoreader.com/accounts/ClientLogin"
-
-    EMAIL = keyring.get_password("Passwords", 'ino_user')
-    PW = keyring.get_password("Passwords", 'ino_pw')
-    APP_ID = keyring.get_password("Passwords", 'ino_id')
-    APP_KEY = keyring.get_password("Passwords", 'ino_key')
-
-
-    resp = requests.post(LOGIN_URL, data={'Email':EMAIL,'Passwd':PW})
-
-    content = {}
-    for line in resp.text.split('\n'):
-        if line:
-            key, val = line.split("=")
-            content[key] = val
-    token = content['Auth']
-
-    headers = {'Authorization': 'GoogleLogin auth=' + token,
-            'Appid': APP_ID,
-            'AppKey': APP_KEY}
-
-    resp = requests.get(BASE_URL + "/unread-count", headers=headers)
-    unreadcounts = resp.json()
-    unread = unreadcounts['unreadcounts'][0]['count']
-
-    return str(unread)
-
-
-if __name__ == "__main__":
-    main()
-
-#+END_SRC
-** mailwatcher.py
-
-Similarly i have a script to count unread emails
-
-#+BEGIN_SRC python :tangle .config/qtile/mailwatcher.py
-# Generated from ~/dotfiles/system.org
-
-import imaplib
-import keyring
-from pathlib import Path
-
-def main():
-
-    EMAIL = keyring.get_password('Passwords', 'email_user')
-    PW = keyring.get_password('Passwords', 'email_pw')
-    SMTP_SERVER = "imap.gmail.com"
-    SMTP_PORT = 993
-
-    mail = imaplib.IMAP4_SSL(SMTP_SERVER)
-    mail.login(EMAIL,PW)
-    mail.select("inbox")
-    _, mail_ids = mail.search(None,"UNSEEN")
-    unread = len(mail_ids[0].split())
-
-    return f"🖂 {unread}"
-
-if __name__ == "__main__":
-    main()
 
 #+END_SRC
 

@@ -33,8 +33,6 @@ from libqtile.config import ScratchPad, DropDown
 
 import random
 import pathlib
-from mailwatcher import main as get_mails
-from inoreader_rss_counter import main as get_feeds
 
 ##### DEFINING CONSTANTS & DEFAULT PROGRAMS #####
 
@@ -112,9 +110,6 @@ def open_audio_settings():
 
 def open_mail():
     qtile.cmd_spawn(EMAIL_CLIENT)
-
-def open_feeds():
-    qtile.cmd_spawn(f"{BROWSER} --new-window https://www.inoreader.com")
 
 def toggle_calendar():
     qtile.cmd_spawn(f'{MY_TERMINAL} -e cal;bash') # TODO find something better for this
@@ -448,25 +443,7 @@ def init_widgets_list():
                         padding = 5
                         ),
                bar_transition(COLORS["background"], COLORS["frost0"]),
-               widget.GenPollText(
-                   background = COLORS["frost0"],
-                   func = get_mails,
-                   update_interval = 600,
-                   mouse_callbacks = {'Button1':open_mail}
-                   ),
                bar_transition(COLORS["frost0"], COLORS["frost1"]),
-               widget.TextBox(
-                        text = "",
-                        foreground = COLORS["white"],
-                        background = COLORS["frost1"],
-                        mouse_callbacks = {'Button1': open_feeds}
-                   ),
-               widget.GenPollText(
-                   background = COLORS["frost1"],
-                   func = get_feeds,
-                   update_interval = 600,
-                   mouse_callbacks={'Button1': open_feeds}
-                   ),
                bar_transition(COLORS["frost1"], COLORS["frost2"]),
                widget.CPU(
                         foreground = COLORS["white"],
@@ -485,12 +462,6 @@ def init_widgets_list():
                         mouse_callbacks={'Button1': open_htop, 'Button3': open_sys_monitor}
                         ),
                bar_transition(COLORS["frost2"], COLORS["frost3"]),
-               widget.ThermalSensor(
-                        foreground=COLORS["white"],
-                        background=COLORS["frost3"],
-                        padding = 0,
-                        update_interval = 10,
-                        ),
                bar_transition(COLORS["frost3"], COLORS["frost0"]),
                widget.TextBox(
                         text = "",
