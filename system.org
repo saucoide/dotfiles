@@ -61,6 +61,30 @@ export PATH=~/.poetry/bin:$PATH
 # use vim as manpager
 export MANPAGER='/bin/bash -c "vim -MRn -c \"set buftype=nofile showtabline=0 ft=man ts=8 nomod nolist norelativenumber nonu noma\" -c \"normal L\" -c \"nmap q :qa<CR>\"</dev/tty <(col -b)"'
 
+# Start SSH automatically and only run one instance
+# TODO fix this
+SSH_ENV="$HOME/.ssh/agent-environment"
+
+function start_agent {
+    echo "Initialising new SSH agent..."
+    /usr/bin/ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
+    echo succeeded
+    chmod 600 "${SSH_ENV}"
+    . "${SSH_ENV}" > /dev/null
+    /usr/bin/ssh-add;
+}
+
+# Source SSH settings, if applicable
+
+if [ -f "${SSH_ENV}" ]; then
+    . "${SSH_ENV}" > /dev/null
+    #ps ${SSH_AGENT_PID} doesn't work under cywgin
+    ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
+        start_agent;
+    }
+else
+    start_agent;
+fi
 # ALIASES
 
 # list (exa is a replacement for ls)
@@ -979,7 +1003,7 @@ My window manager is Qtile, the configuration is lenghty
 ** autostart.sh
 
 #+BEGIN_SRC bash :tangle .config/qtile/autostart.sh
-#! /bin/bash
+#!/bin/bash
 
 # Generated from ~/dotfiles/system.org
 
@@ -1127,6 +1151,9 @@ def open_feeds():
 
 def toggle_calendar():
     qtile.cmd_spawn(f'{MY_TERMINAL} -e cal;bash') # TODO find something better for this
+
+def toggle_rofi():
+    qtile.cmd_spawn('rofi -show drun')
 
 def logout():
     qtile.cmd_spawn("arcolinux-logout")
@@ -1382,7 +1409,7 @@ def init_widgets_list():
                         margin = 2,
                         #margin_x = 0,
                         #margin_y = 0,
-                        mouse_callbacks = {'Button1': lambda x: x.cmd_spawn('rofi -show drun')}
+                        mouse_callbacks = {'Button1': toggle_rofi}
                    ),
              #widget.Sep(
                         #linewidth = 0,
@@ -1484,7 +1511,9 @@ def init_widgets_list():
                widget.Memory(
                         foreground = COLORS["white"],
                         background = COLORS["frost2"],
-                        format = 'RAM {MemUsed}M/{MemTotal}M',
+                        measure_mem = "G",
+                        measure_swap = "G",
+                        format = 'RAM {MemUsed: .1f}/{MemTotal: .1f}GB',
                         padding = 0,
                         mouse_callbacks={'Button1': open_htop, 'Button3': open_sys_monitor}
                         ),
@@ -1582,28 +1611,25 @@ def set_floating(window):
         window.floating = True
 
 floating_layout = layout.Floating(float_rules=[
-                    {'wmclass': 'confirm'},
-                    {'wmclass': 'dialog'},
-                    {'wmclass': 'download'},
-                    {'wmclass': 'error'},
-                    {'wmclass': 'file_progress'},
-                    {'wmclass': 'notification'},
-                    {'wmclass': 'splash'},
-                    {'wmclass': 'toolbar'},
-                    {'wmclass': 'confirmreset'},  # gitk
-                    {'wmclass': 'makebranch'},  # gitk
-                    {'wmclass': 'maketag'},  # gitk
-                    {'wname': 'branchdialog'},  # gitk
-                    {'wname': 'pinentry'},  # GPG key password entry
-                    {'wmclass': 'ulauncher'},
-                    {'wmclass': 'krunner'},
-                    {'wmclass': 'ssh-askpass'},  # ssh-askpass
-                    {'wmclass': 'Arcolinux-tweak-tool.py'},
-                    {'wmclass': 'Arandr'},
-                    {'wmclass': 'arcolinux-logout'},
-                    {'wname': 'branchdialog'},
-                    {'wname': 'Open File'},
-                    {'wname': 'pinentry'},
+                    ,*layout.Floating.default_float_rules,
+                    Match(wm_class='makebranch'),  # gitk
+                    Match(wm_class='confirmreset'),  # gitk
+                    Match(wm_class='maketag'),  # gitk
+                    Match(title='branchdialog'),  # gitk
+                    Match(wm_class='ssh-askpass'),  # ssh-askpass
+                    Match(title='pinentry'),  # GPG key password entry
+                    Match(wm_class='confirm'),
+                    Match(wm_class='dialog'),
+                    Match(wm_class='download'),
+                    Match(wm_class='error'),
+                    Match(wm_class='file_progress'),
+                    Match(wm_class='notification'),
+                    Match(wm_class='splash'),
+                    Match(wm_class='toolbar'),
+                    Match(wm_class='Arandr'),
+                    Match(wm_class='Arcolinux-tweak-tool.py'),
+                    Match(wm_class='arcolinux-logout'),
+                    Match(title='Open File'),
                     ],
                     ,**float_theme
                     )

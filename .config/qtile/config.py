@@ -478,7 +478,9 @@ def init_widgets_list():
                widget.Memory(
                         foreground = COLORS["white"],
                         background = COLORS["frost2"],
-                        format = 'RAM {MemUsed}M/{MemTotal}M',
+                        measure_mem = "G",
+                        measure_swap = "G",
+                        format = 'RAM {MemUsed: .1f}/{MemTotal: .1f}GB',
                         padding = 0,
                         mouse_callbacks={'Button1': open_htop, 'Button3': open_sys_monitor}
                         ),
@@ -577,24 +579,24 @@ def set_floating(window):
 
 floating_layout = layout.Floating(float_rules=[
                     *layout.Floating.default_float_rules,
-                    Match(wm_class: 'makebranch'),  # gitk
-                    Match(wm_class: 'confirmreset'),  # gitk
-                    Match(wm_class: 'maketag'),  # gitk
-                    Match(wname: 'branchdialog'),  # gitk
-                    Match(wm_class: 'ssh-askpass'),  # ssh-askpass
-                    Match(wname: 'pinentry'),  # GPG key password entry
+                    Match(wm_class='makebranch'),  # gitk
+                    Match(wm_class='confirmreset'),  # gitk
+                    Match(wm_class='maketag'),  # gitk
+                    Match(title='branchdialog'),  # gitk
+                    Match(wm_class='ssh-askpass'),  # ssh-askpass
+                    Match(title='pinentry'),  # GPG key password entry
                     Match(wm_class='confirm'),
-                    Match(wm_class: 'dialog'),
-                    Match(wm_class: 'download'),
-                    Match(wm_class: 'error'),
-                    Match(wm_class: 'file_progress'),
-                    Match(wm_class: 'notification'),
-                    Match(wm_class: 'splash'),
-                    Match(wm_class: 'toolbar'),
-                    Match(wm_class: 'Arandr'),
-                    Match(wm_class: 'Arcolinux-tweak-tool.py'),
-                    Match(wm_class: 'arcolinux-logout'),
-                    Match(wname: 'Open File'),
+                    Match(wm_class='dialog'),
+                    Match(wm_class='download'),
+                    Match(wm_class='error'),
+                    Match(wm_class='file_progress'),
+                    Match(wm_class='notification'),
+                    Match(wm_class='splash'),
+                    Match(wm_class='toolbar'),
+                    Match(wm_class='Arandr'),
+                    Match(wm_class='Arcolinux-tweak-tool.py'),
+                    Match(wm_class='arcolinux-logout'),
+                    Match(title='Open File'),
                     ],
                     **float_theme
                     )
