@@ -100,7 +100,7 @@
     :config
     (gcmh-mode 1))
 
-(setq saucoide/is-windows (eq system-type 'windows-nt))
+(setq my/is-windows (eq system-type 'windows-nt))
 
 (use-package emacs
     :init
@@ -112,7 +112,7 @@
 
 (use-package emacs
     :config
-    (if saucoide/is-windows
+    (if my/is-windows
         (progn
             ;; Windows
             (set-face-attribute 'default nil :font "Consolas" :height 100) ; default font
@@ -160,7 +160,7 @@
     :config
     (setq dashboard-startup-banner "~/.emacs.d/logo.txt")
     (setq dashboard-set-navigator t)
-    (unless saucoide/is-windows
+    (unless my/is-windows
         (setq dashboard-set-file-icons t)
         (setq dashboard-set-heading-icons t))
     ;; (setq dashboard-footer-icon nil)
@@ -171,7 +171,7 @@
 
 ;; show icons on dired
 (use-package all-the-icons-dired
-    :if (not saucoide/is-windows))
+    :if (not my/is-windows))
 
 
 (use-package dired
@@ -179,7 +179,7 @@
     :commands (dired dired-jump)
     :config
     (setq dired-listing-switches "-agho --group-directories-first")
-	(unless saucoide/is-windows
+	(unless my/is-windows
           (add-hook 'dired-mode-hook
               (lambda ()
                   (interactive)
@@ -194,7 +194,7 @@
             "H" 'dired-hide-dotfiles-mode))
 
 (use-package openwith
-    :if (not saucoide/is-windows)
+    :if (not my/is-windows)
     :config
     (setq openwith-associations
         (list
@@ -276,7 +276,7 @@
     ("C-c p" . projectile-command-map)
     ;; ("SPC P" . projectile-command-map))
    :init
-   (if saucoide/is-windows
+   (if my/is-windows
        (when (file-directory-p "C:\\Users\\IEUser\\projects")
            (setq projectile-project-search-path '("C:\\Users\\IEUser\\projects")))
        (when (file-directory-p "~/projects")
@@ -297,7 +297,7 @@
     :hook (eglot-mode . flycheck-mode))
 
 ;; on windows dont enable it globally
-(unless saucoide/is-windows
+(unless my/is-windows
     (global-flycheck-mode))
 
 (use-package format-all)
@@ -305,7 +305,7 @@
 (use-package evil-nerd-commenter
     :bind ("C-/" . evilnc-comment-or-uncomment-lines))
 
-(if saucoide/is-windows
+(if my/is-windows
     (progn
         (setq exec-path (add-to-list 'exec-path "C:\Program Files\Git\bin"))
         (setenv "PATH" (concat "C:\Program Files\Git\bin;" (getenv "PATH")))))
@@ -319,13 +319,13 @@
 
 ;; TODO doesnt work well with org mode buffers for me
  (use-package git-gutter
-     :if (not saucoide/is-windows)
+     :if (not my/is-windows)
      :defer t
      :hook ((text-mode . git-gutter-mode)
              (prog-mode . git-gutter-mode)))
 
 (use-package magit-todos
-    :if (not saucoide/is-windows)
+    :if (not my/is-windows)
     :hook (magit-mode . magit-todos-mode)
     :init
     (unless (executable-find "nice")
@@ -390,7 +390,7 @@
     :config 
     (smartparens-global-mode t))
 
-(if saucoide/is-windows
+(if my/is-windows
     (progn
         (setq explicit-shell-file-name "powershell.exe")
         (setq explicit-powershell.exe-args '())))
@@ -401,13 +401,13 @@
     (eshell-toggle-use-projectile-root t)
     (eshell-toggle-run-command nil))
 
-(defun saucoide/org-mode-setup()
+(defun my/org-mode-setup()
     (org-indent-mode)
     (visual-line-mode 1))
 
 (use-package org
     :defer t
-    :hook (org-mode . saucoide/org-mode-setup)
+    :hook (org-mode . my/org-mode-setup)
     :config
     (setq org-ellipsis " ..."
           org-src-tab-acts-natively t
@@ -422,17 +422,17 @@
   :custom
   (org-bullets-bullet-list '("◐" "○" "●" "✖" "✚")))
 
-(defun saucoide/org-mode-visual-fill ()
+(defun my/org-mode-visual-fill ()
     (setq visual-fill-column-width 90)
     (visual-fill-column-mode 1))
 
-(defun saucoide/org-mode-center-text ()
+(defun my/org-mode-center-text ()
  "toggle centering text in buffer"
     (interactive)
     (setq visual-fill-column-center-text (not visual-fill-column-center-text)))
 
 (use-package visual-fill-column 
-    :hook (org-mode . saucoide/org-mode-visual-fill))
+    :hook (org-mode . my/org-mode-visual-fill))
 
 (org-babel-do-load-languages
     'org-babel-load-languages
@@ -452,15 +452,17 @@
 (use-package toc-org
     :hook (org-mode . toc-org-mode))
 
+(add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
+
 (use-package mu4e
-  :ensure  nil
-  :defer 20 ; Wait until 20 seconds after startup
+  :if (not my/is-windows)
+  :ensure nil
+  ;; :defer 20 ; Wait until 20 seconds after startup
   :config
 
   ;; Load org-mode integration
   (require 'org-mu4e)
 
-  (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
 
   ;; This is set to 't' to avoid mail syncing issues when using mbsync
   (setq mu4e-change-filenames-when-moving t)
@@ -565,13 +567,13 @@
 (use-package general
     :config
     (general-evil-setup t)
-    (general-create-definer saucoide/leader-key-def
+    (general-create-definer my/leader-key-def
         :keymaps '(normal insert visual emacs)
         :keymaps 'override
         :prefix "SPC"
         :global-prefix "C-SPC"))
 
-(saucoide/leader-key-def
+(my/leader-key-def
     ;; actions
     "DEL" '(evil-switch-to-windows-last-buffer :which-key "Last buffer")
     "RET" '(counsel-bookmark :which-key "Bookmarks")
@@ -586,7 +588,7 @@
     "x" '(my/popup-scratch-buffer :which-key "Pop scratch buffer")
     "X" '(org-capture :which-key "Org Capture"))
 
-(saucoide/leader-key-def
+(my/leader-key-def
     "b"  '(:ignore t :which-key "buffer")
     "bn" '(next-buffer :which-key "Next buffer")
     "bp" '(next-buffer :which-key "Previous buffer")
@@ -612,7 +614,7 @@
 
 ;; TODO bK use doom's better function
 
-(saucoide/leader-key-def
+(my/leader-key-def
     "c"  '(:ignore t :which-key "code")
     "cc" '(counsel-compile :which-key "Compile")
     "cd" '(evil-goto-definition :which-key "Jump to definition")
@@ -620,9 +622,9 @@
     "cx" '(flycheck-list-errors :which-key "List errors")
     "cn" '(flycheck-next-error :which-key "Next error")
     "cw" '(delete-trailing-whitespace :which-key "Delete trailing whitespace")
-    "cW" '(saucoide/delete-trailing-newlines :which-key "Delete trailing newlines"))
+    "cW" '(my/delete-trailing-newlines :which-key "Delete trailing newlines"))
 
-(saucoide/leader-key-def
+(my/leader-key-def
     "e"  '(:ignore t :which-key "eval")
     "eb" '(eval-buffer :which-key "Evaluate buffer")
     "ed" '(eval-defun :which-key "Evaluate defun")
@@ -632,37 +634,37 @@
 
 ;; from system crafters's config
 (eval-when-compile (require 'cl))
-(defun saucoide/dired-in (path)
+(defun my/dired-in (path)
   (lexical-let ((target path))
     (lambda () (interactive) (dired target))))
 
-(if saucoide/is-windows
-    (saucoide/leader-key-def
+(if my/is-windows
+    (my/leader-key-def
          "d"   '(:ignore t :which-key "dired")
          "dd"  '(dired :which-key "Here")
-         "dh"  `(,(saucoide/dired-in "~") :which-key "Home")
-         "do"  `(,(saucoide/dired-in "P:\\org") :which-key "Org")
-         "dD"  `(,(saucoide/dired-in "%USERPROFILE%'\\Downloads") :which-key "Downloads")
-         "dp"  `(,(saucoide/dired-in "P:\\SAUCO_PROJECTS\\") :which-key "projects")
-         "de"  `(,(saucoide/dired-in "~/.emacs.d") :which-key ".emacs.d"))
-   (saucoide/leader-key-def
+         "dh"  `(,(my/dired-in "~") :which-key "Home")
+         "do"  `(,(my/dired-in "P:\\org") :which-key "Org")
+         "dD"  `(,(my/dired-in "%USERPROFILE%'\\Downloads") :which-key "Downloads")
+         "dp"  `(,(my/dired-in "P:\\SAUCO_PROJECTS\\") :which-key "projects")
+         "de"  `(,(my/dired-in "~/.emacs.d") :which-key ".emacs.d"))
+   (my/leader-key-def
          "d"   '(:ignore t :which-key "dired")
          "dd"  '(dired :which-key "Here")
-         "dh"  `(,(saucoide/dired-in "~") :which-key "Home")
-         "do"  `(,(saucoide/dired-in "~/org") :which-key "Org")
-         "dD"  `(,(saucoide/dired-in "~/downloads") :which-key "Downloads")
-         "dv"  `(,(saucoide/dired-in "~/videos") :which-key "Videos")
-         "d."  `(,(saucoide/dired-in "~/dotfiles") :which-key "dotfiles")
-         "de"  `(,(saucoide/dired-in "~/.emacs.d") :which-key ".emacs.d")))
+         "dh"  `(,(my/dired-in "~") :which-key "Home")
+         "do"  `(,(my/dired-in "~/org") :which-key "Org")
+         "dD"  `(,(my/dired-in "~/downloads") :which-key "Downloads")
+         "dv"  `(,(my/dired-in "~/videos") :which-key "Videos")
+         "d."  `(,(my/dired-in "~/dotfiles") :which-key "dotfiles")
+         "de"  `(,(my/dired-in "~/.emacs.d") :which-key ".emacs.d")))
 
-(saucoide/leader-key-def
+(my/leader-key-def
     "f"  '(:ignore t :which-key "files")
     "fd" '(projectile-dired :which-key "Find directory")
     "ff" '(counsel-find-file :which-key "Find file")
     "fl" '(counsel-locate :which-key "Locate file")
     "fr" '(counsel-recentf :which-key "Recent files")
     "fs" '(save-buffer :which-key "Save file")
-    "fy" '(saucoide/copy-filename-to-clipboard :which-key "Yank filename")
+    "fy" '(my/copy-filename-to-clipboard :which-key "Yank filename")
     "fC" '(copy-file :which-key "Copy this file")
     "fD" '(delete-file :which-key "Delete this file")
     ;; "E" '(a :which-key "Browse emacs.d")
@@ -672,7 +674,7 @@
     ;; "U" '(a :which-key "Sudo this file")
 )
 
-(saucoide/leader-key-def
+(my/leader-key-def
     "g"  '(:ignore t :which-key "git")
     "gg" '(magit-status :which-key "Magit status")
     "g/" '(magit-dispatch :which-key "Magit dispatch")
@@ -683,7 +685,7 @@
     "gS" '(magit-stage-file :which-key "Magit stage file")
     "gU" '(magit-unstage-file :which-key "Magit unstage file"))
 
-(saucoide/leader-key-def
+(my/leader-key-def
     "h"  '(:ignore t :which-key "help")
     "hRET" '(info-emacs-manual :which-key "Emacs manual")
     "h'" '(describe-char :which-key "Describe char")
@@ -707,7 +709,7 @@
     "hV" '(set-variable :which-key "Set variable")
     "hH" '(help-for-help :which-key "Help for help"))
 
-(saucoide/leader-key-def
+(my/leader-key-def
     "n"  '(:ignore t :which-key "notes")
     "na" '(org-agenda :which-key "Org Agenda")
     "nn" '(org-capture :which-key "Org Capture")
@@ -716,12 +718,13 @@
     "nv" '(org-search-view :which-key "Org search view")
     "nN" '(org-capture-goto-target :which-key "Goto capture"))
 
-(saucoide/leader-key-def
+(my/leader-key-def
     "o"  '(:ignore t :which-key "open")
     "o-" '(dired-jump :which-key "Dired")
     "ob" '(browse-url-of-file :which-key "Browser")
     ;o; "d" '(org :which-key "debugger")
     "of" '(make-frame :which-key "New frame")
+    "om" '(mu4e :which-key "Mu4e")
     "op" '(neotree-toggle :which-key "Project sidebar")
     ;o; "r" '(org :which-key "REPL")
     "oe" '(eshell-toggle :which-key "eshell") 
@@ -732,7 +735,7 @@
     "oat" '(org-todo-list :which-key "Todo list")
     "oav" '(org-search-view :which-key "Search view"))
 
-(saucoide/leader-key-def
+(my/leader-key-def
     "p"  '(:ignore t :which-key "projects")
     "p!" '(projectile-run-shell-command-in-root :which-key "Run cmd in project root")
     "p." '(projectile-recentf :which-key "Recent files in project")
@@ -748,17 +751,17 @@
     "pD" '(projectile-remove-known-project :which-key "Delete project")
     "pR" '(projectile-run-project :which-key "Run project"))
 
-(saucoide/leader-key-def
+(my/leader-key-def
     "q"  '(:ignore t :which-key "quit")
     "qq" '(save-buffers-kill-terminal :which-key "Quit"))
 
-(saucoide/leader-key-def
+(my/leader-key-def
     "s"  '(:ignore t :which-key "search")
     "sb" '(swiper :which-key "Search in Buffer"))
 
  ;; TODO add bindings to search in project, etc
 
-(saucoide/leader-key-def
+(my/leader-key-def
     "t"  '(:ignore t :which-key "toggle")
     "tf" '(flycheck-mode :which-key "Flycheck")
     "tl" '(doom/toggle-line-numbers :which-key "Line numbers")
@@ -771,7 +774,7 @@
 (setq evil-vsplit-window-right t
       evil-split-window-below t)
 
-(saucoide/leader-key-def
+(my/leader-key-def
     "w"  '(:ignore t :which-key "window")
     "w+"  '(evil-window-increase-height :which-key "increase height")
     "w-"  '(evil-window-decrease-height :which-key "decrease height")
@@ -808,7 +811,7 @@
     :after evil
     :config
     (winner-mode)
-    (saucoide/leader-key-def
+    (my/leader-key-def
         "<left>" '(winner-undo :which-key "winner undo")
         "<right>" '(winner-redo :which-key "winner redo")))
 
@@ -828,11 +831,11 @@
     :keymaps 'org-mode-map
     "RET" '+org/dwim-at-point)
 
-(defun saucoide/org-babel-tangle-config ()
+(defun my/org-babel-tangle-config ()
     (when (string-equal (file-name-directory (buffer-file-name))
               (expand-file-name user-emacs-directory))
           ;; Dynamic scoping to the rescue
           (let ((org-confirm-babel-evaluate nil))
     (org-babel-tangle))))
 
-(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'saucoide/org-babel-tangle-config)))
+(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'my/org-babel-tangle-config)))
