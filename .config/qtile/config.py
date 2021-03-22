@@ -237,6 +237,11 @@ keys = [
 
     ### APPLICATION LAUNCHING
 
+         ## Screenshots
+          Key([], "Print", lazy.spawn('flameshot gui'),
+             desc='Take a Screenshot'),
+          Key([mod], "Print", lazy.spawn('flameshot launcher'),
+             desc='Screenshot Menu'),
          ## Super + Key
 
          Key([mod], "space", lazy.spawn('rofi -show drun'),
@@ -535,7 +540,7 @@ def init_widgets_list():
                         #fontsize = 12,
                         #foreground = COLORS["white"],
                         #background = COLORS["frost3"],
-	                    #),
+                        #),
                widget.TextBox(
                         text = "[⏻]",
                         background = COLORS["frost3"],
