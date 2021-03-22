@@ -292,6 +292,11 @@
     (setq neo-smart-open t)
     (setq projectile-switch-project-action 'neotree-projectile-action))
 
+(use-package cider
+    :mode "\\.clj[sc]?\\'"
+    :config
+    (evil-collection-cider-setup))
+
 (use-package flycheck
     :defer t
     :hook (eglot-mode . flycheck-mode))
@@ -456,13 +461,12 @@
 
 (use-package mu4e
   :if (not my/is-windows)
-  :ensure nil
-  ;; :defer 20 ; Wait until 20 seconds after startup
+  :ensure nil  ;; tries to download from melpa otherwise, and fails
   :config
 
+  (add-hook 'mu4e-view-mode-hook #'visual-line-mode)
   ;; Load org-mode integration
-  (require 'org-mu4e)
-
+  ;; (require 'org-mu4e)
 
   ;; This is set to 't' to avoid mail syncing issues when using mbsync
   (setq mu4e-change-filenames-when-moving t)
@@ -482,11 +486,8 @@
 
   ;; When html emails are very large compared to the text one, mu4e blocks
   ;; toggling between plaintext and html which is annoying
+  (add-to-list 'mu4e-view-actions '("View in browser" . mu4e-action-view-in-browser))
   (setq mu4e-view-html-plaintext-ratio-heuristic most-positive-fixnum)
-
-  (add-hook 'mu4e-view-mode-hook #'visual-line-mode)
- ;; (setq mu4e-view-use-gnus t)
-
 
   ;; Account settings
   (setq user-full-name "saucoide")
@@ -498,11 +499,36 @@
   (setq mu4e-trash-folder  "/[Gmail]/Bin")
 
   ;; For sending emails
-  (setq message-send-mail-function 'smtpmail-send-it)
+  (setq message-send-mail-function 'smtpmail-send-it
+        message-kill-buffer-on-exit t)
   (setq smtpmail-smtp-server "smtp.gmail.com")
   (setq smtpmail-smtp-user "saucoide@gmail.com")
   (setq smtpmail-smtp-service 587)
   (setq smtpmail-stream-type 'starttls)
+
+  ;; Display Settings
+  (setq mu4e-view-show-addresses t  ;; Show full email addreses for contacts
+        mu4e-view-show-images t
+        mu4e-view-image-max-width 800
+        mu4e-headers-fields
+          '((:from . 25)
+            (:human-date . 12)
+            (:flags . 4)
+            (:subject)))
+
+  ;; Use fancy icons
+  (setq mu4e-use-fancy-chars t
+          mu4e-headers-draft-mark '("D" . "")
+          mu4e-headers-flagged-mark '("F" . "")
+          mu4e-headers-new-mark '("N" . "!")
+          mu4e-headers-passed-mark '("P" . "")
+          mu4e-headers-replied-mark '("R" . "")
+          mu4e-headers-seen-mark '("S" . ".")
+          mu4e-headers-trashed-mark '("T" . "")
+          mu4e-headers-encrypted-mark '("x" . "")
+          mu4e-headers-signed-mark '("s" . "")
+          mu4e-headers-unread-mark '("u" . "✉")
+          mu4e-headers-attach-mark '("a" . ""))
 
   ;; Shortcuts
   (setq mu4e-maildir-shortcuts
