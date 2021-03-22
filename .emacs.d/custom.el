@@ -170,6 +170,36 @@ If on a:
           (org-element-property :end context)))))))
 
 
+(defun doom/toggle-line-numbers ()
+  "Toggle line numbers.
+Cycles through regular, relative and no line numbers. The order depends on what
+`display-line-numbers-type' is set to. If you're using Emacs 26+, and
+visual-line-mode is on, this skips relative and uses visual instead.
+See `display-line-numbers' for what these values mean."
+  (interactive)
+  (defvar doom--line-number-style display-line-numbers-type)
+  (let* ((styles `(t ,(if visual-line-mode 'visual 'relative) nil))
+         (order (cons display-line-numbers-type (remq display-line-numbers-type styles)))
+         (queue (memq doom--line-number-style order))
+         (next (if (= (length queue) 1)
+                   (car order)
+                 (car (cdr queue)))))
+    (setq doom--line-number-style next)
+    (setq display-line-numbers next)
+    (message "Switched to %s line numbers"
+             (pcase next
+               (`t "normal")
+               (`nil "disabled")
+               (_ (symbol-name next))))))
+
+
+(defun doom/toggle-indent-style ()
+  "Switch between tabs and spaces indentation style in the current buffer."
+  (interactive)
+  (setq indent-tabs-mode (not indent-tabs-mode))
+  (message "Indent style changed to %s" (if indent-tabs-mode "tabs" "spaces")))
+
+
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -179,7 +209,7 @@ If on a:
  '(custom-safe-themes
    '("e6ff132edb1bfa0645e2ba032c44ce94a3bd3c15e3929cdf6c049802cf059a2a" "2f1518e906a8b60fac943d02ad415f1d8b3933a5a7f75e307e6e9a26ef5bf570" default))
  '(package-selected-packages
-   '(mu4e evil-snipe evil magit projectile counsel ivy all-the-icons eshell-toggle eglot git-gutter openwith all-the-icons-dired drag-stuff evil-org smartparens python-mode dired-hide-dotfiles dired-single company-box company evil-nerd-commenter typescript-mode lsp-mode visual-fill-column neotree treemacs-magit treemacs-icons-dired treemacs-projectile treemacs-evil treemacs magit-todos toc-org which-key use-package undo-fu smex rotate rainbow-delimiters org-bullets ivy-rich helpful general format-all flycheck evil-magit evil-collection doom-themes doom-modeline dashboard counsel-projectile)))
+   '(cider mu4e evil-snipe evil magit projectile counsel ivy all-the-icons eshell-toggle eglot git-gutter openwith all-the-icons-dired drag-stuff evil-org smartparens python-mode dired-hide-dotfiles dired-single company-box company evil-nerd-commenter typescript-mode lsp-mode visual-fill-column neotree treemacs-magit treemacs-icons-dired treemacs-projectile treemacs-evil treemacs magit-todos toc-org which-key use-package undo-fu smex rotate rainbow-delimiters org-bullets ivy-rich helpful general format-all flycheck evil-magit evil-collection doom-themes doom-modeline dashboard counsel-projectile)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
