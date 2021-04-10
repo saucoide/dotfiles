@@ -124,6 +124,7 @@
         (set-face-attribute 'variable-pitch nil :font "Source Code Pro" :height 100))) ; variable width font
 
 (global-display-line-numbers-mode t)
+(setq display-line-numbers-type 'relative)
 
 ;; modes to skip
 (dolist (mode '(term-mode-hook
@@ -168,6 +169,14 @@
                             (bookmarks . 5)
                             (projects . 5))))
                             ;; (agenda . 5))))
+
+(setq frame-title-format
+      '(""
+        (:eval "%b")
+        (:eval
+         (let ((project-name (projectile-project-name)))
+           (unless (string= "-" project-name)
+             (format (if (buffer-modified-p)  " * %s" " - %s") project-name))))))
 
 ;; show icons on dired
 (use-package all-the-icons-dired
@@ -347,7 +356,8 @@
            ;; ("<tab>" . company-complete-selection)) ; tab completes the selection instead next
     :custom
     (company-minimum-prefix-lenght 2)
-    (company-idle-delay 0.3))
+    (company-idle-delay 0.3)
+    (company-show-numbers t))
 
 ;; a little bit better interface
 (use-package company-box
