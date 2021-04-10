@@ -146,9 +146,11 @@
 
 ;; doom-modeline to replace the standard modeline
 (use-package doom-modeline
-    :custom
-    (doom-modeline-unicode-fallback t)
-    (doom-modeline-icon t)
+    :config
+    (if my/is-windows
+      (setq doom-modeline-icon nil)
+      (setq doom-modeline-unicode-fallback t)
+            doom-modeline-icon t)
     :init
     (column-number-mode)
     (doom-modeline-mode 1))
