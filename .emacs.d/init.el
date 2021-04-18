@@ -428,7 +428,8 @@
     :config
     (setq org-ellipsis " ..."
           org-src-tab-acts-natively t
-		  org-startup-folder 'content
+          org-edit-src-content-indentation 0   ;; src blocks won't get a min indentation automatically
+          org-startup-folder 'content
           org-directory "~/org"
           org-agenda-files "todo.org"
           org-return-follows-link t))
@@ -454,7 +455,8 @@
 (org-babel-do-load-languages
     'org-babel-load-languages
     '((emacs-lisp . t)
-      (python . t)))
+      (python . t)
+      (clojure . t)))
 
 (push '("conf-unix" . conf-unix) org-src-lang-modes)
 
@@ -463,6 +465,7 @@
 (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
 (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
 (add-to-list 'org-structure-template-alist '("py" . "src python"))
+(add-to-list 'org-structure-template-alist '("cl" . "src clojure"))
 (add-to-list 'org-structure-template-alist '("yaml" . "src yaml"))
 (add-to-list 'org-structure-template-alist '("json" . "src json"))
 
