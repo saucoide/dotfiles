@@ -51,6 +51,10 @@
     (setq user-full-name "saucoide"
           user-mail-address "saucoide@gmail.com")
 
+	;; Auth sources, this us used for authentication
+	;; including mu4e, etc.
+    (setq auth-sources '(password-store))
+    (auth-source-pass-enable)
 
     (setq read-process-output-max (* 1024 1024))
 
