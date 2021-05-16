@@ -209,7 +209,7 @@ See `display-line-numbers' for what these values mean."
  '(custom-safe-themes
    '("e6ff132edb1bfa0645e2ba032c44ce94a3bd3c15e3929cdf6c049802cf059a2a" "2f1518e906a8b60fac943d02ad415f1d8b3933a5a7f75e307e6e9a26ef5bf570" default))
  '(package-selected-packages
-   '(elpher cider mu4e evil-snipe evil magit projectile counsel ivy all-the-icons eshell-toggle eglot git-gutter openwith all-the-icons-dired drag-stuff evil-org smartparens python-mode dired-hide-dotfiles dired-single company-box company evil-nerd-commenter typescript-mode lsp-mode visual-fill-column neotree treemacs-magit treemacs-icons-dired treemacs-projectile treemacs-evil treemacs magit-todos toc-org which-key use-package undo-fu smex rotate rainbow-delimiters org-bullets ivy-rich helpful general format-all flycheck evil-magit evil-collection doom-themes doom-modeline dashboard counsel-projectile)))
+   '(evil-org-agenda doct elpher cider mu4e evil-snipe evil magit projectile counsel ivy all-the-icons eshell-toggle eglot git-gutter openwith all-the-icons-dired drag-stuff evil-org smartparens python-mode dired-hide-dotfiles dired-single company-box company evil-nerd-commenter typescript-mode lsp-mode visual-fill-column neotree treemacs-magit treemacs-icons-dired treemacs-projectile treemacs-evil treemacs magit-todos toc-org which-key use-package undo-fu smex rotate rainbow-delimiters org-bullets ivy-rich helpful general format-all flycheck evil-magit evil-collection doom-themes doom-modeline dashboard counsel-projectile)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

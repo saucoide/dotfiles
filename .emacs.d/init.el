@@ -166,15 +166,18 @@
     ;; :requires page-break-lines
     :config
     (setq dashboard-startup-banner "~/.emacs.d/logo.txt")
+	;; (setq dashboard-center-content t)
     (setq dashboard-set-navigator t)
+	(setq dashboard-filter-agenda-entry 'dashboard-no-filter-agenda)
+	;; (setq dashboard-agenda-release-buffers t)
     (unless my/is-windows
         (setq dashboard-set-file-icons t)
         (setq dashboard-set-heading-icons t))
     ;; (setq dashboard-footer-icon nil)
     (setq dashboard-items '((recents  . 5)
                             (bookmarks . 5)
-                            (projects . 5))))
-                            ;; (agenda . 5))))
+                            (projects . 5)
+                            (agenda . t))))
 
 (setq frame-title-format
       '(""
@@ -434,9 +437,41 @@
           org-src-tab-acts-natively t
           org-edit-src-content-indentation 0   ;; src blocks won't get a min indentation automatically
           org-startup-folder 'content
-          org-directory "~/org"
-          org-agenda-files "todo.org"
+          org-directory "~/org/"
+          org-agenda-files (list org-directory)
           org-return-follows-link t))
+
+(use-package evil-org
+  :after org
+  :hook ((org-mode . evil-org-mode)
+         (org-agenda-mode . evil-org-mode)
+		 (evil-org-mode . (lambda () (evil-org-set-key-theme '(navigation todo insert textobjects additional)))))
+  :config
+  (require 'evil-org-agenda)
+  (evil-org-agenda-set-keys))
+
+(use-package doct
+  :commands (doct))
+
+(setq org-capture-templates
+	  (doct '(("Todo" :keys "t"
+			   :icon ("checklist" :set "octicon" :color "green")
+               :file (lambda () (concat org-directory "todo.org"))
+               :prepend t
+               :template ("* TODO %^{Description}"
+                          ":PROPERTIES:"
+                          ":Created: %U"
+                          ":END:"
+                          "%?"))
+	         ("Notes" :keys "n"
+			   :icon ("sticky-note-o" :set "octicon" :color "blue")
+               :file (lambda () (concat org-directory "notes.org"))
+               :prepend t
+               :template ("* %^{Description}"
+                          ":PROPERTIES:"
+                          ":Created: %U"
+                          ":END:"
+                          "%?")))))
 
 (use-package org-bullets
   :after org
@@ -634,6 +669,13 @@
     "X" '(org-capture :which-key "Org Capture"))
 
 (my/leader-key-def
+    "a"  '(:ignore t :which-key "Org Agenda")
+    "aa" '(org-agenda :which-key "Agenda")
+    "at" '(org-todo-list :which-key "Todo list")
+    "am" '(org-tags-view :which-key "Tags view")
+    "av" '(org-search-view :which-key "Search view"))
+
+(my/leader-key-def
     "b"  '(:ignore t :which-key "buffer")
     "bn" '(next-buffer :which-key "Next buffer")
     "bp" '(next-buffer :which-key "Previous buffer")
@@ -756,10 +798,8 @@
 
 (my/leader-key-def
     "n"  '(:ignore t :which-key "notes")
-    "na" '(org-agenda :which-key "Org Agenda")
     "nn" '(org-capture :which-key "Org Capture")
     "ns" '(org-notes-search :which-key "Org Notes search")
-    "nt" '(org-todo-list :which-key "Org To-do list")
     "nv" '(org-search-view :which-key "Org search view")
     "nN" '(org-capture-goto-target :which-key "Goto capture"))
 
@@ -772,13 +812,8 @@
     "om" '(mu4e :which-key "Mu4e")
     "op" '(neotree-toggle :which-key "Project sidebar")
     ;o; "r" '(org :which-key "REPL")
-    "oe" '(eshell-toggle :which-key "eshell") 
+    "oe" '(eshell-toggle :which-key "eshell"))
     ;o; "t" '(org :which-key "Terminal")
-    "oA" '(org-agenda :which-key "Org Agenda")
-    "oaa" '(org-agenda :which-key "Agenda")
-    "oam" '(org-tags-view :which-key "Tags view")
-    "oat" '(org-todo-list :which-key "Todo list")
-    "oav" '(org-search-view :which-key "Search view"))
 
 (my/leader-key-def
     "p"  '(:ignore t :which-key "projects")

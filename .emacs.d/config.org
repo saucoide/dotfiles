@@ -3,10 +3,6 @@
 #+STARTUP: content
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el
 
-*TODOS*
-use doct to set up capture templates
-https://tecosaur.github.io/emacs-config/config.html#capture |
-
 set up org ROAM
 set up nice html / other exports
 
@@ -52,6 +48,7 @@ set up nice html / other exports
   - [[#eshell-toggle][eshell toggle]]
 - [[#org-mode][Org Mode]]
   - [[#org-basic-config][Org Basic Config]]
+  - [[#capture-templates][Capture Templates]]
   - [[#header-bullets][Header Bullets]]
   - [[#visual-fill][Visual Fill]]
   - [[#source-code-blocks][Source Code Blocks]]
@@ -65,6 +62,7 @@ set up nice html / other exports
   - [[#evil][Evil]]
   - [[#general][General]]
   - [[#leader-key-spc][Leader Key =SPC=]]
+  - [[#agenda-spc-a][Agenda =SPC a=]]
   - [[#buffers-spc-b][Buffers =SPC b=]]
   - [[#code-spc-c][Code =SPC c=]]
   - [[#eval-spc-e][Eval =SPC e=]]
@@ -395,21 +393,24 @@ We can customize it with =dashboard= to show recent files, projects, etc.
    
 #+begin_src emacs-lisp
 
-  (use-package dashboard
-      :config
-      (dashboard-setup-startup-hook)
-      ;; :requires page-break-lines
-      :config
-      (setq dashboard-startup-banner "~/.emacs.d/logo.txt")
-      (setq dashboard-set-navigator t)
-      (unless my/is-windows
-          (setq dashboard-set-file-icons t)
-          (setq dashboard-set-heading-icons t))
-      ;; (setq dashboard-footer-icon nil)
-      (setq dashboard-items '((recents  . 5)
-                              (bookmarks . 5)
-                              (projects . 5))))
-                              ;; (agenda . 5))))
+(use-package dashboard
+    :config
+    (dashboard-setup-startup-hook)
+    ;; :requires page-break-lines
+    :config
+    (setq dashboard-startup-banner "~/.emacs.d/logo.txt")
+	;; (setq dashboard-center-content t)
+    (setq dashboard-set-navigator t)
+	(setq dashboard-filter-agenda-entry 'dashboard-no-filter-agenda)
+	;; (setq dashboard-agenda-release-buffers t)
+    (unless my/is-windows
+        (setq dashboard-set-file-icons t)
+        (setq dashboard-set-heading-icons t))
+    ;; (setq dashboard-footer-icon nil)
+    (setq dashboard-items '((recents  . 5)
+                            (bookmarks . 5)
+                            (projects . 5)
+                            (agenda . t))))
 
 #+end_src
 
@@ -868,21 +869,59 @@ To get eshell to toggle as a split buffer
 
 #+begin_src emacs-lisp
 
-  (defun my/org-mode-setup()
-      (org-indent-mode)
-      (visual-line-mode 1))
+(defun my/org-mode-setup()
+    (org-indent-mode)
+    (visual-line-mode 1))
 
-  (use-package org
-      :defer t
-      :hook (org-mode . my/org-mode-setup)
-      :config
-      (setq org-ellipsis " ..."
-            org-src-tab-acts-natively t
-            org-edit-src-content-indentation 0   ;; src blocks won't get a min indentation automatically
-            org-startup-folder 'content
-            org-directory "~/org"
-            org-agenda-files "todo.org"
-            org-return-follows-link t))
+(use-package org
+    :defer t
+    :hook (org-mode . my/org-mode-setup)
+    :config
+    (setq org-ellipsis " ..."
+          org-src-tab-acts-natively t
+          org-edit-src-content-indentation 0   ;; src blocks won't get a min indentation automatically
+          org-startup-folder 'content
+          org-directory "~/org/"
+          org-agenda-files (list org-directory)
+          org-return-follows-link t))
+
+(use-package evil-org
+  :after org
+  :hook ((org-mode . evil-org-mode)
+         (org-agenda-mode . evil-org-mode)
+		 (evil-org-mode . (lambda () (evil-org-set-key-theme '(navigation todo insert textobjects additional)))))
+  :config
+  (require 'evil-org-agenda)
+  (evil-org-agenda-set-keys))  
+
+#+end_src
+
+** Capture Templates
+
+#+begin_src emacs-lisp
+
+(use-package doct
+  :commands (doct))
+
+(setq org-capture-templates
+	  (doct '(("Todo" :keys "t"
+			   :icon ("checklist" :set "octicon" :color "green")
+               :file (lambda () (concat org-directory "todo.org"))
+               :prepend t
+               :template ("* TODO %^{Description}"
+                          ":PROPERTIES:"
+                          ":Created: %U"
+                          ":END:"
+                          "%?"))
+	         ("Notes" :keys "n"
+			   :icon ("sticky-note-o" :set "octicon" :color "blue")
+               :file (lambda () (concat org-directory "notes.org"))
+               :prepend t
+               :template ("* %^{Description}"
+                          ":PROPERTIES:"
+                          ":Created: %U"
+                          ":END:"
+                          "%?")))))
 
 #+end_src
 
@@ -1210,6 +1249,19 @@ My leader key is =SPC=, these is what's directly bound to it
 
 #+end_src
     
+** Agenda =SPC a=
+
+#+begin_src emacs-lisp
+
+(my/leader-key-def
+    "a"  '(:ignore t :which-key "Org Agenda")
+    "aa" '(org-agenda :which-key "Agenda")
+    "at" '(org-todo-list :which-key "Todo list")
+    "am" '(org-tags-view :which-key "Tags view")
+    "av" '(org-search-view :which-key "Search view"))
+
+#+end_src
+
 ** Buffers =SPC b=
 
 #+begin_src emacs-lisp
@@ -1378,14 +1430,12 @@ TODO change these to org-roam bindings
 
 #+begin_src emacs-lisp
 
-  (my/leader-key-def
-      "n"  '(:ignore t :which-key "notes")
-      "na" '(org-agenda :which-key "Org Agenda")
-      "nn" '(org-capture :which-key "Org Capture")
-      "ns" '(org-notes-search :which-key "Org Notes search")
-      "nt" '(org-todo-list :which-key "Org To-do list")
-      "nv" '(org-search-view :which-key "Org search view")
-      "nN" '(org-capture-goto-target :which-key "Goto capture"))
+(my/leader-key-def
+    "n"  '(:ignore t :which-key "notes")
+    "nn" '(org-capture :which-key "Org Capture")
+    "ns" '(org-notes-search :which-key "Org Notes search")
+    "nv" '(org-search-view :which-key "Org search view")
+    "nN" '(org-capture-goto-target :which-key "Goto capture"))
 
 #+end_src
 
@@ -1393,22 +1443,17 @@ TODO change these to org-roam bindings
 
 #+begin_src emacs-lisp
 
-  (my/leader-key-def
-      "o"  '(:ignore t :which-key "open")
-      "o-" '(dired-jump :which-key "Dired")
-      "ob" '(browse-url-of-file :which-key "Browser")
-      ;o; "d" '(org :which-key "debugger")
-      "of" '(make-frame :which-key "New frame")
-      "om" '(mu4e :which-key "Mu4e")
-      "op" '(neotree-toggle :which-key "Project sidebar")
-      ;o; "r" '(org :which-key "REPL")
-      "oe" '(eshell-toggle :which-key "eshell") 
-      ;o; "t" '(org :which-key "Terminal")
-      "oA" '(org-agenda :which-key "Org Agenda")
-      "oaa" '(org-agenda :which-key "Agenda")
-      "oam" '(org-tags-view :which-key "Tags view")
-      "oat" '(org-todo-list :which-key "Todo list")
-      "oav" '(org-search-view :which-key "Search view"))
+(my/leader-key-def
+    "o"  '(:ignore t :which-key "open")
+    "o-" '(dired-jump :which-key "Dired")
+    "ob" '(browse-url-of-file :which-key "Browser")
+    ;o; "d" '(org :which-key "debugger")
+    "of" '(make-frame :which-key "New frame")
+    "om" '(mu4e :which-key "Mu4e")
+    "op" '(neotree-toggle :which-key "Project sidebar")
+    ;o; "r" '(org :which-key "REPL")
+    "oe" '(eshell-toggle :which-key "eshell"))
+    ;o; "t" '(org :which-key "Terminal")
 
 #+end_src
 
