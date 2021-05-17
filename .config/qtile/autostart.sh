@@ -17,6 +17,5 @@ run volumeicon &
 run xfce4-power-manager &
 run spotify
 hsetxkbmap -option "ctrl:nocaps" &
-
-picom --config $HOME/.config/picom/picom.conf &
 /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
+picom --config $HOME/.config/picom/picom.conf &
