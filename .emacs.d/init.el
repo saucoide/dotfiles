@@ -232,7 +232,10 @@
                   '("pdf"))
                   "mupdf"
                   '(file))))
-      (openwith-mode 1))
+	;; need this otherwise it messes with mu4e attachments
+	(require 'mm-util)
+    (add-to-list 'mm-inhibit-file-name-handlers 'openwith-file-handler)
+    (openwith-mode 1))
 
 (use-package which-key
     :init (which-key-mode)

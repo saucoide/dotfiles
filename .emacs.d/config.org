@@ -479,28 +479,31 @@ Open files externally (i'm only using it on linux for now)
 
 #+begin_src emacs-lisp
 
-  (use-package openwith
-      :if (not my/is-windows)
-      :config
-      (setq openwith-associations
-          (list
+(use-package openwith
+    :if (not my/is-windows)
+    :config
+    (setq openwith-associations
+        (list
+            (list (openwith-make-extension-regexp
+                '("mpg" "mpeg" "mp3" "mp4"
+                   "avi" "wmv" "wav" "mov" "flv"
+                   "ogm" "ogg" "mkv"))
+                "smplayer"
+                '(file))
               (list (openwith-make-extension-regexp
-                  '("mpg" "mpeg" "mp3" "mp4"
-                     "avi" "wmv" "wav" "mov" "flv"
-                     "ogm" "ogg" "mkv"))
-                  "smplayer"
-                  '(file))
-                (list (openwith-make-extension-regexp
-                    '("xbm" "pbm" "pgm" "ppm" "pnm"
-                       "png" "gif" "bmp" "tif" "jpeg")) ;; Removed jpg because Telega was
-                        ;; causing feh to be opened...
-                       "feh"
-                       '(file))
-                (list (openwith-make-extension-regexp
-                    '("pdf"))
-                    "mupdf"
-                    '(file))))
-        (openwith-mode 1))
+                  '("xbm" "pbm" "pgm" "ppm" "pnm"
+                     "png" "gif" "bmp" "tif" "jpeg")) ;; Removed jpg because Telega was
+                      ;; causing feh to be opened...
+                     "feh"
+                     '(file))
+              (list (openwith-make-extension-regexp
+                  '("pdf"))
+                  "mupdf"
+                  '(file))))
+	;; need this otherwise it messes with mu4e attachments
+	(require 'mm-util)
+    (add-to-list 'mm-inhibit-file-name-handlers 'openwith-file-handler)
+    (openwith-mode 1))
 
 #+end_src
 
