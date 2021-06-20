@@ -106,6 +106,32 @@
 
 (setq my/is-windows (eq system-type 'windows-nt))
 
+;; for eshell mostly
+(setenv "PATH"
+	(concat ":~/.cargo/bin"
+            ":~/.poetry/bin"
+            ":~/.emacs.d/bin"
+            ":~/.local/bin"
+            ":~/.local/bin"
+            ":/usr/local/bin"
+            ":/usr/bin"
+            ":/bin"
+            ":/usr/local/sbin"
+            ":/usr/lib/jvm/default/bin"))
+
+;; for emacs to find binaries
+(setq exec-path
+	  (append exec-path '("~/.cargo/bin"
+						  "~/.poetry/bin"
+						  "~/.emacs.d/bin"
+						  "~/.local/bin"
+						  "~/.local/bin"
+						  "/usr/local/bin"
+						  "/usr/bin"
+						  "/bin"
+						  "/usr/local/sbin"
+						  "/usr/lib/jvm/default/bin")))
+
 (use-package emacs
     :init
     (scroll-bar-mode -1)		; disable visible scrollbar
@@ -141,7 +167,8 @@
 
 (use-package doom-themes
     :init
-    (load-theme 'doom-palenight t))  
+    (load-theme 'doom-material t))  
+    ;; (load-theme 'doom-palenight t))  
     ;; (load-theme 'doom-dracula t))
 
 ;; all the icons is needed for doom-modeline
@@ -165,7 +192,8 @@
     (dashboard-setup-startup-hook)
     ;; :requires page-break-lines
     :config
-    (setq dashboard-startup-banner "~/.emacs.d/logo.txt")
+    (setq dashboard-startup-banner "~/.emacs.d/logo.png")
+    ;; (setq dashboard-startup-banner "~/.emacs.d/logo.txt")
 	;; (setq dashboard-center-content t)
     (setq dashboard-set-navigator t)
 	(setq dashboard-filter-agenda-entry 'dashboard-no-filter-agenda)
@@ -211,31 +239,13 @@
         (evil-collection-define-key 'normal 'dired-mode-map
             "H" 'dired-hide-dotfiles-mode))
 
-(use-package openwith
-    :if (not my/is-windows)
-    :config
-    (setq openwith-associations
-        (list
-            (list (openwith-make-extension-regexp
-                '("mpg" "mpeg" "mp3" "mp4"
-                   "avi" "wmv" "wav" "mov" "flv"
-                   "ogm" "ogg" "mkv"))
-                "smplayer"
-                '(file))
-              (list (openwith-make-extension-regexp
-                  '("xbm" "pbm" "pgm" "ppm" "pnm"
-                     "png" "gif" "bmp" "tif" "jpeg")) ;; Removed jpg because Telega was
-                      ;; causing feh to be opened...
-                     "feh"
-                     '(file))
-              (list (openwith-make-extension-regexp
-                  '("pdf"))
-                  "mupdf"
-                  '(file))))
-	;; need this otherwise it messes with mu4e attachments
-	(require 'mm-util)
-    (add-to-list 'mm-inhibit-file-name-handlers 'openwith-file-handler)
-    (openwith-mode 1))
+;; TODO replace openwith with something else
+
+;; TODO
+(use-package transient
+  :init
+   (with-eval-after-load 'transient
+    (transient-bind-q-to-quit)))
 
 (use-package which-key
     :init (which-key-mode)
@@ -317,6 +327,11 @@
     :mode "\\.clj[sc]?\\'"
     :config
     (evil-collection-cider-setup))
+
+(use-package rustic
+  :config
+  (setq rustic-lsp-client 'eglot)
+  (setq rustic-format-on-save t))
 
 (use-package flycheck
     :defer t
@@ -417,6 +432,11 @@
     :config 
     (smartparens-global-mode t))
 
+(use-package yasnippet
+  :config
+  (setq yas-snippet-dirs '("~/.emacs.d/yasnippets"))
+  (yas-global-mode 1))
+
 (if my/is-windows
     (progn
         (setq explicit-shell-file-name "powershell.exe")
@@ -501,15 +521,6 @@
       (clojure . t)))
 
 (push '("conf-unix" . conf-unix) org-src-lang-modes)
-
-(require 'org-tempo)
-
-(add-to-list 'org-structure-template-alist '("sh" . "src shell"))
-(add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-(add-to-list 'org-structure-template-alist '("py" . "src python"))
-(add-to-list 'org-structure-template-alist '("cl" . "src clojure"))
-(add-to-list 'org-structure-template-alist '("yaml" . "src yaml"))
-(add-to-list 'org-structure-template-alist '("json" . "src json"))
 
 (use-package toc-org
     :hook (org-mode . toc-org-mode))

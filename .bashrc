@@ -205,3 +205,4 @@ vicd()
 }
 
 neofetch
+. "$HOME/.cargo/env"

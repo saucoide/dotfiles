@@ -4,8 +4,6 @@
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el
 
 set up org ROAM
-set up nice html / other exports
-
 
 * Table of Contents :toc@2:noexport:
 - [[#about][About]]
@@ -19,6 +17,7 @@ set up nice html / other exports
   - [[#load-custom-files][Load custom files]]
   - [[#garbage-collector][Garbage Collector]]
   - [[#windows-specific][Windows Specific]]
+  - [[#path--exec-path][PATH & exec-path]]
 - [[#basic-gui-theme-etc][Basic GUI, Theme, etc.]]
   - [[#basic-gui-elements][Basic GUI Elements]]
   - [[#fonts][Fonts]]
@@ -43,6 +42,7 @@ set up nice html / other exports
   - [[#eglot-lsp][Eglot (LSP)]]
   - [[#company-mode][Company Mode]]
   - [[#smartparens][Smartparens]]
+  - [[#yasnippets][Yasnippets]]
 - [[#terminals][Terminals]]
   - [[#shell-mode][shell-mode]]
   - [[#eshell-toggle][eshell toggle]]
@@ -295,6 +295,39 @@ I have to use windows at work, on a very locked down system, so im going to be u
 
 #+end_src
 
+** PATH & exec-path
+
+I should find a better way to do this, but for now it works
+
+#+begin_src emacs-lisp
+
+;; for eshell mostly
+(setenv "PATH"
+	(concat ":~/.cargo/bin"
+            ":~/.poetry/bin"
+            ":~/.emacs.d/bin"
+            ":~/.local/bin"
+            ":~/.local/bin"
+            ":/usr/local/bin"
+            ":/usr/bin"
+            ":/bin"
+            ":/usr/local/sbin"
+            ":/usr/lib/jvm/default/bin"))
+
+;; for emacs to find binaries
+(setq exec-path
+	  (append exec-path '("~/.cargo/bin"
+						  "~/.poetry/bin"
+						  "~/.emacs.d/bin"
+						  "~/.local/bin"
+						  "~/.local/bin"
+						  "/usr/local/bin"
+						  "/usr/bin"
+						  "/bin"
+						  "/usr/local/sbin"
+						  "/usr/lib/jvm/default/bin")))
+#+end_src
+
 * Basic GUI, Theme, etc.
 ** Basic GUI Elements
   
@@ -361,7 +394,8 @@ Set the the font depending on the platform (I can't install fonts at work so ~co
 
   (use-package doom-themes
       :init
-      (load-theme 'doom-palenight t))  
+      (load-theme 'doom-material t))  
+      ;; (load-theme 'doom-palenight t))  
       ;; (load-theme 'doom-dracula t))
 
 #+end_src
@@ -398,7 +432,8 @@ We can customize it with =dashboard= to show recent files, projects, etc.
     (dashboard-setup-startup-hook)
     ;; :requires page-break-lines
     :config
-    (setq dashboard-startup-banner "~/.emacs.d/logo.txt")
+    (setq dashboard-startup-banner "~/.emacs.d/logo.png")
+    ;; (setq dashboard-startup-banner "~/.emacs.d/logo.txt")
 	;; (setq dashboard-center-content t)
     (setq dashboard-set-navigator t)
 	(setq dashboard-filter-agenda-entry 'dashboard-no-filter-agenda)
@@ -477,37 +512,23 @@ Hide dotfiles and use =H= to toggle
 
 Open files externally (i'm only using it on linux for now)
 
-#+begin_src emacs-lisp
 
-(use-package openwith
-    :if (not my/is-windows)
-    :config
-    (setq openwith-associations
-        (list
-            (list (openwith-make-extension-regexp
-                '("mpg" "mpeg" "mp3" "mp4"
-                   "avi" "wmv" "wav" "mov" "flv"
-                   "ogm" "ogg" "mkv"))
-                "smplayer"
-                '(file))
-              (list (openwith-make-extension-regexp
-                  '("xbm" "pbm" "pgm" "ppm" "pnm"
-                     "png" "gif" "bmp" "tif" "jpeg")) ;; Removed jpg because Telega was
-                      ;; causing feh to be opened...
-                     "feh"
-                     '(file))
-              (list (openwith-make-extension-regexp
-                  '("pdf"))
-                  "mupdf"
-                  '(file))))
-	;; need this otherwise it messes with mu4e attachments
-	(require 'mm-util)
-    (add-to-list 'mm-inhibit-file-name-handlers 'openwith-file-handler)
-    (openwith-mode 1))
+#+begin_src emacs-lisp
+;; TODO replace openwith with something else
 
 #+end_src
 
 ** Command Completion
+*** Transient
+
+#+begin_src emacs-lisp
+;; TODO
+(use-package transient
+  :init
+   (with-eval-after-load 'transient
+    (transient-bind-q-to-quit)))
+#+end_src
+
 *** Which-Key
 
 =which-key= to have keybiding completions for any unfinished key sequence, as a popup
@@ -654,11 +675,19 @@ A sidebar project explorer for quick navigation
 *** Clojure
 
 #+begin_src emacs-lisp
+(use-package cider
+    :mode "\\.clj[sc]?\\'"
+    :config
+    (evil-collection-cider-setup))
+#+end_src
 
-  (use-package cider
-      :mode "\\.clj[sc]?\\'"
-      :config
-      (evil-collection-cider-setup))
+*** Rust
+
+#+begin_src emacs-lisp
+(use-package rustic
+  :config
+  (setq rustic-lsp-client 'eglot)
+  (setq rustic-format-on-save t))
 
 #+end_src
 
@@ -668,13 +697,13 @@ flycheck does syntax checking as you type
 
 #+begin_src emacs-lisp
 
-  (use-package flycheck
-      :defer t
-      :hook (eglot-mode . flycheck-mode))
+(use-package flycheck
+    :defer t
+    :hook (eglot-mode . flycheck-mode))
 
-  ;; on windows dont enable it globally
-  (unless my/is-windows
-      (global-flycheck-mode))
+;; on windows dont enable it globally
+(unless my/is-windows
+    (global-flycheck-mode))
 
 #+end_src
 
@@ -684,7 +713,7 @@ format-all for autoformatting code
 
 #+begin_src emacs-lisp
 
-  (use-package format-all)
+(use-package format-all)
 
 #+end_src
 
@@ -842,6 +871,17 @@ smartparens completes pairs parenthesis, brackets, etc
 
 #+end_src
 
+** Yasnippets
+
+YASnippet is a template system for emaxs, it lets you create custom templates that expand from given keys
+
+#+begin_src emacs-lisp
+(use-package yasnippet
+  :config
+  (setq yas-snippet-dirs '("~/.emacs.d/yasnippets"))
+  (yas-global-mode 1))
+#+end_src
+
 * Terminals
 ** shell-mode
 
@@ -853,6 +893,7 @@ smartparens completes pairs parenthesis, brackets, etc
           (setq explicit-powershell.exe-args '())))
 
 #+end_src
+
 ** eshell toggle
 
 To get eshell to toggle as a split buffer
@@ -975,21 +1016,6 @@ Here we enable the list of languages we want code blocks to work with
           (clojure . t)))
 
     (push '("conf-unix" . conf-unix) org-src-lang-modes)
-
-#+end_src
-
-And we use =org-tempo= to get template src blocks when using =<s=, =<el=, etc.
-
-#+begin_src emacs-lisp
-
-  (require 'org-tempo)
-
-  (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
-  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-  (add-to-list 'org-structure-template-alist '("py" . "src python"))
-  (add-to-list 'org-structure-template-alist '("cl" . "src clojure"))
-  (add-to-list 'org-structure-template-alist '("yaml" . "src yaml"))
-  (add-to-list 'org-structure-template-alist '("json" . "src json"))
 
 #+end_src
 
