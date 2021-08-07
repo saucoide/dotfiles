@@ -525,6 +525,17 @@
 (use-package toc-org
     :hook (org-mode . toc-org-mode))
 
+(use-package org-roam
+  :ensure t
+  :init
+  (setq org-roam-v2-ack t)
+  :custom
+  (org-roam-directory "~/notes/roam/")
+  (org-roam-completion-everywhere t)
+  (org-roam-completion-system 'default)
+  :config
+  (org-roam-setup))
+
 (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
 
 (use-package mu4e
@@ -813,9 +824,9 @@
 (my/leader-key-def
     "n"  '(:ignore t :which-key "notes")
     "nn" '(org-capture :which-key "Org Capture")
-    "ns" '(org-notes-search :which-key "Org Notes search")
-    "nv" '(org-search-view :which-key "Org search view")
-    "nN" '(org-capture-goto-target :which-key "Goto capture"))
+    "ni" '(org-roam-node-insert :which-key "org-roam-node-insert")
+    "nf" '(org-roam-node-find :which-key "org-roam-node-find")
+    "nl" '(org-roam-buffer-toggle :which-key "org-roam-buffer-toggle"))
 
 (my/leader-key-def
     "o"  '(:ignore t :which-key "open")

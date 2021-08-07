@@ -53,6 +53,7 @@ set up org ROAM
   - [[#visual-fill][Visual Fill]]
   - [[#source-code-blocks][Source Code Blocks]]
   - [[#toc-org][Toc-Org]]
+- [[#org-roam][Org Roam]]
 - [[#email---mu4e][Email - mu4e]]
   - [[#recieving-emails---mu4e][Recieving emails - mu4e]]
   - [[#sending-emails][Sending Emails]]
@@ -1030,6 +1031,21 @@ toc-org generates tables of contents in the org file on save
 
 #+end_src
 
+* Org Roam
+
+#+begin_src emacs-lisp
+(use-package org-roam
+  :ensure t
+  :init
+  (setq org-roam-v2-ack t)
+  :custom
+  (org-roam-directory "~/notes/roam/")
+  (org-roam-completion-everywhere t)
+  (org-roam-completion-system 'default)
+  :config
+  (org-roam-setup))
+#+end_src
+
 * Email - mu4e
 
 Install mu4e from the distro's repositories, we just need to make sure the .el files are in emac's load-path
@@ -1462,9 +1478,9 @@ TODO change these to org-roam bindings
 (my/leader-key-def
     "n"  '(:ignore t :which-key "notes")
     "nn" '(org-capture :which-key "Org Capture")
-    "ns" '(org-notes-search :which-key "Org Notes search")
-    "nv" '(org-search-view :which-key "Org search view")
-    "nN" '(org-capture-goto-target :which-key "Goto capture"))
+    "ni" '(org-roam-node-insert :which-key "org-roam-node-insert")
+    "nf" '(org-roam-node-find :which-key "org-roam-node-find")
+    "nl" '(org-roam-buffer-toggle :which-key "org-roam-buffer-toggle"))
 
 #+end_src
 
