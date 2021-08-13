@@ -3,9 +3,7 @@
 #+STARTUP: content
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el
 
-set up org ROAM
-
-* Table of Contents :toc@2:noexport:
+* Table of Contents                                          :toc@2:noexport:
 - [[#about][About]]
 - [[#startup][Startup]]
   - [[#early-initel][early-init.el]]
@@ -437,6 +435,8 @@ We can customize it with =dashboard= to show recent files, projects, etc.
     ;; (setq dashboard-startup-banner "~/.emacs.d/logo.txt")
 	;; (setq dashboard-center-content t)
     (setq dashboard-set-navigator t)
+	(setq dashboard-agenda-time-string-format "%Y-%m-%d %a")
+	(setq dashboard-match-agenda-entry "CATEGORY={TODO}")
 	(setq dashboard-filter-agenda-entry 'dashboard-no-filter-agenda)
 	;; (setq dashboard-agenda-release-buffers t)
     (unless my/is-windows
@@ -928,6 +928,7 @@ To get eshell to toggle as a split buffer
           org-startup-folder 'content
           org-directory "~/org/"
           org-agenda-files (list org-directory)
+		  org-default-notes-file "~/org/notes.org"
           org-return-follows-link t))
 
 (use-package evil-org
@@ -955,7 +956,8 @@ To get eshell to toggle as a split buffer
                :prepend t
                :template ("* TODO %^{Description}"
                           ":PROPERTIES:"
-                          ":Created: %U"
+                          ":CATEGORY: TODO"
+                          ":CREATED: %U"
                           ":END:"
                           "%?"))
 	         ("Notes" :keys "n"
@@ -964,7 +966,8 @@ To get eshell to toggle as a split buffer
                :prepend t
                :template ("* %^{Description}"
                           ":PROPERTIES:"
-                          ":Created: %U"
+                          ":CATEGORY: NOTE"
+                          ":CREATED: %U"
                           ":END:"
                           "%?")))))
 

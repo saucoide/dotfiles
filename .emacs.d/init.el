@@ -196,6 +196,8 @@
     ;; (setq dashboard-startup-banner "~/.emacs.d/logo.txt")
 	;; (setq dashboard-center-content t)
     (setq dashboard-set-navigator t)
+	(setq dashboard-agenda-time-string-format "%Y-%m-%d %a")
+	(setq dashboard-match-agenda-entry "CATEGORY={TODO}")
 	(setq dashboard-filter-agenda-entry 'dashboard-no-filter-agenda)
 	;; (setq dashboard-agenda-release-buffers t)
     (unless my/is-windows
@@ -462,6 +464,7 @@
           org-startup-folder 'content
           org-directory "~/org/"
           org-agenda-files (list org-directory)
+		  org-default-notes-file "~/org/notes.org"
           org-return-follows-link t))
 
 (use-package evil-org
@@ -483,7 +486,8 @@
                :prepend t
                :template ("* TODO %^{Description}"
                           ":PROPERTIES:"
-                          ":Created: %U"
+                          ":CATEGORY: TODO"
+                          ":CREATED: %U"
                           ":END:"
                           "%?"))
 	         ("Notes" :keys "n"
@@ -492,7 +496,8 @@
                :prepend t
                :template ("* %^{Description}"
                           ":PROPERTIES:"
-                          ":Created: %U"
+                          ":CATEGORY: NOTE"
+                          ":CREATED: %U"
                           ":END:"
                           "%?")))))
 
