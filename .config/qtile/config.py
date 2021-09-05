@@ -629,9 +629,9 @@ cursor_warp = False
 
 ##### STARTUP APPLICATIONS #####
 @hook.subscribe.startup_once
-def start_once():
-    autostart = pathlib.Path.home() / ".config/qtile/autostart.sh"
-    subprocess.call([autostart])
+def autostart():
+    autostart_script = pathlib.Path.home() / ".config/qtile/autostart.sh"
+    subprocess.call([autostart_script])
 
 # XXX: Gasp! We're lying here. In fact, nobody really uses or cares about this
 # string besides java UI toolkits; you can see several discussions on the

@@ -1025,16 +1025,16 @@ function run {
   fi
 }
 
-dunst &
-numlockx on &
-run nm-applet &
-blueberry-tray &
-run volumeicon &
-run xfce4-power-manager &
+numlockx on
+setxkbmap -option "ctrl:nocaps"
+run dunst 
+run nm-applet
+run blueberry-tray
+run volumeicon
+run xfce4-power-manager
+run /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+run picom --config $HOME/.config/picom/picom.conf
 run spotify
-setxkbmap -option "ctrl:nocaps" &
-/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
-picom --config $HOME/.config/picom/picom.conf &
 
 #+END_SRC
 
@@ -1672,9 +1672,9 @@ cursor_warp = False
 
 ##### STARTUP APPLICATIONS #####
 @hook.subscribe.startup_once
-def start_once():
-    autostart = pathlib.Path.home() / ".config/qtile/autostart.sh"
-    subprocess.call([autostart])
+def autostart():
+    autostart_script = pathlib.Path.home() / ".config/qtile/autostart.sh"
+    subprocess.call([autostart_script])
 
 # XXX: Gasp! We're lying here. In fact, nobody really uses or cares about this
 # string besides java UI toolkits; you can see several discussions on the
