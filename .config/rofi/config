@@ -1,4 +1,0 @@
-# Generated from ~/dotfiles/system.org
-rofi.show-icons: true
-rofi.modi: window,drun,run,ssh
-rofi.theme: ~/.config/rofi/themes/simple_nord.rasi

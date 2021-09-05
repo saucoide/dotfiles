@@ -322,11 +322,22 @@ I use a custom rofi theme with nord colors
 
 ** config
 
-#+BEGIN_SRC conf :tangle .config/rofi/config
-# Generated from ~/dotfiles/system.org
-rofi.show-icons: true
-rofi.modi: window,drun,run,ssh
-rofi.theme: ~/.config/rofi/themes/simple_nord.rasi
+#+BEGIN_SRC conf :tangle .config/rofi/config.rasi
+/* Generated from ~/dotfiles/system.org */
+configuration {
+  modi: "filebrowser,window,drun,run,ssh";
+  show-icons : true;
+  display-filebrowser : true;
+  theme: "themes/simple_nord";
+  timeout {
+      action: "kb-cancel";
+      delay:  0;
+  }
+  filebrowser {
+      directories-first: true;
+      sorting-method:    "name";
+  }
+}
 #+END_SRC
 
 ** simple_nord.rasi (theme)
