@@ -240,7 +240,7 @@ It can also autoload packages only when needed instead of everything at startup
     (setq undo-limit 60000000              ; Raise undo limit to 60mb
           evil-want-fine-undo t)           ; A more granular undo
 
-    (setq-default indent-tabs-mode t)      ; use spaces
+    (setq-default indent-tabs-mode nil)      ; use spaces
     (setq-default tab-width 4)             ; 4 spaces is the right tab width
     (setq-default fill-column  90))        ; line length
 
@@ -690,6 +690,12 @@ A sidebar project explorer for quick navigation
   (setq rustic-lsp-client 'eglot)
   (setq rustic-format-on-save t))
 
+#+end_src
+
+*** Elm
+
+#+begin_src emacs-lisp
+(use-package elm-mode)
 #+end_src
 
 ** Linting
