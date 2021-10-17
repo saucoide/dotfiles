@@ -27,6 +27,7 @@
   - [[#window-title][Window title]]
 - [[#package-configuration][Package Configuration]]
   - [[#dired][Dired]]
+  - [[#ranger][Ranger]]
   - [[#command-completion][Command Completion]]
   - [[#help][Help]]
   - [[#projectile][Projectile]]
@@ -38,6 +39,7 @@
   - [[#commenting][Commenting]]
   - [[#git][Git]]
   - [[#eglot-lsp][Eglot (LSP)]]
+  - [[#lsp][LSP]]
   - [[#company-mode][Company Mode]]
   - [[#smartparens][Smartparens]]
   - [[#yasnippets][Yasnippets]]
@@ -53,7 +55,8 @@
   - [[#toc-org][Toc-Org]]
 - [[#org-roam][Org Roam]]
 - [[#email---mu4e][Email - mu4e]]
-  - [[#recieving-emails---mu4e][Recieving emails - mu4e]]
+  - [[#getting-emails-from-the-account---mbsync][Getting emails from the account - mbsync]]
+  - [[#receiving-emails---mu4e][Receiving emails - mu4e]]
   - [[#sending-emails][Sending Emails]]
   - [[#email-formatting][Email Formatting]]
   - [[#composing-emails-with-org-msg][Composing emails with org-msg]]
@@ -480,10 +483,10 @@ The emacs file manager
 
   (use-package dired
       :ensure nil
-      :commands (dired dired-jump)
+      ;; :commands (dired dired-jump)
       :config
-      (setq dired-listing-switches "-agho --group-directories-first")
-	  (unless my/is-windows
+      ;; (setq dired-listing-switches "-agho --group-directories-first")
+      (unless my/is-windows
             (add-hook 'dired-mode-hook
                 (lambda ()
                     (interactive)
@@ -495,7 +498,7 @@ dired-single forces a single dired buffer instead of a new one everytime
 
 #+begin_src emacs-lisp
 
-  (use-package dired-single)
+  ;; (use-package dired-single)
 
 #+end_src
 
@@ -503,11 +506,11 @@ Hide dotfiles and use =H= to toggle
 
 #+begin_src emacs-lisp
 
-  (use-package dired-hide-dotfiles
-      :hook (dired-mode . dired-hide-dotfiles-mode)
-      :config
-          (evil-collection-define-key 'normal 'dired-mode-map
-              "H" 'dired-hide-dotfiles-mode))
+;; (use-package dired-hide-dotfiles
+;;     :hook (dired-mode . dired-hide-dotfiles-mode)
+;;     :config
+;;         (evil-collection-define-key 'normal 'dired-mode-map
+;;             "H" 'dired-hide-dotfiles-mode))
 
 #+end_src
 
@@ -517,6 +520,20 @@ Open files externally (i'm only using it on linux for now)
 #+begin_src emacs-lisp
 ;; TODO replace openwith with something else
 
+#+end_src
+
+** Ranger
+
+I'm using ranger.el instead of dired
+
+#+begin_src emacs-lisp
+(use-package ranger
+  :load-path "~/development/emacs/ranger/"
+  :config
+    (setq ranger-cleanup-eagerly t)
+;    (setq ranger-show-hidden t)
+    (setq ranger-dont-show-binary t)
+)
 #+end_src
 
 ** Command Completion
@@ -695,7 +712,10 @@ A sidebar project explorer for quick navigation
 *** Elm
 
 #+begin_src emacs-lisp
-(use-package elm-mode)
+(use-package elm-mode
+  :hook
+  (elm-mode . elm-indent-simple-mode)
+  (elm-mode . elm-format-on-save-mode))
 #+end_src
 
 ** Linting
@@ -801,7 +821,36 @@ Highlight lines with changes
 
 #+begin_src emacs-lisp
 ;; TODO
-  (use-package eglot)
+  ;; (use-package eglot)
+
+#+end_src
+
+** LSP
+
+#+begin_src emacs-lisp
+(use-package lsp-mode
+  :init
+  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  (setq lsp-keymap-prefix "C-c l")
+  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+         (elm-mode . lsp)
+         (python-mode . lsp)
+         (clojure-mode . lsp)
+         (rustic-mode . lsp)
+         ;; if you want which-key integration
+         (lsp-mode . lsp-enable-which-key-integration))
+  :commands lsp)
+
+;; optionally
+(use-package lsp-ui :commands lsp-ui-mode)
+;; if you are ivy user
+(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+
+;; optionally if you want to use debugger
+(use-package dap-mode)
+;; (use-package dap-python)
+;; (use-package dap-LANGUAGE) to load the dap adapter for your language
 
 #+end_src
 
@@ -1057,104 +1106,151 @@ toc-org generates tables of contents in the org file on save
 
 * Email - mu4e
 
-Install mu4e from the distro's repositories, we just need to make sure the .el files are in emac's load-path
+Install mu4e from the distro's repositories, we just need to make sure the .el files are in emacs's load-path
 
-** Recieving emails - mu4e
+** Getting emails from the account - mbsync
+
+#+begin_src conf :tangle ~/.mbsyncrc
+IMAPAccount saucoide-gmail
+Host imap.gmail.com
+User saucoide@gmail.com
+PassCmd "pass smtp.gmail.com/saucoide@gmail.com"
+SSLType IMAPS
+CertificateFile /etc/ssl/certs/ca-certificates.crt
+
+IMAPStore gmail-remote
+Account saucoide-gmail
+
+MaildirStore gmail-local
+Subfolders Verbatim
+Path ~/mail/gmail/
+Inbox ~/mail/gmail/Inbox
+
+Channel gmail
+Far :gmail-remote:
+Near :gmail-local:
+Patterns * "![Gmail]/All Mail"
+Create Both
+SyncState *
+
+#+end_src
+
+** Receiving emails - mu4e
 
 #+BEGIN_SRC emacs-lisp
 
-  (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
+(add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
 
-  (use-package mu4e
-    :if (not my/is-windows)
-    :ensure nil  ;; tries to download from melpa otherwise, and fails
-    :config
+(use-package mu4e
+  :if (not my/is-windows)
+  :ensure nil  ;; tries to download from melpa otherwise, and fails
+  :config
 
-    (add-hook 'mu4e-view-mode-hook #'visual-line-mode)
-    ;; Load org-mode integration
-    ;; (require 'org-mu4e)
+  (add-hook 'mu4e-view-mode-hook #'visual-line-mode)
+  ;; Load org-mode integration
+  ;; (require 'org-mu4e)
 
-    ;; This is set to 't' to avoid mail syncing issues when using mbsync
-    (setq mu4e-change-filenames-when-moving t)
-    (setq mu4e-view-auto-mark-as-read nil)
+  ;; This is set to 't' to avoid mail syncing issues when using mbsync
+  (setq mu4e-change-filenames-when-moving t)
+
+  ;; I want to refile to also mark the emails as read
+  ;; so redefining it here
+  (setq mu4e-view-auto-mark-as-read nil)
+  (add-to-list 'mu4e-marks
+    '(refile
+        :char ("r" . "▶")
+        :prompt "refile"
+        :dyn-target (lambda (target msg) (mu4e-get-refile-folder msg))
+        :action (lambda (docid msg target)
+                    (mu4e~proc-move docid (mu4e~mark-check-target target) "+S-u-N"))))
 
 
-    ;; Refresh mail using isync every 10 minutes
-    (setq mu4e-update-interval 600)
-    (setq mu4e-get-mail-command "mbsync -a")
-    (setq mu4e-maildir "~/mail/gmail")
+  ;; Refresh mail using isync every 10 minutes
+  (setq mu4e-update-interval 600)
+  (setq mu4e-get-mail-command "mbsync -a")
+  (setq mu4e-maildir "~/mail")
 
-    ;; I find it very annoying when the reply to a thread un-archives all other emails
-    (setq mu4e-headers-include-related nil)
+  ;; I find it very annoying when the reply to a thread un-archives all other emails
+  (setq mu4e-headers-include-related nil)
 
-    ;; US date format is no good
-    (setq mu4e-headers-date-format "%Y/%m/%d")
+  ;; US date format is no good
+  (setq mu4e-headers-date-format "%Y-%m-%d")
 
-    ;; When html emails are very large compared to the text one, mu4e blocks
-    ;; toggling between plaintext and html which is annoying
-    (add-to-list 'mu4e-view-actions '("View in browser" . mu4e-action-view-in-browser))
-    (setq mu4e-view-html-plaintext-ratio-heuristic most-positive-fixnum)
+  (add-to-list 'mu4e-view-actions '("View in browser" . mu4e-action-view-in-browser))
 
-    ;; Account settings
-    (setq user-full-name "saucoide")
-    (setq user-mail-address "saucoide@gmail.com")
+  ;; Prefer always the plaintext version if it exists
+  (with-eval-after-load "mm-decode"
+  (add-to-list 'mm-discouraged-alternatives "text/html")
+  (add-to-list 'mm-discouraged-alternatives "text/richtext"))
+  
+  ;; When html emails are very large compared to the text one, mu4e blocks
+  ;; toggling between plaintext and html which is annoying
+  ;; (setq mu4e-view-html-plaintext-ratio-heuristic most-positive-fixnum)
 
-    (setq mu4e-drafts-folder "/[Gmail]/Drafts")
-    (setq mu4e-sent-folder   "/[Gmail]/Sent Mail")
-    (setq mu4e-refile-folder "/[Gmail]/All Mail")
-    (setq mu4e-trash-folder  "/[Gmail]/Bin")
+  ;; Html messages in a dark theme are hard to read
+  (setq shr-color-visible-luminance-min 80)
 
-    ;; For sending emails
-    (setq message-send-mail-function 'smtpmail-send-it
-          message-kill-buffer-on-exit t)
-    (setq smtpmail-smtp-server "smtp.gmail.com")
-    (setq smtpmail-smtp-user "saucoide@gmail.com")
-    (setq smtpmail-smtp-service 587)
-    (setq smtpmail-stream-type 'starttls)
+  ;; Account settings
+  (setq user-full-name "saucoide")
+  (setq user-mail-address "saucoide@gmail.com")
 
-    ;; Display Settings
-    (setq mu4e-view-show-addresses t  ;; Show full email addreses for contacts
-          mu4e-view-show-images t
-          mu4e-view-image-max-width 800
-          mu4e-headers-fields
-            '((:from . 25)
-              (:human-date . 12)
-              (:flags . 4)
-              (:subject)))
+  (setq mu4e-drafts-folder "/[Gmail]/Drafts")
+  (setq mu4e-sent-folder   "/[Gmail]/Sent Mail")
+  (setq mu4e-refile-folder "/ReadInbox")
+  (setq mu4e-trash-folder  "/[Gmail]/Bin")
 
-    ;; Use fancy icons
-    (setq mu4e-use-fancy-chars t
-            mu4e-headers-draft-mark '("D" . "")
-            mu4e-headers-flagged-mark '("F" . "")
-            mu4e-headers-new-mark '("N" . "!")
-            mu4e-headers-passed-mark '("P" . "")
-            mu4e-headers-replied-mark '("R" . "")
-            mu4e-headers-seen-mark '("S" . ".")
-            mu4e-headers-trashed-mark '("T" . "")
-            mu4e-headers-encrypted-mark '("x" . "")
-            mu4e-headers-signed-mark '("s" . "")
-            mu4e-headers-unread-mark '("u" . "✉")
-            mu4e-headers-attach-mark '("a" . ""))
+  ;; For sending emails
+  (setq message-send-mail-function 'smtpmail-send-it
+        message-kill-buffer-on-exit t)
+  (setq smtpmail-smtp-server "smtp.gmail.com")
+  (setq smtpmail-smtp-user "saucoide@gmail.com")
+  (setq smtpmail-smtp-service 587)
+  (setq smtpmail-stream-type 'starttls)
 
-    ;; Shortcuts
-    (setq mu4e-maildir-shortcuts
-      '((:maildir "/Inbox"    :key ?i)
-        (:maildir "/ReadInbox" :key ?r)
-        (:maildir "/[Gmail]/Sent Mail" :key ?s)
-        (:maildir "/[Gmail]/Bin"     :key ?t)
-        (:maildir "/[Gmail]/Drafts"    :key ?d)
-        (:maildir "/[Gmail]/All Mail"  :key ?a)))
+  ;; Display Settings
+  (setq mu4e-view-show-addresses t  ;; Show full email addreses for contacts
+        mu4e-view-show-images t
+        mu4e-view-image-max-width 800
+        mu4e-headers-fields
+          '((:from . 25)
+            (:human-date . 12)
+            (:flags . 4)
+            (:subject)))
 
-    ;; Bookmarks
-    (setq mu4e-bookmarks
-      '(
-       ;; (:name "Unread messages" :query "flag:unread AND NOT flag:trashed" :key ?i)
-       ;; (:name "Today's messages" :query "date:today..now AND NOT flag:trashed" :key ?t)
-        (:name "Inbox" :query "maildir:/Inbox" :key ?b)
-        (:name "ReadInbox" :query "maildir:/ReadInbox" :key ?r)
-       ;; (:name "with Attachments" :query "flag:attach" :key ?a)
-       ;; (:name "Last 7 days" :query "date:7d..now AND NOT flag:trashed" :key ?w)
-        )))
+  ;; Use fancy icons
+  (setq mu4e-use-fancy-chars t
+          mu4e-headers-draft-mark '("D" . "")
+          mu4e-headers-flagged-mark '("F" . "")
+          mu4e-headers-new-mark '("N" . "!")
+          mu4e-headers-passed-mark '("P" . "")
+          mu4e-headers-replied-mark '("R" . "")
+          mu4e-headers-seen-mark '("S" . ".")
+          mu4e-headers-trashed-mark '("T" . "")
+          mu4e-headers-encrypted-mark '("x" . "")
+          mu4e-headers-signed-mark '("s" . "")
+          mu4e-headers-unread-mark '("u" . "✉")
+          mu4e-headers-attach-mark '("a" . ""))
+
+  ;; Shortcuts
+  (setq mu4e-maildir-shortcuts
+    '((:maildir "/Inbox"    :key ?i)
+      (:maildir "/[Gmail]/Sent Mail" :key ?s)
+      (:maildir "/[Gmail]/Bin"     :key ?t)
+      (:maildir "/[Gmail]/Drafts"    :key ?d)))
+      ;; (:maildir "/[Gmail]/All Mail"  :key ?a)))
+
+  ;; Bookmarks
+  (setq mu4e-bookmarks
+    '(
+     ;; (:name "Unread messages" :query "flag:unread AND NOT flag:trashed" :key ?i)
+     ;; (:name "Today's messages" :query "date:today..now AND NOT flag:trashed" :key ?t)
+      (:name "Inbox" :query "maildir:/Inbox" :key ?b)
+      (:name "ReadInbox" :query "maildir:/ReadInbox" :key ?r)
+     ;; (:name "Sent" :query "maildir:/Sent Mail" :key ?s)
+     ;; (:name "All" :query "maildir:/All Mail" :key ?a)
+     ;; (:name "with Attachments" :query "flag:attach" :key ?a)
+     ;; (:name "Last 7 days" :query "date:7d..now AND NOT flag:trashed" :key ?w)
+      )))
 
 #+END_SRC
 

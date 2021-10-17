@@ -84,7 +84,7 @@
     (setq undo-limit 60000000              ; Raise undo limit to 60mb
           evil-want-fine-undo t)           ; A more granular undo
 
-    (setq-default indent-tabs-mode t)      ; use spaces
+    (setq-default indent-tabs-mode nil)      ; use spaces
     (setq-default tab-width 4)             ; 4 spaces is the right tab width
     (setq-default fill-column  90))        ; line length
 
@@ -224,24 +224,32 @@
 
 (use-package dired
     :ensure nil
-    :commands (dired dired-jump)
+    ;; :commands (dired dired-jump)
     :config
-    (setq dired-listing-switches "-agho --group-directories-first")
-	(unless my/is-windows
+    ;; (setq dired-listing-switches "-agho --group-directories-first")
+    (unless my/is-windows
           (add-hook 'dired-mode-hook
               (lambda ()
                   (interactive)
                   (all-the-icons-dired-mode 1)))))
 
-(use-package dired-single)
+;; (use-package dired-single)
 
-(use-package dired-hide-dotfiles
-    :hook (dired-mode . dired-hide-dotfiles-mode)
-    :config
-        (evil-collection-define-key 'normal 'dired-mode-map
-            "H" 'dired-hide-dotfiles-mode))
+;; (use-package dired-hide-dotfiles
+;;     :hook (dired-mode . dired-hide-dotfiles-mode)
+;;     :config
+;;         (evil-collection-define-key 'normal 'dired-mode-map
+;;             "H" 'dired-hide-dotfiles-mode))
 
 ;; TODO replace openwith with something else
+
+(use-package ranger
+  :load-path "~/development/emacs/ranger/"
+  :config
+    (setq ranger-cleanup-eagerly t)
+;    (setq ranger-show-hidden t)
+    (setq ranger-dont-show-binary t)
+)
 
 ;; TODO
 (use-package transient
@@ -335,6 +343,11 @@
   (setq rustic-lsp-client 'eglot)
   (setq rustic-format-on-save t))
 
+(use-package elm-mode
+  :hook
+  (elm-mode . elm-indent-simple-mode)
+  (elm-mode . elm-format-on-save-mode))
+
 (use-package flycheck
     :defer t
     :hook (eglot-mode . flycheck-mode))
@@ -375,7 +388,31 @@
         (setq magit-todos-nice nil)))
 
 ;; TODO
-  (use-package eglot)
+  ;; (use-package eglot)
+
+(use-package lsp-mode
+  :init
+  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  (setq lsp-keymap-prefix "C-c l")
+  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+         (elm-mode . lsp)
+         (python-mode . lsp)
+         (clojure-mode . lsp)
+         (rustic-mode . lsp)
+         ;; if you want which-key integration
+         (lsp-mode . lsp-enable-which-key-integration))
+  :commands lsp)
+
+;; optionally
+(use-package lsp-ui :commands lsp-ui-mode)
+;; if you are ivy user
+(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+
+;; optionally if you want to use debugger
+(use-package dap-mode)
+;; (use-package dap-python)
+;; (use-package dap-LANGUAGE) to load the dap adapter for your language
 
 (use-package company
     :init
@@ -554,24 +591,43 @@
 
   ;; This is set to 't' to avoid mail syncing issues when using mbsync
   (setq mu4e-change-filenames-when-moving t)
+
+  ;; I want to refile to also mark the emails as read
+  ;; so redefining it here
   (setq mu4e-view-auto-mark-as-read nil)
+  (add-to-list 'mu4e-marks
+    '(refile
+        :char ("r" . "▶")
+        :prompt "refile"
+        :dyn-target (lambda (target msg) (mu4e-get-refile-folder msg))
+        :action (lambda (docid msg target)
+                    (mu4e~proc-move docid (mu4e~mark-check-target target) "+S-u-N"))))
 
 
   ;; Refresh mail using isync every 10 minutes
   (setq mu4e-update-interval 600)
   (setq mu4e-get-mail-command "mbsync -a")
-  (setq mu4e-maildir "~/mail/gmail")
+  (setq mu4e-maildir "~/mail")
 
   ;; I find it very annoying when the reply to a thread un-archives all other emails
   (setq mu4e-headers-include-related nil)
 
   ;; US date format is no good
-  (setq mu4e-headers-date-format "%Y/%m/%d")
+  (setq mu4e-headers-date-format "%Y-%m-%d")
 
+  (add-to-list 'mu4e-view-actions '("View in browser" . mu4e-action-view-in-browser))
+
+  ;; Prefer always the plaintext version if it exists
+  (with-eval-after-load "mm-decode"
+  (add-to-list 'mm-discouraged-alternatives "text/html")
+  (add-to-list 'mm-discouraged-alternatives "text/richtext"))
+  
   ;; When html emails are very large compared to the text one, mu4e blocks
   ;; toggling between plaintext and html which is annoying
-  (add-to-list 'mu4e-view-actions '("View in browser" . mu4e-action-view-in-browser))
-  (setq mu4e-view-html-plaintext-ratio-heuristic most-positive-fixnum)
+  ;; (setq mu4e-view-html-plaintext-ratio-heuristic most-positive-fixnum)
+
+  ;; Html messages in a dark theme are hard to read
+  (setq shr-color-visible-luminance-min 80)
 
   ;; Account settings
   (setq user-full-name "saucoide")
@@ -579,7 +635,7 @@
 
   (setq mu4e-drafts-folder "/[Gmail]/Drafts")
   (setq mu4e-sent-folder   "/[Gmail]/Sent Mail")
-  (setq mu4e-refile-folder "/[Gmail]/All Mail")
+  (setq mu4e-refile-folder "/ReadInbox")
   (setq mu4e-trash-folder  "/[Gmail]/Bin")
 
   ;; For sending emails
@@ -617,11 +673,10 @@
   ;; Shortcuts
   (setq mu4e-maildir-shortcuts
     '((:maildir "/Inbox"    :key ?i)
-      (:maildir "/ReadInbox" :key ?r)
       (:maildir "/[Gmail]/Sent Mail" :key ?s)
       (:maildir "/[Gmail]/Bin"     :key ?t)
-      (:maildir "/[Gmail]/Drafts"    :key ?d)
-      (:maildir "/[Gmail]/All Mail"  :key ?a)))
+      (:maildir "/[Gmail]/Drafts"    :key ?d)))
+      ;; (:maildir "/[Gmail]/All Mail"  :key ?a)))
 
   ;; Bookmarks
   (setq mu4e-bookmarks
@@ -630,6 +685,8 @@
      ;; (:name "Today's messages" :query "date:today..now AND NOT flag:trashed" :key ?t)
       (:name "Inbox" :query "maildir:/Inbox" :key ?b)
       (:name "ReadInbox" :query "maildir:/ReadInbox" :key ?r)
+     ;; (:name "Sent" :query "maildir:/Sent Mail" :key ?s)
+     ;; (:name "All" :query "maildir:/All Mail" :key ?a)
      ;; (:name "with Attachments" :query "flag:attach" :key ?a)
      ;; (:name "Last 7 days" :query "date:7d..now AND NOT flag:trashed" :key ?w)
       )))
