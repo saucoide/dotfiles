@@ -246,9 +246,12 @@
 (use-package ranger
   :load-path "~/development/emacs/ranger/"
   :config
-    (setq ranger-cleanup-eagerly t)
+    (setq ranger-cleanup-eagerly nil)
+    (ranger-override-dired-mode t)
+    (setq ranger-return-to-ranger t)
 ;    (setq ranger-show-hidden t)
     (setq ranger-dont-show-binary t)
+    (setq ranger-excluded-extensions '("mkv" "iso" "mp4"))
 )
 
 ;; TODO

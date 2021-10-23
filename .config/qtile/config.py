@@ -45,6 +45,7 @@ MY_TERMINAL = "termite"
 TEXT_EDITOR = "emacs"
 EMAIL_CLIENT = "emacs"
 FILE_MANAGER = "thunar"
+TERMINAL_FILE_MANAGER = "ranger"
 BROWSER = "firefox"
 SYS_MONITOR = "xfce4-taskmanager"
 
@@ -247,8 +248,8 @@ keys = [
          Key([mod], "space", lazy.spawn('rofi -show drun'),
              desc='Launch rofi drun'),
 
-          Key([mod], "r", lazy.spawn('rofi -show run'),
-             desc='Launch rofi run'),
+          Key([mod], "r", lazy.spawn(TERMINAL_FILE_MANAGER),
+             desc='Launch terminal file manager'),
 
          Key([mod], "e", lazy.spawn(FILE_MANAGER),
              desc='Launch file manager'),

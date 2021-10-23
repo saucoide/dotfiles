@@ -31,6 +31,8 @@ export PATH=~/.local/bin:$PATH
 export PATH=~/.emacs.d/bin:$PATH
 export PATH=~/.poetry/bin:$PATH
 
+export EDITOR=vim
+
 # use vim as manpager
 export MANPAGER='/bin/bash -c "vim -MRn -c \"set buftype=nofile showtabline=0 ft=man ts=8 nomod nolist norelativenumber nonu noma\" -c \"normal L\" -c \"nmap q :qa<CR>\"</dev/tty <(col -b)"'
 
@@ -194,15 +196,9 @@ ex ()
   fi
 }
 
-vicd()
-{
-    local dst="$(command vifm --choose-dir - "$@")"
-    if [ -z "$dst" ]; then
-        echo 'Directory picking cancelled/failed'
-        return 1
-    fi
-    cd "$dst"
-}
-
+# fix for qtile & terminal apps resizing
+# (its fixed on master, should remove soon)
+unset COLUMNS
+unset LINES
+    
 neofetch
-. "$HOME/.cargo/env"
