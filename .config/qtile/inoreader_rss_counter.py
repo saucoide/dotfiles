@@ -35,5 +35,12 @@ def main():
     return str(unread)
 
 
+def main_wrapper():
+    try:
+        return main()
+    except:
+        return "Err"
+
+
 if __name__ == "__main__":
-    main()
+    main_wrapper()

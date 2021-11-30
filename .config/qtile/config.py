@@ -33,8 +33,8 @@ from libqtile.config import ScratchPad, DropDown
 
 import random
 import pathlib
-from mailwatcher import main as get_mails
-from inoreader_rss_counter import main as get_feeds
+from mailwatcher import main_wrapper as get_mails
+from inoreader_rss_counter import main_wrapper as get_feeds
 
 ##### DEFINING CONSTANTS & DEFAULT PROGRAMS #####
 

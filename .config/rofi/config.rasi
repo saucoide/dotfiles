@@ -2,8 +2,7 @@
 configuration {
   modi: "filebrowser,window,drun,run,ssh";
   show-icons : true;
-  display-filebrowser : true;
-  theme: "themes/simple_nord";
+  display-filebrowser : "true";
   timeout {
       action: "kb-cancel";
       delay:  0;
@@ -13,3 +12,5 @@ configuration {
       sorting-method:    "name";
   }
 }
+    
+@theme "themes/simple_nord"

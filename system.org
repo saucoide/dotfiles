@@ -1099,8 +1099,7 @@ I use a custom rofi theme with nord colors
 configuration {
   modi: "filebrowser,window,drun,run,ssh";
   show-icons : true;
-  display-filebrowser : true;
-  theme: "themes/simple_nord";
+  display-filebrowser : "true";
   timeout {
       action: "kb-cancel";
       delay:  0;
@@ -1110,6 +1109,8 @@ configuration {
       sorting-method:    "name";
   }
 }
+    
+@theme "themes/simple_nord"
 #+END_SRC
 
 ** simple_nord.rasi (theme)
@@ -1849,8 +1850,8 @@ from libqtile.config import ScratchPad, DropDown
 
 import random
 import pathlib
-from mailwatcher import main as get_mails
-from inoreader_rss_counter import main as get_feeds
+from mailwatcher import main_wrapper as get_mails
+from inoreader_rss_counter import main_wrapper as get_feeds
 
 ##### DEFINING CONSTANTS & DEFAULT PROGRAMS #####
 
@@ -2506,8 +2507,15 @@ def main():
     return str(unread)
 
 
+def main_wrapper():
+    try:
+        return main()
+    except:
+        return "Err"
+
+
 if __name__ == "__main__":
-    main()
+    main_wrapper()
 
 #+END_SRC
 ** mailwatcher.py
@@ -2536,8 +2544,14 @@ def main():
 
     return f"🖂 {unread}"
 
+def main_wrapper():
+    try:
+        return main()
+    except:
+        return "Err"
+
 if __name__ == "__main__":
-    main()
+    main_wrapper()
 
 #+END_SRC
 
