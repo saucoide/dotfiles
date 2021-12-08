@@ -232,6 +232,61 @@ neofetch
 
 #+END_SRC
 
+** fish
+
+The recommended way to config fish is to add separate functions to the ~/functions~
+directory that will be autoloaded, but i prefer to configure everything in a single file, so i'll just replace ~config.fish~
+
+#+BEGIN_SRC sh :tangle .config/fish/config.fish
+
+# Startup greeting
+function fish_greeting
+    neofetch
+end
+
+
+# My functions
+# ---------------------------------------------------------------------
+function ls
+ exa --long --classify --color=always --group-directories-first
+end
+
+function lsa
+ exa --long --all --classify --color=always --group-directories-first
+end
+
+function cd..
+  cd ..
+end
+# ---------------------------------------------------------------------
+
+
+# PROMPT (starship https://github.com/starship/starship)
+starship init fish | source
+
+#+END_SRC
+
+*** Starship
+
+To customize some icons
+
+#+begin_src conf :tangle .config/starship.toml
+    
+# Inserts a blank line between shell prompts
+add_newline = true
+
+[character] 
+success_symbol = "[➜](green)"
+error_symbol= "[➜](red)"
+
+[python]
+symbol = " "
+
+# Disable the package module, hiding it from the prompt completely
+[package]
+disabled = true
+#+end_src
+
 ** Termite
 
 #+BEGIN_SRC conf :tangle .config/termite/config
@@ -249,8 +304,7 @@ cursor_blink = system
 cursor_shape = block
 dynamic_title = true
 filter_unmatched_urls = true
-font = Monospace 11
-#font = Hack Bold 10
+font = JetBrainsMono Nerd Font Mono 11
 geometry = 900x650
 highlight = #2f2f2f
 icon_name = terminal

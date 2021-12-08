@@ -1,0 +1,13 @@
+# Inserts a blank line between shell prompts
+add_newline = true
+
+[character] 
+success_symbol = "[➜](green)"
+error_symbol= "[➜](red)"
+
+[python]
+symbol = " "
+
+# Disable the package module, hiding it from the prompt completely
+[package]
+disabled = true
