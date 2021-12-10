@@ -44,8 +44,8 @@ alias wget="wget -c"
 alias userlist="cut -d: -f1 /etc/passwd"
 ## Aliases for software managment
 ### Pacman
-alias pacman='pacman --color auto'
-alias update='pacman -Syyu'
+alias pacman='sudo pacman --color auto'
+alias update='sudo pacman -Syyu'
 ### Cleanup orphaned packages
 alias cleanup='sudo pacman -Rns (pacman -Qtdq)'
 ### Yay as aur helper - updates everything
