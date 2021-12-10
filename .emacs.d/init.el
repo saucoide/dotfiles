@@ -209,6 +209,9 @@
                             (projects . 5)
                             (agenda . t))))
 
+;; Set dashboard to be the initial buffer that opens when using emacsclient
+(setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+
 (setq frame-title-format
       '(""
         (:eval "%b")

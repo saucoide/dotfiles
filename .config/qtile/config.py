@@ -42,7 +42,7 @@ mod = "mod4"   # mod key to SUPER/WINDOWS
 TRANS_FONT_SIZE = 60  # font size used for the separator effect on the bar, adjust for different resolutions
 
 MY_TERMINAL = "termite"
-TEXT_EDITOR = "emacs"
+TEXT_EDITOR = "emacsclient -c -a ''"
 EMAIL_CLIENT = "emacs"
 FILE_MANAGER = "thunar"
 TERMINAL_FILE_MANAGER = "ranger"
