@@ -2034,7 +2034,7 @@ run /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 
 #+END_SRC
 
-** config.py
+** TODO config.py
 
 #+BEGIN_SRC python :tangle .config/qtile/config.py
 # -*- coding: utf-8 -*-
@@ -2072,15 +2072,15 @@ from libqtile.config import ScratchPad, DropDown
 
 import random
 import pathlib
-from mailwatcher import main_wrapper as get_mails
-from inoreader_rss_counter import main_wrapper as get_feeds
+# from mailwatcher import main_wrapper as get_mails
+# from inoreader_rss_counter import main_wrapper as get_feeds
 
 ##### DEFINING CONSTANTS & DEFAULT PROGRAMS #####
 
 mod = "mod4"   # mod key to SUPER/WINDOWS
 TRANS_FONT_SIZE = 60  # font size used for the separator effect on the bar, adjust for different resolutions
 
-MY_TERMINAL = "termite"
+MY_TERMINAL = "alacritty"
 TEXT_EDITOR = "emacsclient -c -a ''"
 EMAIL_CLIENT = "emacs"
 FILE_MANAGER = "thunar"
@@ -2493,12 +2493,12 @@ def init_widgets_list():
                         padding = 5
                         ),
                bar_transition(COLORS["background"], COLORS["frost0"]),
-               widget.GenPollText(
-                   background = COLORS["frost0"],
-                   func = get_mails,
-                   update_interval = 600,
-                   mouse_callbacks = {'Button1':open_mail}
-                   ),
+               # widget.GenPollText(
+               #     background = COLORS["frost0"],
+               #     func = get_mails,
+               #     update_interval = 600,
+               #     mouse_callbacks = {'Button1':open_mail}
+               #     ),
                bar_transition(COLORS["frost0"], COLORS["frost1"]),
                widget.TextBox(
                         text = "",
@@ -2506,12 +2506,12 @@ def init_widgets_list():
                         background = COLORS["frost1"],
                         mouse_callbacks = {'Button1': open_feeds}
                    ),
-               widget.GenPollText(
-                   background = COLORS["frost1"],
-                   func = get_feeds,
-                   update_interval = 600,
-                   mouse_callbacks={'Button1': open_feeds}
-                   ),
+               # widget.GenPollText(
+               #     background = COLORS["frost1"],
+               #     func = get_feeds,
+               #     update_interval = 600,
+               #     mouse_callbacks={'Button1': open_feeds}
+               #     ),
                bar_transition(COLORS["frost1"], COLORS["frost2"]),
                widget.CPU(
                         foreground = COLORS["white"],

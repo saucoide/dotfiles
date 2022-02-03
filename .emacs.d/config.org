@@ -304,30 +304,30 @@ I should find a better way to do this, but for now it works
 #+begin_src emacs-lisp
 
 ;; for eshell mostly
-(setenv "PATH"
-	(concat ":~/.cargo/bin"
-            ":~/.poetry/bin"
-            ":~/.emacs.d/bin"
-            ":~/.local/bin"
-            ":~/.local/bin"
-            ":/usr/local/bin"
-            ":/usr/bin"
-            ":/bin"
-            ":/usr/local/sbin"
-            ":/usr/lib/jvm/default/bin"))
+;; (setenv "PATH"
+;; 	(concat ":~/.cargo/bin"
+;;             ":~/.poetry/bin"
+;;             ":~/.emacs.d/bin"
+;;             ":~/.local/bin"
+;;             ":~/.local/bin"
+;;             ":/usr/local/bin"
+;;             ":/usr/bin"
+;;             ":/bin"
+;;             ":/usr/local/sbin"
+;;             ":/usr/lib/jvm/default/bin"))
 
-;; for emacs to find binaries
-(setq exec-path
-	  (append exec-path '("~/.cargo/bin"
-						  "~/.poetry/bin"
-						  "~/.emacs.d/bin"
-						  "~/.local/bin"
-						  "~/.local/bin"
-						  "/usr/local/bin"
-						  "/usr/bin"
-						  "/bin"
-						  "/usr/local/sbin"
-						  "/usr/lib/jvm/default/bin")))
+;; ;; for emacs to find binaries
+;; (setq exec-path
+;; 	  (append exec-path '("~/.cargo/bin"
+;; 						  "~/.poetry/bin"
+;; 						  "~/.emacs.d/bin"
+;; 						  "~/.local/bin"
+;; 						  "~/.local/bin"
+;; 						  "/usr/local/bin"
+;; 						  "/usr/bin"
+;; 						  "/bin"
+;; 						  "/usr/local/sbin"
+;; 						  "/usr/lib/jvm/default/bin")))
 #+end_src
 
 * Basic GUI, Theme, etc.
@@ -1095,6 +1095,13 @@ toc-org generates tables of contents in the org file on save
 #+end_src
 
 * Org Roam
+
+On guix, i install ~emacs-emacsql-sqlite3~ from guix and not MELPA
+Then make sure to load it before ~org-roam~ itself
+
+#+begin_src emacs-lisp
+(use-package emacsql-sqlite)
+#+end_src
 
 #+begin_src emacs-lisp
 (use-package org-roam

@@ -107,30 +107,30 @@
 (setq my/is-windows (eq system-type 'windows-nt))
 
 ;; for eshell mostly
-(setenv "PATH"
-	(concat ":~/.cargo/bin"
-            ":~/.poetry/bin"
-            ":~/.emacs.d/bin"
-            ":~/.local/bin"
-            ":~/.local/bin"
-            ":/usr/local/bin"
-            ":/usr/bin"
-            ":/bin"
-            ":/usr/local/sbin"
-            ":/usr/lib/jvm/default/bin"))
+;; (setenv "PATH"
+;; 	(concat ":~/.cargo/bin"
+;;             ":~/.poetry/bin"
+;;             ":~/.emacs.d/bin"
+;;             ":~/.local/bin"
+;;             ":~/.local/bin"
+;;             ":/usr/local/bin"
+;;             ":/usr/bin"
+;;             ":/bin"
+;;             ":/usr/local/sbin"
+;;             ":/usr/lib/jvm/default/bin"))
 
-;; for emacs to find binaries
-(setq exec-path
-	  (append exec-path '("~/.cargo/bin"
-						  "~/.poetry/bin"
-						  "~/.emacs.d/bin"
-						  "~/.local/bin"
-						  "~/.local/bin"
-						  "/usr/local/bin"
-						  "/usr/bin"
-						  "/bin"
-						  "/usr/local/sbin"
-						  "/usr/lib/jvm/default/bin")))
+;; ;; for emacs to find binaries
+;; (setq exec-path
+;; 	  (append exec-path '("~/.cargo/bin"
+;; 						  "~/.poetry/bin"
+;; 						  "~/.emacs.d/bin"
+;; 						  "~/.local/bin"
+;; 						  "~/.local/bin"
+;; 						  "/usr/local/bin"
+;; 						  "/usr/bin"
+;; 						  "/bin"
+;; 						  "/usr/local/sbin"
+;; 						  "/usr/lib/jvm/default/bin")))
 
 (use-package emacs
     :init
@@ -572,6 +572,8 @@
 
 (use-package toc-org
     :hook (org-mode . toc-org-mode))
+
+(use-package emacsql-sqlite)
 
 (use-package org-roam
   :ensure t
