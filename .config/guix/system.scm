@@ -27,6 +27,7 @@
 		  (home-directory "/home/saucoide")
 		  (supplementary-groups '("wheel" "netdev" "audio" "video")))
 		%base-user-accounts))
+
   (packages
     (append
       (list (specification->package "qtile-scn")
@@ -44,13 +45,34 @@
 	    (specification->package "stow")
 	    )
       %base-packages))
+
   (services
     (append
       (list (service xfce-desktop-service-type)
 	    (service cups-service-type)
 	    (set-xorg-configuration
-	      (xorg-configuration
-		(keyboard-layout keyboard-layout))))
+          (xorg-configuration
+            (keyboard-layout keyboard-layout)
+            (extra-config (list
+                "Section \"InputClass\"
+                    Identifier \"Touchpads\"
+                    Driver \"libinput\"
+                    MatchDevicePath \"/dev/input/event*\"
+                    MatchIsTouchpad \"on\"
+
+                    Option \"Tapping\" \"on\"
+                    Option \"TappingDrag\" \"on\"
+                    Option \"DisableWhileTyping\" \"on\"
+                    Option \"MiddleEmulation\" \"on\"
+                    Option \"ScrollMethod\" \"twofinger\"
+                EndSection
+                Section \"InputClass\"
+                    Identifier \"Keyboards\"
+                    Driver \"libinput\"
+                    MatchDevicePath \"/dev/input/event*\"
+                    MatchIsKeyboard \"on\"
+                EndSection
+                ")))))
     (modify-services %desktop-services
       (guix-service-type config => (guix-configuration
 	(inherit config)
@@ -66,19 +88,25 @@
 					  )
 					)"))
             %default-authorized-guix-keys))))))) 
+
   (bootloader
     (bootloader-configuration
-      (bootloader grub-bootloader)
-      (targets (list "/dev/sda"))
+      (bootloader grub-efi-bootloader)
+      (targets (list "/boot/efi"))
       (keyboard-layout keyboard-layout)))
+  
   (swap-devices
-    (list (uuid "d8a2d1ef-1c33-4e36-b01d-e9e27bbc4596")))
+    (list (uuid "92b57a70-1483-4455-bcbc-00af949efecd")))
+
   (file-systems
     (cons* (file-system
+             (mount-point "/boot/efi")
+             (device (uuid "B554-3AA6" 'fat32))
+             (type "vfat"))
+           (file-system
              (mount-point "/")
              (device
-               (uuid "dcea7200-698a-483f-916c-0cefd419b810"
+               (uuid "39906d5f-499e-4320-8e2e-2b6fa3bdecad"
                      'ext4))
              (type "ext4"))
            %base-file-systems)))
-
