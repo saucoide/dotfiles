@@ -522,10 +522,10 @@ def init_widgets_list():
                         mouse_callbacks = {'Button1': open_pamac}
                         ),
                bar_transition(COLORS["frost1"], COLORS["frost2"]),
-                #widget.Systray(
-                        #background=COLORS["frost2"],
-                        #padding = 5
-                        #),
+               widget.Systray(
+                        background=COLORS["frost2"],
+                        padding = 5
+                        ),
                #bar_transition(COLORS["frost2"], COLORS["frost3"]),
                widget.Clock(
                         foreground = COLORS["white"],
