@@ -148,10 +148,9 @@
             (set-face-attribute 'default nil :font "Consolas" :height 100) ; default font
             (set-face-attribute 'fixed-pitch nil :font "Consolas" :height 100) ; monospace font 
             (set-face-attribute 'variable-pitch nil :font "Consolas" :height 100)) ; variable width font
-        ;; Linux
-        (set-face-attribute 'default nil :font "Source Code Pro" :height 100) ; default font
-        (set-face-attribute 'fixed-pitch nil :font "Source Code Pro" :height 100) ; monospace font
-        (set-face-attribute 'variable-pitch nil :font "Source Code Pro" :height 100))) ; variable width font
+      (set-face-attribute 'default nil :font "JetBrains Mono Nerd Font Mono" :height 100) ; default font
+      (set-face-attribute 'fixed-pitch nil :font "JetBrains Mono Nerd Font Mono" :height 100) ; monospace font
+      (set-face-attribute 'variable-pitch nil :font "JetBrains Mono Nerd Font Mono" :height 100))) ; variable width font
 
 (global-display-line-numbers-mode t)
 (setq display-line-numbers-type 'relative)
