@@ -1,2 +1,5 @@
 *.pyc
 __pycache__
+*.elc
+auto-save-list
+elpa
