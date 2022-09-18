@@ -458,11 +458,12 @@ Set the the font depending on the platform (I can't install fonts at work so ~co
    
 #+begin_src emacs-lisp
 
-  (use-package doom-themes
-      :init
-      (load-theme 'doom-material t))  
-      ;; (load-theme 'doom-palenight t))  
-      ;; (load-theme 'doom-dracula t))
+(use-package doom-themes
+    :init
+    (load-theme 'doom-one t))
+    ;; (load-theme 'doom-material t))  
+    ;; (load-theme 'doom-palenight t))  
+    ;; (load-theme 'doom-dracula t))
 
 #+end_src
 
@@ -546,6 +547,8 @@ The emacs file manager
 (use-package all-the-icons-dired
     :hook (dired-mode . all-the-icons-dired-mode))
 
+;; dired-single forces a single dired buffer instead of a new one everytime
+(use-package dired-single)
 
 (use-package dired
     :ensure nil
@@ -561,21 +564,11 @@ The emacs file manager
     (kbd "h") 'dired-single-up-directory
     (kbd "<left>") 'dired-single-up-directory))
 
-#+end_src
 
-dired-single forces a single dired buffer instead of a new one everytime
-
-#+begin_src emacs-lisp
-
-  (use-package dired-single)
-
-#+end_src
-
-Open files externally (i'm only using it on linux for now)
-
-#+begin_src emacs-lisp
-
-;; TODO replace openwith with something else
+;; Add some colors to the output
+(use-package diredfl
+  :hook (dired-mode . diredfl-mode))
+  
 
 #+end_src
 

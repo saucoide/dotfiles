@@ -205,7 +205,8 @@
 
 (use-package doom-themes
     :init
-    (load-theme 'doom-material t))  
+    (load-theme 'doom-one t))
+    ;; (load-theme 'doom-material t))  
     ;; (load-theme 'doom-palenight t))  
     ;; (load-theme 'doom-dracula t))
 
@@ -262,6 +263,8 @@
 (use-package all-the-icons-dired
     :hook (dired-mode . all-the-icons-dired-mode))
 
+;; dired-single forces a single dired buffer instead of a new one everytime
+(use-package dired-single)
 
 (use-package dired
     :ensure nil
@@ -277,9 +280,10 @@
     (kbd "h") 'dired-single-up-directory
     (kbd "<left>") 'dired-single-up-directory))
 
-(use-package dired-single)
 
-;; TODO replace openwith with something else
+;; Add some colors to the output
+(use-package diredfl
+  :hook (dired-mode . diredfl-mode))
 
 ;; TODO
 (use-package transient
