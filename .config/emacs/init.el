@@ -542,7 +542,12 @@
   :after org
   :hook ((org-mode . evil-org-mode)
          (org-agenda-mode . evil-org-mode)
-		 (evil-org-mode . (lambda () (evil-org-set-key-theme '(navigation todo insert textobjects additional)))))
+		 (evil-org-mode . (lambda ()
+                            (evil-org-set-key-theme '(navigation
+                                                      todo
+                                                      insert
+                                                      textobjects
+                                                      additional)))))
   :config
   (require 'evil-org-agenda)
   (evil-org-agenda-set-keys))
@@ -579,7 +584,7 @@
   (org-bullets-bullet-list '("◐" "○" "●" "✖" "✚")))
 
 (defun my/org-mode-visual-fill ()
-    (setq visual-fill-column-width 79)
+    (setq visual-fill-column-width 100)
     (visual-fill-column-mode 1))
 
 (defun my/org-mode-center-text ()
