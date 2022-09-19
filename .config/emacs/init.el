@@ -631,7 +631,6 @@
   (setq mu4e-change-filenames-when-moving t)
 
   ;; I want to refile to also mark the emails as read
-  ;; so redefining it here
   (setq mu4e-view-auto-mark-as-read nil)
   (add-to-list 'mu4e-marks
     '(refile
@@ -639,7 +638,7 @@
         :prompt "refile"
         :dyn-target (lambda (target msg) (mu4e-get-refile-folder msg))
         :action (lambda (docid msg target)
-                    (mu4e~proc-move docid (mu4e~mark-check-target target) "+S-u-N"))))
+                    (mu4e--server-move docid (mu4e--mark-check-target target) "+S-u-N"))))
 
 
   ;; Refresh mail using isync every 10 minutes
