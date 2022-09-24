@@ -367,6 +367,10 @@
     (setq neo-smart-open t)
     (setq projectile-switch-project-action 'neotree-projectile-action))
 
+(use-package dwim-shell-command
+  :config
+   (require 'dwim-shell-commands))
+
 (use-package cider
     :mode "\\.clj[sc]?\\'"
     :config

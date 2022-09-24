@@ -32,6 +32,7 @@
   - [[#help][Help]]
   - [[#projectile][Projectile]]
   - [[#neotree][Neotree]]
+  - [[#dmiw-shell-commands][DMIW Shell commands]]
 - [[#development][Development]]
   - [[#languages][Languages]]
   - [[#linting][Linting]]
@@ -268,8 +269,8 @@ It can also autoload packages only when needed instead of everything at startup
 
 #+begin_src emacs-lisp
 
-  (setq custom-file "~/.config/emacs/custom.el")
-  (load custom-file t)
+(setq custom-file "~/.config/emacs/custom.el")
+(load custom-file t)
 
 #+end_src
 
@@ -720,6 +721,14 @@ A sidebar project explorer for quick navigation
       (setq neo-smart-open t)
       (setq projectile-switch-project-action 'neotree-projectile-action))
 
+#+end_src
+
+** DMIW Shell commands
+
+#+begin_src emacs-lisp
+(use-package dwim-shell-command
+  :config
+   (require 'dwim-shell-commands))
 #+end_src
 
 * Development
