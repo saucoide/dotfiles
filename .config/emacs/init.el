@@ -27,7 +27,7 @@
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                          ("org" . "https://orgmode.org/elpa/")
-                           ("elpa" . "https://elpa.gnu.org/packages/")))
+                         ("elpa" . "https://elpa.gnu.org/packages/")))
 
 (package-initialize)
 (unless package-archive-contents
@@ -96,8 +96,13 @@
           auto-save-default nil
           create-lockfiles nil))
 
+;; emacs custom-file to save customizations
 (setq custom-file "~/.config/emacs/custom.el")
 (load custom-file t)
+
+;; custom modules with convenience functions i use
+(with-eval-after-load (load-file "~/.config/emacs/custom/general_functions.el"))
+(with-eval-after-load 'mu4e (load-file "~/.config/emacs/custom/mu4e_functions.el"))
 
 (use-package gcmh
     :demand
@@ -196,7 +201,9 @@
 
 ;; modes to skip
 (dolist (mode '(term-mode-hook
-                eshell-mode-hook))
+                eshell-mode-hook
+                image-mode-hook
+                pdf-view-mode-hook))
 (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 (use-package rainbow-delimiters
@@ -370,6 +377,8 @@
 (use-package dwim-shell-command
   :config
    (require 'dwim-shell-commands))
+
+(use-package pdf-tools)
 
 (use-package cider
     :mode "\\.clj[sc]?\\'"
@@ -626,7 +635,10 @@
 (use-package mu4e
   :ensure nil  ;; tries to download from melpa otherwise, and fails
   :config
-
+  (setq mu4e-attachment-dir "~/downloads")
+  (evil-define-key 'normal mu4e-view-mode-map
+    (kbd "p") 'my/mu4e-save-attachments-dired)
+  
   (add-hook 'mu4e-view-mode-hook #'visual-line-mode)
   ;; Load org-mode integration
   ;; (require 'org-mu4e)
