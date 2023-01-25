@@ -8,3 +8,11 @@ eln-cache
 transient
 recentf
 smex-items
+.dap-breakpoints
+.lsp-session-v1
+.org-id-locations
+org-roam.db
+projectile-bookmarks.eld
+.config/fish/.nvimlog
+.config/fish/config.fish.backup
+/.config/fish/functions/br.fish
