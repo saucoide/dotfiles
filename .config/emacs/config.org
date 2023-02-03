@@ -14,7 +14,6 @@
   - [[#backups][Backups]]
   - [[#load-custom-files][Load custom files]]
   - [[#garbage-collector][Garbage Collector]]
-  - [[#system-specific][System Specific]]
   - [[#path--exec-path][PATH & exec-path]]
   - [[#evil][Evil]]
 - [[#basic-gui-theme-etc][Basic GUI, Theme, etc.]]
@@ -36,6 +35,7 @@
 - [[#development][Development]]
   - [[#languages][Languages]]
   - [[#repl][REPL]]
+  - [[#kubernetes][Kubernetes]]
   - [[#linting][Linting]]
   - [[#code-formatting][Code Formatting]]
   - [[#commenting][Commenting]]
@@ -293,49 +293,41 @@ GCMH sets a high GC threshold when emacs is active and lowers it on idle to avoi
 
 #+end_src
 
-** System Specific
-
-I have to use windows at work, on a very locked down system, so im going to be
-using this variable to have different settings
-
-#+begin_src emacs-lisp
-(setq my/is-windows (eq system-type 'windows-nt))
-(setq my/is-mac (eq system-type 'darwin))
-#+end_src
-
 ** PATH & exec-path
 
 I should find a better way to do this, but for now it works
 
 #+begin_src emacs-lisp
+(use-package exec-path-from-shell
+  :init
+  (setq exec-path-from-shell-shell-name "fish")
+  (exec-path-from-shell-initialize))
+;; ;; for eshell mostly
+;; (setenv "PATH"
+;;         (concat ":~/.cargo/bin"
+;;                 ":~/.poetry/bin"
+;;                 ":~/.config/emacs/bin"
+;;                 ":~/.local/bin"
+;;                 ":/usr/local/bin"
+;;                 ":/usr/bin"
+;;                 ":/bin"
+;;                 ":/usr/local/sbin"
+;;                 ":/usr/lib/jvm/default/bin"
+;;                 ":$HOME/google-cloud-sdk/bin"))
 
-;; for eshell mostly
-(setenv "PATH"
-        (concat ":~/.cargo/bin"
-                ":~/.poetry/bin"
-                ":~/.config/emacs/bin"
-                ":~/.local/bin"
-                ":~/.local/bin"
-                ":/usr/local/bin"
-                ":/usr/bin"
-                ":/bin"
-                ":/usr/local/sbin"
-                ":/usr/lib/jvm/default/bin"))
-
-;; for emacs to find binaries
-(setq exec-path
-      (append exec-path '("~/.cargo/bin"
-                          "~/.poetry/bin"
-                          "~/.config/emacs/bin"
-                          "~/.local/bin"
-                          "~/.local/bin"
-                          "/usr/local/bin"
-                          "/usr/bin"
-                          "/bin"
-                          "/usr/local/sbin"
-                          "/usr/lib/jvm/default/bin")))
+;; ;; for emacs to find binaries
+;; (setq exec-path
+;;       (append exec-path '("~/.cargo/bin"
+;;                           "~/.poetry/bin"
+;;                           "~/.config/emacs/bin"
+;;                           "~/.local/bin"
+;;                           "/usr/local/bin"
+;;                           "/usr/bin"
+;;                           "/bin"
+;;                           "/usr/local/sbin"
+;;                           "/usr/lib/jvm/default/bin"
+;;                           "$HOME/google-cloud-sdk/bin")))
 #+end_src
-
 
 ** Evil
    
@@ -384,7 +376,8 @@ evil-snipe, search 2 character motions to jump around text with ~s~ and ~S~
       :demand
       :config
       (evil-snipe-mode +1)
-      (evil-snipe-override-mode +1))
+      (evil-snipe-override-mode +1)
+      (setq evil-snipe-scope 'buffer))
 
 #+end_src
 
@@ -464,20 +457,18 @@ evil-snipe, search 2 character motions to jump around text with ~s~ and ~S~
 
 #+begin_src emacs-lisp
 
-;; all the icons is needed for doom-modeline
-;; run M-x all-the-icons-install-fonts 
-;; in WINDOWS that will only download the fonts, and then you need to install
-;; them manually
+  ;; all the icons is needed for doom-modeline
+  ;; run M-x all-the-icons-install-fonts 
+  ;; in WINDOWS that will only download the fonts, and then you need to install
+  ;; them manually
 
-(use-package all-the-icons)
+  (use-package all-the-icons)
 
-;; doom-modeline to replace the standard modeline
-(use-package doom-modeline
+  ;; doom-modeline to replace the standard modeline
+  (use-package doom-modeline
     :config
-    (if my/is-windows
-      (setq doom-modeline-icon nil)
-      (setq doom-modeline-unicode-fallback t)
-            doom-modeline-icon t)
+    (setq doom-modeline-unicode-fallback t
+          doom-modeline-icon t)
     :init
     (column-number-mode)
     (doom-modeline-mode 1))
@@ -686,28 +677,25 @@ helpful is an enhanced version of the builtin emacs help, with more information
 
 #+begin_src emacs-lisp
 
-(use-package projectile
-  :diminish projectile-mode
-  :config (projectile-mode)
-  (add-to-list 'projectile-globally-ignored-directories "*venv")
-  (add-to-list 'projectile-globally-ignored-directories "venv")
-  (add-to-list 'projectile-globally-ignored-directories "*.venv")
-  (add-to-list 'projectile-globally-ignored-directories ".venv")
-  (add-to-list 'projectile-globally-ignored-file-suffixes "*.pyc")
-  :bind-keymap
-  ("C-c p" . projectile-command-map)
-  ;; ("SPC P" . projectile-command-map))
-  :init
-  (if my/is-windows
-      (when (file-directory-p "C:\\Users\\IEUser\\projects")
-        (setq projectile-project-search-path '("C:\\Users\\IEUser\\projects")))
+  (use-package projectile
+    :diminish projectile-mode
+    :config (projectile-mode)
+    (add-to-list 'projectile-globally-ignored-directories "*venv")
+    (add-to-list 'projectile-globally-ignored-directories "venv")
+    (add-to-list 'projectile-globally-ignored-directories "*.venv")
+    (add-to-list 'projectile-globally-ignored-directories ".venv")
+    (add-to-list 'projectile-globally-ignored-file-suffixes "*.pyc")
+    :bind-keymap
+    ("C-c p" . projectile-command-map)
+    ;; ("SPC P" . projectile-command-map))
+    :init
     (when (file-directory-p "~/projects")
-      (setq projectile-project-search-path '("~/projects"))))
-  ;; action that triggers on switching projects (eg open dired)
-  (setq projectile-switch-project-action #'projectile-dired))
+      (setq projectile-project-search-path '("~/projects")))
+    ;; action that triggers on switching projects (eg open dired)
+    (setq projectile-switch-project-action #'projectile-dired))
 
-(use-package counsel-projectile
-  :config (counsel-projectile-mode))
+  (use-package counsel-projectile
+    :config (counsel-projectile-mode))
 
 #+end_src
 
@@ -857,6 +845,18 @@ eval in repl all the things
   )
 #+end_src
 
+** Kubernetes
+
+#+begin_src emacs-lisp
+;; (add-to-list 'load-path "~/dotfiles/.config/emacs/local-packages/kubectl")
+;; (require 'kubectl)
+
+(use-package kubernetes)
+(use-package kubernetes-evil
+  :ensure t
+  :after kubernetes)
+#+end_src
+
 ** Linting
 
 flycheck does syntax checking as you type
@@ -919,7 +919,6 @@ Highlight lines with changes
 #+begin_src emacs-lisp
 ;; TODO doesnt work well with org mode buffers for me
 (use-package git-gutter
-  :if (not my/is-windows)
   :defer t
   :hook ((text-mode . git-gutter-mode)
          (prog-mode . git-gutter-mode)))
@@ -1213,7 +1212,8 @@ Here we enable the list of languages we want code blocks to work with
     '((emacs-lisp . t)
       (python . t)
       (clojure . t)
-      (shell . t)))
+      (shell . t)
+      (sql . t)))
 
 (push '("conf-unix" . conf-unix) org-src-lang-modes)
 
@@ -1271,20 +1271,26 @@ My leader key is =SPC=, these is what's directly bound to it
  
 #+begin_src emacs-lisp
 
+(defun my/find-file()
+  (interactive)
+  (if (projectile-project-p)
+      (counsel-projectile-find-file)
+    (counsel-find-file)))
+
 (my/leader-key-def
-    ;; actions
-    "DEL" '(evil-switch-to-windows-last-buffer :which-key "Last buffer")
-    "RET" '(counsel-bookmark :which-key "Bookmarks")
-    "SPC" '(counsel-find-file :which-key "Find file")
-    "<home>" '(dashboard-refresh-buffer :which-key "Switch to Dashboard")
-    "'" '(ivy-resume :which-key "Resume last search")
-    "," '(projectile-switch-to-buffer :which-key "Switch project buffer")
-    "." '(counsel-M-x :which-key "M-x")
-    ":" '(counsel-find-file :which-key "Find file")
-    ";" '(eval-expression :which-key "Eval expression")
-    "<" '(counsel-switch-buffer :which-key "Switch buffer (all)")
-    "x" '(my/popup-scratch-buffer :which-key "Pop scratch buffer")
-    "X" '(org-capture :which-key "Org Capture"))
+  ;; actions
+  "DEL" '(evil-switch-to-windows-last-buffer :which-key "Last buffer")
+  "RET" '(counsel-bookmark :which-key "Bookmarks")
+  "SPC" '(my/find-file :which-key "Find file")
+  "<home>" '(dashboard-refresh-buffer :which-key "Switch to Dashboard")
+  "'" '(ivy-resume :which-key "Resume last search")
+  "," '(projectile-switch-to-buffer :which-key "Switch project buffer")
+  "." '(counsel-M-x :which-key "M-x")
+  ":" '(counsel-find-file :which-key "Find file")
+  ";" '(eval-expression :which-key "Eval expression")
+  "<" '(counsel-switch-buffer :which-key "Switch buffer (all)")
+  "x" '(my/popup-scratch-buffer :which-key "Pop scratch buffer")
+  "X" '(org-capture :which-key "Org Capture"))
 
 #+end_src
     
@@ -1375,15 +1381,14 @@ My leader key is =SPC=, these is what's directly bound to it
     (lambda () (interactive) (dired target))))
 
 (my/leader-key-def
-  "d"   '(:ignore t :which-key "dired")
-  "dd"  '(dired :which-key "Here")
-  "dh"  `(,(my/dired-in "~") :which-key "Home")
-  "do"  `(,(my/dired-in "~/org") :which-key "Org")
-  "dD"  `(,(my/dired-in "~/downloads") :which-key "Downloads")
-  "dv"  `(,(my/dired-in "~/videos") :which-key "Videos")
-  "d."  `(,(my/dired-in "~/dotfiles") :which-key "dotfiles")
-  "dp"  `(,(my/dired-in "~/projects") :which-key "projects")
-  "de"  `(,(my/dired-in "~/.config/emacs") :which-key "emacs"))
+  "d"  '(dired :which-key "Here"))
+  ;; "dh"  `(,(my/dired-in "~") :which-key "Home")
+  ;; "do"  `(,(my/dired-in "~/org") :which-key "Org")
+  ;; "dD"  `(,(my/dired-in "~/downloads") :which-key "Downloads")
+  ;; "dv"  `(,(my/dired-in "~/videos") :which-key "Videos")
+  ;; "d."  `(,(my/dired-in "~/dotfiles") :which-key "dotfiles")
+  ;; "dp"  `(,(my/dired-in "~/projects") :which-key "projects")
+  ;; "de"  `(,(my/dired-in "~/.config/emacs") :which-key "emacs"))
 #+end_src
 
 ** Files =SPC f=
@@ -1492,6 +1497,9 @@ TODO change these to org-roam bindings
 ** Projects =SPC p=
    
 #+begin_src emacs-lisp
+(defun my/switch-project-dired()
+  (interactive)
+    (counsel-projectile-switch-project 'counsel-projectile-switch-project-action-dired))
 
 (my/leader-key-def
     "p"  '(:ignore t :which-key "projects")
@@ -1502,7 +1510,7 @@ TODO change these to org-roam bindings
     "pd" '(projectile-dired :which-key "dired in project")
     "pf" '(counsel-projectile-find-file :which-key "Find file in project")
     "pk" '(projectile-kill-buffers :which-key "Kill project buffers")
-    "pp" '(counsel-projectile-switch-project :which-key "Switch project") 
+    "pp" '(my/switch-project-dired :which-key "Switch project") 
     "pr" '(projectile-recentf :which-key "Recent files in project")
     "ps" '(projectile-ripgrep :which-key "ripgrep on project")
     "pt" '(magit-todos-list :which-key "Project TODOs")
@@ -1656,8 +1664,12 @@ I want to remap swiper-isearch to =C-s=
 #+begin_src emacs-lisp
 
 (general-define-key
-    :states '(normal insert visual)
-    "C-s" 'swiper-isearch)
+ :states '(normal insert visual)
+ "C-s" 'swiper-isearch)
+
+(general-define-key
+ :states '(normal visual)
+ "/" 'swiper-isearch)
 
 #+end_src
 

@@ -1226,9 +1226,10 @@ if [ -d "$HOME/.local/bin" ] ;
   then PATH="$HOME/.local/bin:$PATH"
 fi
 
-export PATH=~/.local/bin:$PATH
-export PATH=~/.emacs.d/bin:$PATH
-export PATH=~/.poetry/bin:$PATH
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.emacs.d/bin:$PATH"
+export PATH="$HOME/.poetry/bin:$PATH"
+export PATH="$HOME/google-cloud-sdk/bin:$PATH"
 
 export EDITOR=vim
 
@@ -1332,8 +1333,6 @@ ex ()
   fi
 }
 
-neofetch
-
 #+END_SRC
 
 ** fish
@@ -1354,6 +1353,7 @@ fish_add_path --prepend "$HOME/.poetry/bin"
 fish_add_path --prepend "/usr/bin/"
 fish_add_path --prepend "/usr/local/bin"
 fish_add_path --prepend "/Users/saucon/Library/Application Support/Coursier/bin"
+fish_add_path --prepend "$HOME/scripts"
 
 
 # The next line updates PATH for the Google Cloud SDK.
@@ -1367,7 +1367,7 @@ set VISUAL "emacsclient -c -a ''"
 set EDITOR "emacsclient -t -a ''"
 set SSH_ENV "$HOME/.ssh/agent-environment"
 set JAVA_HOME "/Users/saucon/Library/Caches/Coursier/arc/https/github.com/adoptium/temurin8-binaries/releases/download/jdk8u345-b01/OpenJDK8U-jdk_x64_mac_hotspot_8u345b01.tar.gz/jdk8u345-b01/Contents/Home"
-
+set USE_GKE_GCLOUD_AUTH_PLUGIN True
 
 # Set vim as Manpager
 set --export MANPAGER '/bin/bash -c "vim -MRn -c \"set buftype=nofile showtabline=0 ft=man ts=8 nomod nolist norelativenumber nonu noma\" -c \"normal L\" -c \"nmap q :qa<CR>\"</dev/tty <(col -b)"'

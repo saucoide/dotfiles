@@ -27,9 +27,10 @@ if [ -d "$HOME/.local/bin" ] ;
   then PATH="$HOME/.local/bin:$PATH"
 fi
 
-export PATH=~/.local/bin:$PATH
-export PATH=~/.emacs.d/bin:$PATH
-export PATH=~/.poetry/bin:$PATH
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.emacs.d/bin:$PATH"
+export PATH="$HOME/.poetry/bin:$PATH"
+export PATH="$HOME/google-cloud-sdk/bin:$PATH"
 
 export EDITOR=vim
 
@@ -132,5 +133,3 @@ ex ()
     echo "'$1' is not a valid file"
   fi
 }
-
-neofetch

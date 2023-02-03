@@ -115,34 +115,35 @@
     :config
     (gcmh-mode 1))
 
-(setq my/is-windows (eq system-type 'windows-nt))
-(setq my/is-mac (eq system-type 'darwin))
+(use-package exec-path-from-shell
+  :init
+  (setq exec-path-from-shell-shell-name "fish")
+  (exec-path-from-shell-initialize))
+;; ;; for eshell mostly
+;; (setenv "PATH"
+;;         (concat ":~/.cargo/bin"
+;;                 ":~/.poetry/bin"
+;;                 ":~/.config/emacs/bin"
+;;                 ":~/.local/bin"
+;;                 ":/usr/local/bin"
+;;                 ":/usr/bin"
+;;                 ":/bin"
+;;                 ":/usr/local/sbin"
+;;                 ":/usr/lib/jvm/default/bin"
+;;                 ":$HOME/google-cloud-sdk/bin"))
 
-;; for eshell mostly
-(setenv "PATH"
-        (concat ":~/.cargo/bin"
-                ":~/.poetry/bin"
-                ":~/.config/emacs/bin"
-                ":~/.local/bin"
-                ":~/.local/bin"
-                ":/usr/local/bin"
-                ":/usr/bin"
-                ":/bin"
-                ":/usr/local/sbin"
-                ":/usr/lib/jvm/default/bin"))
-
-;; for emacs to find binaries
-(setq exec-path
-      (append exec-path '("~/.cargo/bin"
-                          "~/.poetry/bin"
-                          "~/.config/emacs/bin"
-                          "~/.local/bin"
-                          "~/.local/bin"
-                          "/usr/local/bin"
-                          "/usr/bin"
-                          "/bin"
-                          "/usr/local/sbin"
-                          "/usr/lib/jvm/default/bin")))
+;; ;; for emacs to find binaries
+;; (setq exec-path
+;;       (append exec-path '("~/.cargo/bin"
+;;                           "~/.poetry/bin"
+;;                           "~/.config/emacs/bin"
+;;                           "~/.local/bin"
+;;                           "/usr/local/bin"
+;;                           "/usr/bin"
+;;                           "/bin"
+;;                           "/usr/local/sbin"
+;;                           "/usr/lib/jvm/default/bin"
+;;                           "$HOME/google-cloud-sdk/bin")))
 
 (use-package evil
     :init
@@ -173,7 +174,8 @@
     :demand
     :config
     (evil-snipe-mode +1)
-    (evil-snipe-override-mode +1))
+    (evil-snipe-override-mode +1)
+    (setq evil-snipe-scope 'buffer))
 
 (scroll-bar-mode -1)	; disable visible scrollbar
 (tool-bar-mode -1)		; disable toolbar
@@ -225,14 +227,12 @@
 
 ;; doom-modeline to replace the standard modeline
 (use-package doom-modeline
-    :config
-    (if my/is-windows
-      (setq doom-modeline-icon nil)
-      (setq doom-modeline-unicode-fallback t)
-            doom-modeline-icon t)
-    :init
-    (column-number-mode)
-    (doom-modeline-mode 1))
+  :config
+  (setq doom-modeline-unicode-fallback t
+        doom-modeline-icon t)
+  :init
+  (column-number-mode)
+  (doom-modeline-mode 1))
 
 (use-package dashboard
     :config
@@ -364,11 +364,8 @@
   ("C-c p" . projectile-command-map)
   ;; ("SPC P" . projectile-command-map))
   :init
-  (if my/is-windows
-      (when (file-directory-p "C:\\Users\\IEUser\\projects")
-        (setq projectile-project-search-path '("C:\\Users\\IEUser\\projects")))
-    (when (file-directory-p "~/projects")
-      (setq projectile-project-search-path '("~/projects"))))
+  (when (file-directory-p "~/projects")
+    (setq projectile-project-search-path '("~/projects")))
   ;; action that triggers on switching projects (eg open dired)
   (setq projectile-switch-project-action #'projectile-dired))
 
@@ -469,6 +466,14 @@
                  (local-set-key (kbd "C-<return>") 'eir-eval-in-shell)))
   )
 
+;; (add-to-list 'load-path "~/dotfiles/.config/emacs/local-packages/kubectl")
+;; (require 'kubectl)
+
+(use-package kubernetes)
+(use-package kubernetes-evil
+  :ensure t
+  :after kubernetes)
+
 (use-package flycheck
   :init (global-flycheck-mode))
     ;; :defer t
@@ -488,7 +493,6 @@
 
 ;; TODO doesnt work well with org mode buffers for me
 (use-package git-gutter
-  :if (not my/is-windows)
   :defer t
   :hook ((text-mode . git-gutter-mode)
          (prog-mode . git-gutter-mode)))
@@ -687,7 +691,8 @@
     '((emacs-lisp . t)
       (python . t)
       (clojure . t)
-      (shell . t)))
+      (shell . t)
+      (sql . t)))
 
 (push '("conf-unix" . conf-unix) org-src-lang-modes)
 
@@ -714,20 +719,26 @@
         :prefix "SPC"
         :global-prefix "C-SPC"))
 
+(defun my/find-file()
+  (interactive)
+  (if (projectile-project-p)
+      (counsel-projectile-find-file)
+    (counsel-find-file)))
+
 (my/leader-key-def
-    ;; actions
-    "DEL" '(evil-switch-to-windows-last-buffer :which-key "Last buffer")
-    "RET" '(counsel-bookmark :which-key "Bookmarks")
-    "SPC" '(counsel-find-file :which-key "Find file")
-    "<home>" '(dashboard-refresh-buffer :which-key "Switch to Dashboard")
-    "'" '(ivy-resume :which-key "Resume last search")
-    "," '(projectile-switch-to-buffer :which-key "Switch project buffer")
-    "." '(counsel-M-x :which-key "M-x")
-    ":" '(counsel-find-file :which-key "Find file")
-    ";" '(eval-expression :which-key "Eval expression")
-    "<" '(counsel-switch-buffer :which-key "Switch buffer (all)")
-    "x" '(my/popup-scratch-buffer :which-key "Pop scratch buffer")
-    "X" '(org-capture :which-key "Org Capture"))
+  ;; actions
+  "DEL" '(evil-switch-to-windows-last-buffer :which-key "Last buffer")
+  "RET" '(counsel-bookmark :which-key "Bookmarks")
+  "SPC" '(my/find-file :which-key "Find file")
+  "<home>" '(dashboard-refresh-buffer :which-key "Switch to Dashboard")
+  "'" '(ivy-resume :which-key "Resume last search")
+  "," '(projectile-switch-to-buffer :which-key "Switch project buffer")
+  "." '(counsel-M-x :which-key "M-x")
+  ":" '(counsel-find-file :which-key "Find file")
+  ";" '(eval-expression :which-key "Eval expression")
+  "<" '(counsel-switch-buffer :which-key "Switch buffer (all)")
+  "x" '(my/popup-scratch-buffer :which-key "Pop scratch buffer")
+  "X" '(org-capture :which-key "Org Capture"))
 
 (my/leader-key-def
     "a"  '(:ignore t :which-key "Org Agenda")
@@ -788,15 +799,14 @@
     (lambda () (interactive) (dired target))))
 
 (my/leader-key-def
-  "d"   '(:ignore t :which-key "dired")
-  "dd"  '(dired :which-key "Here")
-  "dh"  `(,(my/dired-in "~") :which-key "Home")
-  "do"  `(,(my/dired-in "~/org") :which-key "Org")
-  "dD"  `(,(my/dired-in "~/downloads") :which-key "Downloads")
-  "dv"  `(,(my/dired-in "~/videos") :which-key "Videos")
-  "d."  `(,(my/dired-in "~/dotfiles") :which-key "dotfiles")
-  "dp"  `(,(my/dired-in "~/projects") :which-key "projects")
-  "de"  `(,(my/dired-in "~/.config/emacs") :which-key "emacs"))
+  "d"  '(dired :which-key "Here"))
+  ;; "dh"  `(,(my/dired-in "~") :which-key "Home")
+  ;; "do"  `(,(my/dired-in "~/org") :which-key "Org")
+  ;; "dD"  `(,(my/dired-in "~/downloads") :which-key "Downloads")
+  ;; "dv"  `(,(my/dired-in "~/videos") :which-key "Videos")
+  ;; "d."  `(,(my/dired-in "~/dotfiles") :which-key "dotfiles")
+  ;; "dp"  `(,(my/dired-in "~/projects") :which-key "projects")
+  ;; "de"  `(,(my/dired-in "~/.config/emacs") :which-key "emacs"))
 
 (my/leader-key-def
     "f"  '(:ignore t :which-key "files")
@@ -869,6 +879,10 @@
     "oe" '(eshell-toggle :which-key "eshell")
     "ot" '(vterm-other-window :which-key "vterm"))
 
+(defun my/switch-project-dired()
+  (interactive)
+    (counsel-projectile-switch-project 'counsel-projectile-switch-project-action-dired))
+
 (my/leader-key-def
     "p"  '(:ignore t :which-key "projects")
     "p!" '(projectile-run-shell-command-in-root :which-key "Run cmd in project root")
@@ -878,7 +892,7 @@
     "pd" '(projectile-dired :which-key "dired in project")
     "pf" '(counsel-projectile-find-file :which-key "Find file in project")
     "pk" '(projectile-kill-buffers :which-key "Kill project buffers")
-    "pp" '(counsel-projectile-switch-project :which-key "Switch project") 
+    "pp" '(my/switch-project-dired :which-key "Switch project") 
     "pr" '(projectile-recentf :which-key "Recent files in project")
     "ps" '(projectile-ripgrep :which-key "ripgrep on project")
     "pt" '(magit-todos-list :which-key "Project TODOs")
@@ -961,8 +975,12 @@
     "?" 'which-key-show-major-mode)
 
 (general-define-key
-    :states '(normal insert visual)
-    "C-s" 'swiper-isearch)
+ :states '(normal insert visual)
+ "C-s" 'swiper-isearch)
+
+(general-define-key
+ :states '(normal visual)
+ "/" 'swiper-isearch)
 
 (use-package drag-stuff)
 (drag-stuff-global-mode 1)
