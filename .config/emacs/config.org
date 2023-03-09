@@ -1382,7 +1382,7 @@ My leader key is =SPC=, these is what's directly bound to it
     (lambda () (interactive) (dired target))))
 
 (my/leader-key-def
-  "d"  '(dired :which-key "Here"))
+  "d"  '(counsel-find-file :which-key "Here"))
   ;; "dh"  `(,(my/dired-in "~") :which-key "Home")
   ;; "do"  `(,(my/dired-in "~/org") :which-key "Org")
   ;; "dD"  `(,(my/dired-in "~/downloads") :which-key "Downloads")
@@ -1536,9 +1536,9 @@ TODO change these to org-roam bindings
 
   (my/leader-key-def
       "s"  '(:ignore t :which-key "search")
-      "ss" '(swiper :which-key "Swiper")
-      "sp" '(projectile-ripgrep :which-key "ripgrep on project")
-      "sr" '(rg-menu :which-key "Ripgrep menu"))
+      "ss" '(rg-menu :which-key "ripgrep-menu")
+      "sp" '(projectile-ripgrep :which-key "projectile -ipgrep")
+      "sr" '(rg--transient :which-key "ripgrep-regex"))
 
    ;; TODO add bindings to search in project, etc
 
