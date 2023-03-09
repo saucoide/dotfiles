@@ -821,6 +821,7 @@ eval in repl all the things
   (setq eir-repl-placement 'right)
   (setq eir-jump-after-eval nil)
   (setq eir-always-split-script-window t)
+  (setq eir-use-python-shell-send-string nil)
   ;;; Emacs-lisp
   (require 'eval-in-repl-ielm)
   (setq eir-ielm-eval-in-current-buffer t)
