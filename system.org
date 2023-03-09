@@ -216,14 +216,14 @@ cmd + shift -b : yabai -m window --toggle border
 ctrl + cmd - 0x18 : yabai -m space --balance
 
 # Resize windows
-ctrl + cmd - left : yabai -m window --resize left:-50:0; \
-                  yabai -m window --resize right:-50:0
+ctrl + cmd - left : yabai -m window --resize left:-75:0; \
+                  yabai -m window --resize right:-74:0
 ctrl + cmd - down : yabai -m window --resize bottom:0:50; \
-                  yabai -m window --resize top:0:50
-ctrl + cmd - up : yabai -m window --resize top:0:-50; \
-                  yabai -m window --resize bottom:0:-50
-ctrl + cmd - right : yabai -m window --resize right:50:0; \
-                  yabai -m window --resize left:50:0
+                  yabai -m window --resize top:0:75
+ctrl + cmd - up : yabai -m window --resize top:0:-75; \
+                  yabai -m window --resize bottom:0:-75
+ctrl + cmd - right : yabai -m window --resize right:75:0; \
+                  yabai -m window --resize left:75:0
 
 
 
@@ -288,7 +288,7 @@ yabai -m config insert_feedback_color       0xff2d74da
 
 yabai -m config active_window_opacity       1.0
 yabai -m config normal_window_opacity       0.90
-yabai -m config split_ratio                 0.50
+yabai -m config split_ratio                 0.66
 
 yabai -m config auto_balance                off
 
