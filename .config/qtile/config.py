@@ -622,7 +622,7 @@ mouse = [
 dgroups_key_binder = None
 dgroups_app_rules = []  # type: List
 main = None
-follow_mouse_focus = True
+follow_mouse_focus = False
 bring_front_click = False
 cursor_warp = False
 

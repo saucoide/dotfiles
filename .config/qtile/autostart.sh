@@ -18,4 +18,5 @@ run volumeicon &
 run xfce4-power-manager &
 run picom --config $HOME/.config/picom/picom.conf &
 run /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
+run udiskie &
 # run spotify &

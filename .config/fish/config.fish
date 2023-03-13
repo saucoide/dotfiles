@@ -4,6 +4,7 @@ fish_add_path --prepend "~/.bin"
 fish_add_path --prepend "~/.local/bin"
 fish_add_path --prepend "~/.emacs.d/bin"
 fish_add_path --prepend "~/.poetry/bin"
+fish_add_path --prepend "~/.local/share/coursier/bin"
 # ---------------------------------------------------------------------
 
 
@@ -30,6 +31,9 @@ set --export MANPAGER '/bin/bash -c "vim -MRn -c \"set buftype=nofile showtablin
 alias ls="lsd --long --color=always --group-dirs=first --date '+%Y-%m-%d %H:%M'"
 alias lsa="lsd --long --almost-all --group-dirs=first --date '+%Y-%m-%d %H:%M'"
 alias lst="lsd --long --tree --depth=2 --color=always --date '+%Y-%m-%d %H:%M'"
+## pbcopy pbpaste alias
+alias pbcopy="xclip -selection clipboard"
+alias pbpaste="xclip -selection clipboard -o"
 ## a better cat
 alias cat="bat"
 ## I always miss the space
@@ -138,6 +142,18 @@ function extract
     end
   end
 end
+
+function pesel
+  pass pesel | pbcopy
+end
+
+function weather
+  ~/.config/fish/scripts/weather.sh
+end
+
+function webcam
+  ~/.config/fish/scripts/webcam.sh
+end
 # ---------------------------------------------------------------------
 
 
@@ -190,4 +206,3 @@ set fish_color_autosuggestion "4c566a"
 
 # PROMPT (starship https://github.com/starship/starship)
 starship init fish | source
-

@@ -117,7 +117,7 @@
             ":~/.poetry/bin"
             ":~/.config/emacs/bin"
             ":~/.local/bin"
-            ":~/.local/bin"
+            "~/.local/share/coursier/bin"
             ":/usr/local/bin"
             ":/usr/bin"
             ":/bin"
@@ -130,7 +130,7 @@
 						  "~/.poetry/bin"
 						  "~/.config/emacs/bin"
 						  "~/.local/bin"
-						  "~/.local/bin"
+						  "~/.local/share/coursier/bin"
 						  "/usr/local/bin"
 						  "/usr/bin"
 						  "/bin"
@@ -166,7 +166,8 @@
     :demand
     :config
     (evil-snipe-mode +1)
-    (evil-snipe-override-mode +1))
+    (evil-snipe-override-mode +1)
+    (setq evil-snipe-scope 'buffer))
 
 ;; (evil-define-key 'normal dired-mode-map
 ;;     (kbd "zh") 'dired-hide-dotfiles-mode
@@ -179,7 +180,7 @@
     :init
     (scroll-bar-mode -1)		; disable visible scrollbar
     (tool-bar-mode -1)		; disable toolbar
-    (tooltip-mode -1)		; disable tooltips
+    (tooltip-mode -1)	        ; disable tooltips
     (set-fringe-mode 3) 		; margins
     (menu-bar-mode -1)) 		; disable menu bar
 
@@ -198,6 +199,7 @@
 
 (global-display-line-numbers-mode t)
 (setq display-line-numbers-type 't)
+(setq truncate-lines nil)            ; truncate lines
 
 ;; modes to skip
 (dolist (mode '(term-mode-hook
@@ -272,21 +274,43 @@
 
 ;; dired-single forces a single dired buffer instead of a new one everytime
 (use-package dired-single)
+(use-package dired-hide-dotfiles)
+
+(defun my/open-externally ()
+  (interactive)
+  (let ((filename (dired-get-filename))
+        (text-types '("application/vnd.lotus-organizer"
+                      "text/plain"
+                      "text/markdown")))
+     (if (or (file-directory-p filename)
+             (member (mailcap-file-name-to-mime-type filename) text-types))
+        (dired-single-buffer)
+        (dwim-shell-commands-open-externally))))
+
 
 (use-package dired
     :ensure nil
     ;; :commands (dired dired-jump)
     :config
     (setq dired-listing-switches "-algho --group-directories-first --time-style \"+%Y-%m-%d %H:%M\"")
+    (setq dired-dwim-target t)
     (all-the-icons-dired-mode 1)
     (dired-hide-dotfiles-mode 1)
     (evil-define-key 'normal dired-mode-map
     (kbd "H") 'dired-hide-dotfiles-mode
+    ;; (kbd "RET") 'dwim-shell-commands-open-externally
+    (kbd "RET") 'my/open-externally
     (kbd "l") 'dired-single-buffer
     (kbd "<right>") 'dired-single-buffer
     (kbd "h") 'dired-single-up-directory
-    (kbd "<left>") 'dired-single-up-directory))
+    (kbd "<left>") 'dired-single-up-directory)
+    )
 
+(defun my/dired-customizations()
+  "Custom behaviours for `dired-mode'."
+  (setq truncate-lines t))
+
+(add-hook 'dired-mode-hook #'my/dired-customizations)
 
 ;; Add some colors to the output
 (use-package diredfl
@@ -385,6 +409,23 @@
     :config
     (evil-collection-cider-setup))
 
+(use-package scala-mode
+  :interpreter ("scala" . scala-mode))
+
+(use-package sbt-mode
+  :commands sbt-start sbt-command
+  :config
+  ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
+  ;; allows using SPACE when in the minibuffer
+  (substitute-key-definition
+   'minibuffer-complete-word
+   'self-insert-command
+   minibuffer-local-completion-map)
+   ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
+   (setq sbt:program-options '("-Dsbt.supershell=false")))
+
+(use-package lsp-metals)
+
 (use-package rustic
   :config
   (setq rustic-lsp-client 'eglot)
@@ -395,13 +436,13 @@
   (elm-mode . elm-indent-simple-mode)
   (elm-mode . elm-format-on-save-mode))
 
-(use-package flycheck
-    :defer t
-    :hook (eglot-mode . flycheck-mode))
+;;(use-package flycheck
+;;  :defer t
+;;  :hook (eglot-mode . flycheck-mode))
 
 ;; on windows dont enable it globally
-(unless my/is-windows
-    (global-flycheck-mode))
+;;(unless my/is-windows
+;;  (global-flycheck-mode))
 
 (use-package format-all)
 
@@ -428,14 +469,15 @@
              (prog-mode . git-gutter-mode)))
 
 (use-package magit-todos
-    :if (not my/is-windows)
-    :hook (magit-mode . magit-todos-mode)
-    :init
-    (unless (executable-find "nice")
-        (setq magit-todos-nice nil)))
+  :if (not my/is-windows)
+  :hook (magit-mode . magit-todos-mode)
+  :init
+  (unless (executable-find "nice")
+    (setq magit-todos-nice nil)))
 
 ;; TODO
-  ;; (use-package eglot)
+  ;; (use-package eglot
+  ;;   :hook (scala-mode . eglot-ensure))
 
 (use-package lsp-mode
   :init
@@ -446,18 +488,19 @@
          (python-mode . lsp)
          (clojure-mode . lsp)
          (rustic-mode . lsp)
+         (scala-mode . lsp)
          ;; if you want which-key integration
          (lsp-mode . lsp-enable-which-key-integration))
   :commands lsp)
 
 ;; optionally
-(use-package lsp-ui :commands lsp-ui-mode)
+;; (use-package lsp-ui :commands lsp-ui-mode)
 ;; if you are ivy user
-(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
-(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+;; (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+;; (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
 
 ;; optionally if you want to use debugger
-(use-package dap-mode)
+;; (use-package dap-mode)
 ;; (use-package dap-python)
 ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
 
@@ -523,16 +566,7 @@
   (setq yas-snippet-dirs '("~/.config/emacs/yasnippets"))
   (yas-global-mode 1))
 
-(if my/is-windows
-    (progn
-        (setq explicit-shell-file-name "powershell.exe")
-        (setq explicit-powershell.exe-args '())))
-
-(use-package eshell-toggle
-    :custom
-    (eshell-toggle-size-fraction 3)
-    (eshell-toggle-use-projectile-root t)
-    (eshell-toggle-run-command nil))
+(use-package vterm)
 
 (defun my/org-mode-setup()
     (org-indent-mode)
@@ -722,6 +756,17 @@
           mu4e-headers-signed-mark '("s" . "")
           mu4e-headers-unread-mark '("u" . "✉")
           mu4e-headers-attach-mark '("a" . ""))
+  ;; (setq mu4e-headers-unread-mark    '("u" . "📩 "))
+  ;; (setq mu4e-headers-draft-mark     '("D" . "🚧 "))
+  ;; (setq mu4e-headers-flagged-mark   '("F" . "🚩 "))
+  ;; (setq mu4e-headers-new-mark       '("N" . "✨ "))
+  ;; (setq mu4e-headers-passed-mark    '("P" . "↪ "))
+  ;; (setq mu4e-headers-replied-mark   '("R" . "↩ "))
+  ;; (setq mu4e-headers-seen-mark      '("S" . " "))
+  ;; (setq mu4e-headers-trashed-mark   '("T" . "🗑️"))
+  ;; (setq mu4e-headers-attach-mark    '("a" . "📎 "))
+  ;; (setq mu4e-headers-encrypted-mark '("x" . "🔑 "))
+  ;; (setq mu4e-headers-signed-mark    '("s" . "🖊 "))
 
 
   
@@ -947,7 +992,10 @@
 
 (my/leader-key-def
     "s"  '(:ignore t :which-key "search")
-    "sb" '(swiper :which-key "Search in Buffer"))
+    "ss" '(swiper :which-key "Swiper")
+    ;; "sr" '(swiper :which-key "ripgrep")
+
+    )
 
  ;; TODO add bindings to search in project, etc
 
@@ -1012,6 +1060,10 @@
 (general-define-key
     :states '(normal insert visual)
     "C-s" 'swiper-isearch)
+
+(general-define-key
+    :states '(normal visual)
+    "/" 'swiper-isearch)
 
 (use-package drag-stuff)
 (drag-stuff-global-mode 1)

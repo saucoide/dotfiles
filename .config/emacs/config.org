@@ -46,8 +46,7 @@
   - [[#smartparens][Smartparens]]
   - [[#yasnippets][Yasnippets]]
 - [[#terminals][Terminals]]
-  - [[#shell-mode][shell-mode]]
-  - [[#eshell-toggle][eshell toggle]]
+  - [[#vterm][vterm]]
 - [[#org-mode][Org Mode]]
   - [[#org-basic-config][Org Basic Config]]
   - [[#capture-templates][Capture Templates]]
@@ -315,7 +314,7 @@ I should find a better way to do this, but for now it works
             ":~/.poetry/bin"
             ":~/.config/emacs/bin"
             ":~/.local/bin"
-            ":~/.local/bin"
+            "~/.local/share/coursier/bin"
             ":/usr/local/bin"
             ":/usr/bin"
             ":/bin"
@@ -328,7 +327,7 @@ I should find a better way to do this, but for now it works
 						  "~/.poetry/bin"
 						  "~/.config/emacs/bin"
 						  "~/.local/bin"
-						  "~/.local/bin"
+						  "~/.local/share/coursier/bin"
 						  "/usr/local/bin"
 						  "/usr/bin"
 						  "/bin"
@@ -384,7 +383,8 @@ evil-snipe, search 2 character motions to jump around text with ~s~ and ~S~
       :demand
       :config
       (evil-snipe-mode +1)
-      (evil-snipe-override-mode +1))
+      (evil-snipe-override-mode +1)
+      (setq evil-snipe-scope 'buffer))
 
 #+end_src
 
@@ -410,7 +410,7 @@ Overwriting a few keybindings from Dired
       :init
       (scroll-bar-mode -1)		; disable visible scrollbar
       (tool-bar-mode -1)		; disable toolbar
-      (tooltip-mode -1)		; disable tooltips
+      (tooltip-mode -1)	        ; disable tooltips
       (set-fringe-mode 3) 		; margins
       (menu-bar-mode -1)) 		; disable menu bar 
 
@@ -441,15 +441,16 @@ Set the the font depending on the platform (I can't install fonts at work so ~co
 
 #+begin_src emacs-lisp
 
-  (global-display-line-numbers-mode t)
-  (setq display-line-numbers-type 't)
+(global-display-line-numbers-mode t)
+(setq display-line-numbers-type 't)
+(setq truncate-lines nil)            ; truncate lines
 
-  ;; modes to skip
-  (dolist (mode '(term-mode-hook
-                  eshell-mode-hook
-                  image-mode-hook
-                  pdf-view-mode-hook))
-  (add-hook mode (lambda () (display-line-numbers-mode 0))))  
+;; modes to skip
+(dolist (mode '(term-mode-hook
+                eshell-mode-hook
+                image-mode-hook
+                pdf-view-mode-hook))
+(add-hook mode (lambda () (display-line-numbers-mode 0))))  
 
 #+end_src
 
@@ -558,21 +559,43 @@ The emacs file manager
 
 ;; dired-single forces a single dired buffer instead of a new one everytime
 (use-package dired-single)
+(use-package dired-hide-dotfiles)
+
+(defun my/open-externally ()
+  (interactive)
+  (let ((filename (dired-get-filename))
+        (text-types '("application/vnd.lotus-organizer"
+                      "text/plain"
+                      "text/markdown")))
+     (if (or (file-directory-p filename)
+             (member (mailcap-file-name-to-mime-type filename) text-types))
+        (dired-single-buffer)
+        (dwim-shell-commands-open-externally))))
+
 
 (use-package dired
     :ensure nil
     ;; :commands (dired dired-jump)
     :config
     (setq dired-listing-switches "-algho --group-directories-first --time-style \"+%Y-%m-%d %H:%M\"")
+    (setq dired-dwim-target t)
     (all-the-icons-dired-mode 1)
     (dired-hide-dotfiles-mode 1)
     (evil-define-key 'normal dired-mode-map
     (kbd "H") 'dired-hide-dotfiles-mode
+    ;; (kbd "RET") 'dwim-shell-commands-open-externally
+    (kbd "RET") 'my/open-externally
     (kbd "l") 'dired-single-buffer
     (kbd "<right>") 'dired-single-buffer
     (kbd "h") 'dired-single-up-directory
-    (kbd "<left>") 'dired-single-up-directory))
+    (kbd "<left>") 'dired-single-up-directory)
+    )
 
+(defun my/dired-customizations()
+  "Custom behaviours for `dired-mode'."
+  (setq truncate-lines t))
+
+(add-hook 'dired-mode-hook #'my/dired-customizations)
 
 ;; Add some colors to the output
 (use-package diredfl
@@ -757,6 +780,26 @@ A sidebar project explorer for quick navigation
     :config
     (evil-collection-cider-setup))
 #+end_src
+*** Scala
+
+#+begin_src emacs-lisp
+(use-package scala-mode
+  :interpreter ("scala" . scala-mode))
+
+(use-package sbt-mode
+  :commands sbt-start sbt-command
+  :config
+  ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
+  ;; allows using SPACE when in the minibuffer
+  (substitute-key-definition
+   'minibuffer-complete-word
+   'self-insert-command
+   minibuffer-local-completion-map)
+   ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
+   (setq sbt:program-options '("-Dsbt.supershell=false")))
+
+(use-package lsp-metals)
+#+end_src
 
 *** Rust
 
@@ -783,13 +826,13 @@ flycheck does syntax checking as you type
 
 #+begin_src emacs-lisp
 
-(use-package flycheck
-    :defer t
-    :hook (eglot-mode . flycheck-mode))
+;;(use-package flycheck
+;;  :defer t
+;;  :hook (eglot-mode . flycheck-mode))
 
 ;; on windows dont enable it globally
-(unless my/is-windows
-    (global-flycheck-mode))
+;;(unless my/is-windows
+;;  (global-flycheck-mode))
 
 #+end_src
 
@@ -867,12 +910,12 @@ Highlight lines with changes
 
 #+begin_src emacs-lisp
 
-  (use-package magit-todos
-      :if (not my/is-windows)
-      :hook (magit-mode . magit-todos-mode)
-      :init
-      (unless (executable-find "nice")
-          (setq magit-todos-nice nil)))
+(use-package magit-todos
+  :if (not my/is-windows)
+  :hook (magit-mode . magit-todos-mode)
+  :init
+  (unless (executable-find "nice")
+    (setq magit-todos-nice nil)))
 
 #+end_src
 
@@ -880,7 +923,8 @@ Highlight lines with changes
 
 #+begin_src emacs-lisp
 ;; TODO
-  ;; (use-package eglot)
+  ;; (use-package eglot
+  ;;   :hook (scala-mode . eglot-ensure))
 
 #+end_src
 
@@ -896,18 +940,19 @@ Highlight lines with changes
          (python-mode . lsp)
          (clojure-mode . lsp)
          (rustic-mode . lsp)
+         (scala-mode . lsp)
          ;; if you want which-key integration
          (lsp-mode . lsp-enable-which-key-integration))
   :commands lsp)
 
 ;; optionally
-(use-package lsp-ui :commands lsp-ui-mode)
+;; (use-package lsp-ui :commands lsp-ui-mode)
 ;; if you are ivy user
-(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
-(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+;; (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+;; (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
 
 ;; optionally if you want to use debugger
-(use-package dap-mode)
+;; (use-package dap-mode)
 ;; (use-package dap-python)
 ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
 
@@ -998,28 +1043,11 @@ YASnippet is a template system for emaxs, it lets you create custom templates th
 #+end_src
 
 * Terminals
-** shell-mode
+** vterm
 
 #+begin_src emacs-lisp
 
-  (if my/is-windows
-      (progn
-          (setq explicit-shell-file-name "powershell.exe")
-          (setq explicit-powershell.exe-args '())))
-
-#+end_src
-
-** eshell toggle
-
-To get eshell to toggle as a split buffer
-
-#+begin_src emacs-lisp
-
-  (use-package eshell-toggle
-      :custom
-      (eshell-toggle-size-fraction 3)
-      (eshell-toggle-use-projectile-root t)
-      (eshell-toggle-run-command nil))
+  (use-package vterm)
 
 #+end_src
 
@@ -1295,6 +1323,17 @@ SyncState *
           mu4e-headers-signed-mark '("s" . "")
           mu4e-headers-unread-mark '("u" . "✉")
           mu4e-headers-attach-mark '("a" . ""))
+  ;; (setq mu4e-headers-unread-mark    '("u" . "📩 "))
+  ;; (setq mu4e-headers-draft-mark     '("D" . "🚧 "))
+  ;; (setq mu4e-headers-flagged-mark   '("F" . "🚩 "))
+  ;; (setq mu4e-headers-new-mark       '("N" . "✨ "))
+  ;; (setq mu4e-headers-passed-mark    '("P" . "↪ "))
+  ;; (setq mu4e-headers-replied-mark   '("R" . "↩ "))
+  ;; (setq mu4e-headers-seen-mark      '("S" . " "))
+  ;; (setq mu4e-headers-trashed-mark   '("T" . "🗑️"))
+  ;; (setq mu4e-headers-attach-mark    '("a" . "📎 "))
+  ;; (setq mu4e-headers-encrypted-mark '("x" . "🔑 "))
+  ;; (setq mu4e-headers-signed-mark    '("s" . "🖊 "))
 
 
   
@@ -1660,7 +1699,10 @@ TODO change these to org-roam bindings
 
   (my/leader-key-def
       "s"  '(:ignore t :which-key "search")
-      "sb" '(swiper :which-key "Search in Buffer"))
+      "ss" '(swiper :which-key "Swiper")
+      ;; "sr" '(swiper :which-key "ripgrep")
+
+      )
 
    ;; TODO add bindings to search in project, etc
 
@@ -1772,9 +1814,13 @@ I want to remap swiper-isearch to =C-s=
 
 #+begin_src emacs-lisp
 
-  (general-define-key
-      :states '(normal insert visual)
-      "C-s" 'swiper-isearch)
+(general-define-key
+    :states '(normal insert visual)
+    "C-s" 'swiper-isearch)
+
+(general-define-key
+    :states '(normal visual)
+    "/" 'swiper-isearch)
 
 #+end_src
 

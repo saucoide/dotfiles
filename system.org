@@ -246,6 +246,7 @@ fish_add_path --prepend "~/.bin"
 fish_add_path --prepend "~/.local/bin"
 fish_add_path --prepend "~/.emacs.d/bin"
 fish_add_path --prepend "~/.poetry/bin"
+fish_add_path --prepend "~/.local/share/coursier/bin"
 # ---------------------------------------------------------------------
 
 
@@ -272,6 +273,9 @@ set --export MANPAGER '/bin/bash -c "vim -MRn -c \"set buftype=nofile showtablin
 alias ls="lsd --long --color=always --group-dirs=first --date '+%Y-%m-%d %H:%M'"
 alias lsa="lsd --long --almost-all --group-dirs=first --date '+%Y-%m-%d %H:%M'"
 alias lst="lsd --long --tree --depth=2 --color=always --date '+%Y-%m-%d %H:%M'"
+## pbcopy pbpaste alias
+alias pbcopy="xclip -selection clipboard"
+alias pbpaste="xclip -selection clipboard -o"
 ## a better cat
 alias cat="bat"
 ## I always miss the space
@@ -379,6 +383,18 @@ function extract
         set_color normal
     end
   end
+end
+
+function pesel
+  pass pesel | pbcopy
+end
+
+function weather
+  ~/.config/fish/scripts/weather.sh
+end
+
+function webcam
+  ~/.config/fish/scripts/webcam.sh
 end
 # ---------------------------------------------------------------------
 
@@ -2032,6 +2048,7 @@ run volumeicon &
 run xfce4-power-manager &
 run picom --config $HOME/.config/picom/picom.conf &
 run /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
+run udiskie &
 # run spotify &
 
 #+END_SRC
@@ -2663,7 +2680,7 @@ mouse = [
 dgroups_key_binder = None
 dgroups_app_rules = []  # type: List
 main = None
-follow_mouse_focus = True
+follow_mouse_focus = False
 bring_front_click = False
 cursor_warp = False
 
