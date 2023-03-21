@@ -31,7 +31,6 @@
   - [[#help][Help]]
   - [[#projectile][Projectile]]
   - [[#ripgrep][Ripgrep]]
-  - [[#neotree][Neotree]]
 - [[#development][Development]]
   - [[#languages][Languages]]
   - [[#repl][REPL]]
@@ -75,6 +74,7 @@
   - [[#toggle-spc-t][Toggle =SPC t=]]
   - [[#window-management-spc-w][Window Management =SPC w=]]
   - [[#other-keybindings][Other KeyBindings]]
+- [[#envrc][envrc]]
 - [[#auto-literate-config][Auto Literate Config]]
 
 * About
@@ -419,7 +419,6 @@ evil-snipe, search 2 character motions to jump around text with ~s~ and ~S~
 
 ;; modes to skip
 (dolist (mode '(term-mode-hook
-                neotree-mode-hook
                 eshell-mode-hook
                 vterm-mode-hook))
         (add-hook mode (lambda ()
@@ -708,20 +707,6 @@ helpful is an enhanced version of the builtin emacs help, with more information
   (rg-enable-menu))
 
 #+end_src
-** Neotree
-
-A sidebar project explorer for quick navigation
-
-#+begin_src emacs-lisp
-
-(use-package neotree
-  :config
-  (setq neo-smart-open t)
-  (setq neo-window-fixed-size nil)
-  (setq projectile-switch-project-action 'neotree-projectile-action))
-
-#+end_src
-
 * Development
 
 ** Languages
@@ -729,26 +714,24 @@ A sidebar project explorer for quick navigation
 
 #+begin_src emacs-lisp
 
-(use-package lsp-pyright
-  :hook (python-mode . (lambda()
-                         (require 'lsp-pyright)
-                         (lsp))))
-(use-package pyvenv
-  :init
-  (setenv "WORKON_HOME" "~/.pyenv/versions")
-    (defun try/pyvenv-workon ()
-    (when (buffer-file-name)
-      (let* ((python-version ".python-version")
-             (project-dir (locate-dominating-file (buffer-file-name) python-version)))
-        (when project-dir
-          (pyvenv-workon
-            (with-temp-buffer
-              (insert-file-contents (expand-file-name python-version project-dir))
-             (car (split-string (buffer-string)))))))))
-  :config
-  (pyvenv-mode 1)
-  :hook
-  (python-mode . try/pyvenv-workon))
+(use-package lsp-pyright)
+
+;; (use-package pyvenv
+;;   :init
+;;   (setenv "WORKON_HOME" "~/.pyenv/versions")
+;;     (defun try/pyvenv-workon ()
+;;     (when (buffer-file-name)
+;;       (let* ((python-version ".python-version")
+;;              (project-dir (locate-dominating-file (buffer-file-name) python-version)))
+;;         (when project-dir
+;;           (pyvenv-workon
+;;             (with-temp-buffer
+;;               (insert-file-contents (expand-file-name python-version project-dir))
+;;              (car (split-string (buffer-string)))))))))
+;;   :config
+;;   (pyvenv-mode 1)
+;;   :hook
+;;   (python-mode . try/pyvenv-workon))
 
 #+end_src
 
@@ -873,11 +856,40 @@ flycheck does syntax checking as you type
 
 ** Code Formatting
 
-format-all for autoformatting code
+Reformatter to automatically format code
 
 #+begin_src emacs-lisp
 
-(use-package format-all)
+;; Reformatter
+(use-package reformatter)
+
+;; Defining reformatters
+;; python
+(reformatter-define black
+  :program "black"
+  :args '("-"))
+;; yaml
+;; (reformatter-define black
+;;   :program "black"
+;;   :args '("-"))
+
+;; This function acts as entrypoint / dispatcher
+;; depending on the mode
+(defun my/reformat-buffer()
+    "Reformat the current buffer if there is
+ a reformatter configured for the active major mode."
+  (interactive)
+  (pcase major-mode
+    ('python-mode (black-buffer))
+    (_ (message "No reformatted configured for `%s`" major-mode))
+    )
+  )
+  
+;; (defun my/reformat-region
+;;     "Reformat the selected region"
+;;     (interactive)
+;;  )
+    ;;todo)
 
 #+end_src
 
@@ -1013,7 +1025,7 @@ Highlight lines with changes
          (scala-mode . lsp)
          ;; if you want which-key integration
          (lsp-mode . lsp-enable-which-key-integration))
-  :commands lsp)
+  :commands (lsp lsp-deferred))
 
 ;; optionally
 (use-package lsp-ui :commands lsp-ui-mode)
@@ -1294,7 +1306,7 @@ toc-org generates tables of contents in the org file on save
 #+end_src
 
 * Key Bindings
-  
+
   I'm using =general.el=, =evil-mode= and =evil-collection= as a base to configure key bidings
  
 ** General
@@ -1393,14 +1405,13 @@ My leader key is =SPC=, these is what's directly bound to it
 
   (my/leader-key-def
       "c"  '(:ignore t :which-key "code")
+      "c <return>" '(lsp-execute-code-action :which-key "Code Actions")
       "cc" '(counsel-compile :which-key "Compile")
       "cd" '(lsp-find-definition :which-key "Jump to definition")
       "cr" '(lsp-find-references :which-key "Jump to references")
-      "cf" '(format-all-buffer :which-key "Format buffer/region")
-      "cx" '(flycheck-list-errors :which-key "List errors")
-      "cn" '(flycheck-next-error :which-key "Next error")
-      "cw" '(delete-trailing-whitespace :which-key "Delete trailing whitespace")
-      "cW" '(my/delete-trailing-newlines :which-key "Delete trailing newlines"))
+      "cf" '(my/reformat-buffer :which-key "Format buffer")
+      "cl" '(flycheck-list-errors :which-key "List errors")
+      "cn" '(flycheck-next-error :which-key "Next error"))
 
 #+end_src
 
@@ -1485,7 +1496,7 @@ My leader key is =SPC=, these is what's directly bound to it
 
   (my/leader-key-def
       "h"  '(:ignore t :which-key "help")
-      "hRET" '(info-emacs-manual :which-key "Emacs manual")
+      "h <return>" '(info-emacs-manual :which-key "Emacs manual")
       "h'" '(describe-char :which-key "Describe char")
       "h." '(display-local-help :which-key "Local-help")
       "h?" '(help-for-help :which-key "Help for help")
@@ -1535,7 +1546,6 @@ TODO change these to org-roam bindings
     ;o; "d" '(org :which-key "debugger")
     "of" '(make-frame :which-key "New frame")
     "om" '(mu4e :which-key "Mu4e")
-    "op" '(neotree-toggle :which-key "neotree")
     ;o; "r" '(org :which-key "REPL")
     "oe" '(eshell-toggle :which-key "eshell")
     "ot" '(vterm-other-window :which-key "vterm"))
@@ -1599,7 +1609,6 @@ TODO change these to org-roam bindings
       "t"  '(:ignore t :which-key "toggle")
       "tf" '(flycheck-mode :which-key "Flycheck")
       "tl" '(doom/toggle-line-numbers :which-key "Line numbers")
-      "tn" '(neotree-toggle :which-key "Neotree")
       "tt" '(toggle-truncate-lines :which-key "Truncate lines")
       "tI" '(doom/toggle-indent-style :which-key "Indentation"))
 
@@ -1743,6 +1752,18 @@ In doom emacs, =RET= on org mode can be used for plenty of stuff
       :keymaps 'org-mode-map
       "RET" '+org/dwim-at-point)
 
+#+end_src
+
+* envrc
+
+Envrc to enable direnv goodness per buffer
+
+Doing this late in the init as recommended [[https://github.com/purcell/envrc][here]]
+
+#+begin_src emacs-lisp
+(use-package envrc
+  :config
+  (envrc-global-mode))
 #+end_src
 
 * Auto Literate Config

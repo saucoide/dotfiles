@@ -198,7 +198,6 @@
 
 ;; modes to skip
 (dolist (mode '(term-mode-hook
-                neotree-mode-hook
                 eshell-mode-hook
                 vterm-mode-hook))
         (add-hook mode (lambda ()
@@ -376,32 +375,24 @@
   :config
   (rg-enable-menu))
 
-(use-package neotree
-  :config
-  (setq neo-smart-open t)
-  (setq neo-window-fixed-size nil)
-  (setq projectile-switch-project-action 'neotree-projectile-action))
+(use-package lsp-pyright)
 
-(use-package lsp-pyright
-  :hook (python-mode . (lambda()
-                         (require 'lsp-pyright)
-                         (lsp))))
-(use-package pyvenv
-  :init
-  (setenv "WORKON_HOME" "~/.pyenv/versions")
-    (defun try/pyvenv-workon ()
-    (when (buffer-file-name)
-      (let* ((python-version ".python-version")
-             (project-dir (locate-dominating-file (buffer-file-name) python-version)))
-        (when project-dir
-          (pyvenv-workon
-            (with-temp-buffer
-              (insert-file-contents (expand-file-name python-version project-dir))
-             (car (split-string (buffer-string)))))))))
-  :config
-  (pyvenv-mode 1)
-  :hook
-  (python-mode . try/pyvenv-workon))
+;; (use-package pyvenv
+;;   :init
+;;   (setenv "WORKON_HOME" "~/.pyenv/versions")
+;;     (defun try/pyvenv-workon ()
+;;     (when (buffer-file-name)
+;;       (let* ((python-version ".python-version")
+;;              (project-dir (locate-dominating-file (buffer-file-name) python-version)))
+;;         (when project-dir
+;;           (pyvenv-workon
+;;             (with-temp-buffer
+;;               (insert-file-contents (expand-file-name python-version project-dir))
+;;              (car (split-string (buffer-string)))))))))
+;;   :config
+;;   (pyvenv-mode 1)
+;;   :hook
+;;   (python-mode . try/pyvenv-workon))
 
 (use-package cider
     :mode "\\.clj[sc]?\\'"
@@ -443,6 +434,7 @@
   (setq eir-repl-placement 'right)
   (setq eir-jump-after-eval nil)
   (setq eir-always-split-script-window t)
+  (setq eir-use-python-shell-send-string nil)
   ;;; Emacs-lisp
   (require 'eval-in-repl-ielm)
   (setq eir-ielm-eval-in-current-buffer t)
@@ -479,7 +471,36 @@
     ;; :defer t
     ;; :hook (lsp-mode . flycheck-mode))
 
-(use-package format-all)
+;; Reformatter
+(use-package reformatter)
+
+;; Defining reformatters
+;; python
+(reformatter-define black
+  :program "black"
+  :args '("-"))
+;; yaml
+;; (reformatter-define black
+;;   :program "black"
+;;   :args '("-"))
+
+;; This function acts as entrypoint / dispatcher
+;; depending on the mode
+(defun my/reformat-buffer()
+    "Reformat the current buffer if there is
+ a reformatter configured for the active major mode."
+  (interactive)
+  (pcase major-mode
+    ('python-mode (black-buffer))
+    (_ (message "No reformatted configured for `%s`" major-mode))
+    )
+  )
+  
+;; (defun my/reformat-region
+;;     "Reformat the selected region"
+;;     (interactive)
+;;  )
+    ;;todo)
 
 (use-package evil-nerd-commenter
   :bind ("C-/" . evilnc-comment-or-uncomment-lines))
@@ -490,6 +511,46 @@
   :commands (magit-status magit-get-current-branch))
 
 ;; (use-package forge)
+
+(use-package hydra)
+(use-package smerge-mode
+  :config
+  (defhydra unpackaged/smerge-hydra
+    (:color pink :hint nil :post (smerge-auto-leave))
+    "
+^Move^       ^Keep^               ^Diff^                 ^Other^
+^^-----------^^-------------------^^---------------------^^-------
+_n_ext       _b_ase               _<_: upper/base        _C_ombine
+_p_rev       _u_pper              _=_: upper/lower       _r_esolve
+^^           _l_ower              _>_: base/lower        _k_ill current
+^^           _a_ll                _R_efine
+^^           _RET_: current       _E_diff
+"
+    ("n" smerge-next)
+    ("p" smerge-prev)
+    ("b" smerge-keep-base)
+    ("u" smerge-keep-upper)
+    ("l" smerge-keep-lower)
+    ("a" smerge-keep-all)
+    ("RET" smerge-keep-current)
+    ("\C-m" smerge-keep-current)
+    ("<" smerge-diff-base-upper)
+    ("=" smerge-diff-upper-lower)
+    (">" smerge-diff-base-lower)
+    ("R" smerge-refine)
+    ("E" smerge-ediff)
+    ("C" smerge-combine-with-next)
+    ("r" smerge-resolve)
+    ("k" smerge-kill-current)
+    ("ZZ" (lambda ()
+            (interactive)
+            (save-buffer)
+            (bury-buffer))
+     "Save and bury buffer" :color blue)
+    ("q" nil "cancel" :color blue))
+  :hook (magit-diff-visit-file . (lambda ()
+                                   (when smerge-mode
+                                     (unpackaged/smerge-hydra/body)))))
 
 ;; TODO doesnt work well with org mode buffers for me
 (use-package git-gutter
@@ -519,7 +580,7 @@
          (scala-mode . lsp)
          ;; if you want which-key integration
          (lsp-mode . lsp-enable-which-key-integration))
-  :commands lsp)
+  :commands (lsp lsp-deferred))
 
 ;; optionally
 (use-package lsp-ui :commands lsp-ui-mode)
@@ -775,14 +836,13 @@
 
 (my/leader-key-def
     "c"  '(:ignore t :which-key "code")
+    "c <return>" '(lsp-execute-code-action :which-key "Code Actions")
     "cc" '(counsel-compile :which-key "Compile")
     "cd" '(lsp-find-definition :which-key "Jump to definition")
     "cr" '(lsp-find-references :which-key "Jump to references")
-    "cf" '(format-all-buffer :which-key "Format buffer/region")
-    "cx" '(flycheck-list-errors :which-key "List errors")
-    "cn" '(flycheck-next-error :which-key "Next error")
-    "cw" '(delete-trailing-whitespace :which-key "Delete trailing whitespace")
-    "cW" '(my/delete-trailing-newlines :which-key "Delete trailing newlines"))
+    "cf" '(my/reformat-buffer :which-key "Format buffer")
+    "cl" '(flycheck-list-errors :which-key "List errors")
+    "cn" '(flycheck-next-error :which-key "Next error"))
 
 (my/leader-key-def
     "e"  '(:ignore t :which-key "eval")
@@ -799,7 +859,7 @@
     (lambda () (interactive) (dired target))))
 
 (my/leader-key-def
-  "d"  '(dired :which-key "Here"))
+  "d"  '(counsel-find-file :which-key "Here"))
   ;; "dh"  `(,(my/dired-in "~") :which-key "Home")
   ;; "do"  `(,(my/dired-in "~/org") :which-key "Org")
   ;; "dD"  `(,(my/dired-in "~/downloads") :which-key "Downloads")
@@ -838,7 +898,7 @@
 
 (my/leader-key-def
     "h"  '(:ignore t :which-key "help")
-    "hRET" '(info-emacs-manual :which-key "Emacs manual")
+    "h <return>" '(info-emacs-manual :which-key "Emacs manual")
     "h'" '(describe-char :which-key "Describe char")
     "h." '(display-local-help :which-key "Local-help")
     "h?" '(help-for-help :which-key "Help for help")
@@ -874,7 +934,6 @@
     ;o; "d" '(org :which-key "debugger")
     "of" '(make-frame :which-key "New frame")
     "om" '(mu4e :which-key "Mu4e")
-    "op" '(neotree-toggle :which-key "neotree")
     ;o; "r" '(org :which-key "REPL")
     "oe" '(eshell-toggle :which-key "eshell")
     "ot" '(vterm-other-window :which-key "vterm"))
@@ -905,9 +964,9 @@
 
 (my/leader-key-def
     "s"  '(:ignore t :which-key "search")
-    "ss" '(swiper :which-key "Swiper")
-    "sp" '(projectile-ripgrep :which-key "ripgrep on project")
-    "sr" '(rg-menu :which-key "Ripgrep menu"))
+    "ss" '(rg-menu :which-key "ripgrep-menu")
+    "sp" '(projectile-ripgrep :which-key "projectile -ipgrep")
+    "sr" '(rg--transient :which-key "ripgrep-regex"))
 
  ;; TODO add bindings to search in project, etc
 
@@ -915,7 +974,6 @@
     "t"  '(:ignore t :which-key "toggle")
     "tf" '(flycheck-mode :which-key "Flycheck")
     "tl" '(doom/toggle-line-numbers :which-key "Line numbers")
-    "tn" '(neotree-toggle :which-key "Neotree")
     "tt" '(toggle-truncate-lines :which-key "Truncate lines")
     "tI" '(doom/toggle-indent-style :which-key "Indentation"))
 
@@ -989,6 +1047,10 @@
     :states 'normal
     :keymaps 'org-mode-map
     "RET" '+org/dwim-at-point)
+
+(use-package envrc
+  :config
+  (envrc-global-mode))
 
 (defun my/org-babel-tangle-config ()
   (when (string-equal (file-name-directory (buffer-file-name))
