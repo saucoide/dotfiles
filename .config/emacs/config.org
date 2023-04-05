@@ -335,26 +335,26 @@ Evil, evil collection & undo-fu
    
 #+begin_src emacs-lisp
 
-  (use-package evil
-      :init
-      (setq evil-want-integration t)
-      (setq evil-want-keybinding nil)
-      (setq evil-want-C-u-scroll t)
-      (setq evil-want-C-i-jump nil)
-      :config
-      (evil-mode 1)
-      (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state))
+(use-package evil
+    :init
+    (setq evil-want-integration t)
+    (setq evil-want-keybinding nil)
+    (setq evil-want-C-u-scroll t)
+    (setq evil-want-C-i-jump nil)
+    :config
+    (evil-mode 1)
+    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state))
 
-  (use-package evil-collection
-      :after evil
-      :config
-      (evil-collection-init))
+(use-package evil-collection
+  :after evil
+  :config
+  (evil-collection-init))
 
-   ;; using undo-fu to get redo functionality
-  (use-package undo-fu
-      :config
-      (define-key evil-normal-state-map "u" 'undo-fu-only-undo)
-      (define-key evil-normal-state-map "\C-r" 'undo-fu-only-redo))
+ ;; using undo-fu to get redo functionality
+(use-package undo-fu
+    :config
+    (define-key evil-normal-state-map "u" 'undo-fu-only-undo)
+    (define-key evil-normal-state-map "\C-r" 'undo-fu-only-redo))
 
 #+end_src
    
@@ -865,13 +865,20 @@ Reformatter to automatically format code
 
 ;; Defining reformatters
 ;; python
-(reformatter-define black
+(reformatter-define black-format
   :program "black"
   :args '("-"))
-;; yaml
-;; (reformatter-define black
-;;   :program "black"
-;;   :args '("-"))
+(reformatter-define prettier-format
+  :program "prettier"
+  :args '("--parser" "json"))
+;; terraform
+(reformatter-define terraform-format
+  :program "terraform"
+  :args '("fmt" "-"))
+;; terraform
+(reformatter-define pg-format
+  :program "pg_format"
+  :args '("-"))
 
 ;; This function acts as entrypoint / dispatcher
 ;; depending on the mode
@@ -880,16 +887,25 @@ Reformatter to automatically format code
  a reformatter configured for the active major mode."
   (interactive)
   (pcase major-mode
-    ('python-mode (black-buffer))
+    ('python-mode (black-format-buffer))
+    ('terraform-mode (terraform-format-buffer))
+    ('js-mode (prettier-format-buffer))
+    ('sql-mode (pg-format-buffer))
     (_ (message "No reformatted configured for `%s`" major-mode))
     )
   )
   
-;; (defun my/reformat-region
-;;     "Reformat the selected region"
-;;     (interactive)
-;;  )
-    ;;todo)
+(defun my/reformat-region (beg end)
+    "Reformat the current buffer if there is
+ a reformatter configured for the active major mode."
+  (interactive "r")
+  (pcase major-mode
+    ;; ('python-mode (black-format-buffer))
+    ;; ('terraform-mode (terraform-format-buffer))
+    ('js-mode (prettier-format-region beg end))
+    (_ (message "No reformatted configured for `%s`" major-mode))
+    )
+  )
 
 #+end_src
 
@@ -1131,9 +1147,13 @@ YASnippet is a template system for emaxs, it lets you create custom templates th
 #+begin_src emacs-lisp
 
 (use-package vterm
-    :ensure t
-    :config
-    (setq vterm-shell "/usr/local/bin/fish"))
+  :after evil-collection
+  :config
+  (setq vterm-shell "/usr/local/bin/fish")
+  (setq term-prompt-regexp "➜ *")
+  (evil-define-minor-mode-key 'normal 'vterm-mode (kbd "_") 'evil-collection-vterm-first-non-blank)
+  ;; (evil-define-key 'normal 'vterm-mode-map (kbd "cc") 'evil-collection-vterm-change-line)
+  )
 
 #+end_src
 
@@ -1539,6 +1559,16 @@ TODO change these to org-roam bindings
 
 #+begin_src emacs-lisp
 
+(defun my/vterm-toggle()
+  (interactive)
+  (if (projectile-project-p)
+      (projectile-run-vterm-other-window)
+    (vterm-other-window)))
+
+(defun my/vterm-here()
+  (interactive)
+  (vterm-other-window vterm-buffer-name))
+
 (my/leader-key-def
     "o"  '(:ignore t :which-key "open")
     "o-" '(dired-jump :which-key "Dired")
@@ -1548,7 +1578,9 @@ TODO change these to org-roam bindings
     "om" '(mu4e :which-key "Mu4e")
     ;o; "r" '(org :which-key "REPL")
     "oe" '(eshell-toggle :which-key "eshell")
-    "ot" '(vterm-other-window :which-key "vterm"))
+    "ot" '(my/vterm-toggle :which-key "toggle-vterm")
+    "oT" '(my/vterm-here :which-key "vterm-here")
+    )
 
 #+end_src
 

@@ -1,3 +1,6 @@
+# Get most envvars from profile (requires oh-my-fish & fenv installed)
+fenv source "$HOME/.profile"
+
 # PATH
 # ---------------------------------------------------------------------
 fish_add_path --prepend "$HOME/bin"
@@ -22,6 +25,7 @@ set EDITOR "emacsclient -t -a ''"
 set SSH_ENV "$HOME/.ssh/agent-environment"
 set JAVA_HOME "/Users/saucon/Library/Caches/Coursier/arc/https/github.com/adoptium/temurin8-binaries/releases/download/jdk8u345-b01/OpenJDK8U-jdk_x64_mac_hotspot_8u345b01.tar.gz/jdk8u345-b01/Contents/Home"
 set USE_GKE_GCLOUD_AUTH_PLUGIN True
+# set --export PYTHONBREAKPOINT ipdb.set_trace
 
 # Set vim as Manpager
 set --export MANPAGER '/bin/bash -c "vim -MRn -c \"set buftype=nofile showtabline=0 ft=man ts=8 nomod nolist norelativenumber nonu noma\" -c \"normal L\" -c \"nmap q :qa<CR>\"</dev/tty <(col -b)"'
@@ -121,6 +125,33 @@ function extract
         set_color normal
     end
   end
+end
+
+
+function vterm_printf;
+    if begin; [  -n "$TMUX" ]  ; and  string match -q -r "screen|tmux" "$TERM"; end 
+        # tell tmux to pass the escape sequences through
+        printf "\ePtmux;\e\e]%s\007\e\\" "$argv"
+    else if string match -q -- "screen*" "$TERM"
+        # GNU screen (screen, screen-256color, screen-256color-bce)
+        printf "\eP\e]%s\007\e\\" "$argv"
+    else
+        printf "\e]%s\e\\" "$argv"
+    end
+end
+
+function vterm_prompt_end;
+    vterm_printf '51;A'(whoami)'@'(hostname)':'(pwd)
+end
+
+functions --copy fish_prompt vterm_old_fish_prompt
+
+function fish_prompt --description 'Write out the prompt; do not replace this. Instead, put this at end of your file.'
+    # Remove the trailing newline from the original prompt. This is done
+    # using the string builtin from fish, but to make sure any escape codes
+    # are correctly interpreted, use %b for printf.
+    printf "%b" (string join "\n" (vterm_old_fish_prompt))
+    vterm_prompt_end
 end
 # ---------------------------------------------------------------------
 

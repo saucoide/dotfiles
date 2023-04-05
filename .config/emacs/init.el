@@ -156,9 +156,9 @@
     (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state))
 
 (use-package evil-collection
-    :after evil
-    :config
-    (evil-collection-init))
+  :after evil
+  :config
+  (evil-collection-init))
 
  ;; using undo-fu to get redo functionality
 (use-package undo-fu
@@ -476,13 +476,20 @@
 
 ;; Defining reformatters
 ;; python
-(reformatter-define black
+(reformatter-define black-format
   :program "black"
   :args '("-"))
-;; yaml
-;; (reformatter-define black
-;;   :program "black"
-;;   :args '("-"))
+(reformatter-define prettier-format
+  :program "prettier"
+  :args '("--parser" "json"))
+;; terraform
+(reformatter-define terraform-format
+  :program "terraform"
+  :args '("fmt" "-"))
+;; terraform
+(reformatter-define pg-format
+  :program "pg_format"
+  :args '("-"))
 
 ;; This function acts as entrypoint / dispatcher
 ;; depending on the mode
@@ -491,16 +498,25 @@
  a reformatter configured for the active major mode."
   (interactive)
   (pcase major-mode
-    ('python-mode (black-buffer))
+    ('python-mode (black-format-buffer))
+    ('terraform-mode (terraform-format-buffer))
+    ('js-mode (prettier-format-buffer))
+    ('sql-mode (pg-format-buffer))
     (_ (message "No reformatted configured for `%s`" major-mode))
     )
   )
   
-;; (defun my/reformat-region
-;;     "Reformat the selected region"
-;;     (interactive)
-;;  )
-    ;;todo)
+(defun my/reformat-region (beg end)
+    "Reformat the current buffer if there is
+ a reformatter configured for the active major mode."
+  (interactive "r")
+  (pcase major-mode
+    ;; ('python-mode (black-format-buffer))
+    ;; ('terraform-mode (terraform-format-buffer))
+    ('js-mode (prettier-format-region beg end))
+    (_ (message "No reformatted configured for `%s`" major-mode))
+    )
+  )
 
 (use-package evil-nerd-commenter
   :bind ("C-/" . evilnc-comment-or-uncomment-lines))
@@ -656,9 +672,13 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
   (yas-global-mode 1))
 
 (use-package vterm
-    :ensure t
-    :config
-    (setq vterm-shell "/usr/local/bin/fish"))
+  :after evil-collection
+  :config
+  (setq vterm-shell "/usr/local/bin/fish")
+  (setq term-prompt-regexp "➜ *")
+  (evil-define-minor-mode-key 'normal 'vterm-mode (kbd "_") 'evil-collection-vterm-first-non-blank)
+  ;; (evil-define-key 'normal 'vterm-mode-map (kbd "cc") 'evil-collection-vterm-change-line)
+  )
 
 (use-package eshell-toggle
     :custom
@@ -927,6 +947,16 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
     "nf" '(org-roam-node-find :which-key "org-roam-node-find")
     "nl" '(org-roam-buffer-toggle :which-key "org-roam-buffer-toggle"))
 
+(defun my/vterm-toggle()
+  (interactive)
+  (if (projectile-project-p)
+      (projectile-run-vterm-other-window)
+    (vterm-other-window)))
+
+(defun my/vterm-here()
+  (interactive)
+  (vterm-other-window vterm-buffer-name))
+
 (my/leader-key-def
     "o"  '(:ignore t :which-key "open")
     "o-" '(dired-jump :which-key "Dired")
@@ -936,7 +966,9 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
     "om" '(mu4e :which-key "Mu4e")
     ;o; "r" '(org :which-key "REPL")
     "oe" '(eshell-toggle :which-key "eshell")
-    "ot" '(vterm-other-window :which-key "vterm"))
+    "ot" '(my/vterm-toggle :which-key "toggle-vterm")
+    "oT" '(my/vterm-here :which-key "vterm-here")
+    )
 
 (defun my/switch-project-dired()
   (interactive)
