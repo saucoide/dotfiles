@@ -1,9 +1,0 @@
-# -*- mode: snippet -*-
-# name: clojure-block
-# key: <cl
-# --
-
-#+begin_src clojure
-$0
-#+end_src
-

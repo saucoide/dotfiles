@@ -1,22 +1,92 @@
-#+TITLE: Desktop's configuration
+#+TITLE: zima's configuration
 #+AUTHOR: Sauco
-#+DESCRIPTION: My desktop's configuration
+#+DESCRIPTION: laptop's config
 #+STARTUP: content
 
-* Introduction
+* About
 
-I am using Arcolinux with Qtile as my desktop environment.
+This is the configuration I use for a thinkpad t480s laptop.
 
-It is a literate config written in org-mode, use =org-babel-tangle= to
-write the code blocks to their location.
+It uses Archlinux with Qtile window manager.
 
-My emacs configuration is in a separate [[emacs_config.org][]] file.
+Both pacman and guix are used, but I try to keep the things installed
+with pacman to a minimum. 
 
-I then use GNU Stow to symlink everything inside =~/dotfiles= into the home directory by
+This file is a literate config written in org-mode, use =org-babel-tangle= to
+write the code blocks, and GNU Stow to symlink them into the home directory
 
 #+BEGIN_SRC bash
 stow .
 #+END_SRC
+
+Emacs configuration is in a separate [[emacs_config.org][]] file.
+
+* Instructions
+
+1. Install Archlinux
+2. Install the base packages with pacman
+
+#+begin_src bash
+# This list might be different depending on what base install of arch is done
+pacman -S git fish
+#+end_src
+   
+3. Install Guix
+4. 
+
+* .profile
+
+#+begin_src bash :tangle .profile
+# ************************************
+# Generated from ~/dotfiles/system.org
+# ************************************
+
+# Guix profile
+GUIX_PROFILE="$HOME/.guix-profile"
+. "$GUIX_PROFILE/etc/profile"
+
+# fish as default non-login shell
+export SHELL=/usr/bin/fish
+
+#+end_src
+
+* Guix
+** channels.scm
+
+Guix channel configuration
+
+#+begin_src scheme :tangle .config/guix/channels.scm
+;; ************************************
+;; Generated from ~/dotfiles/system.org
+;; ************************************
+
+(list (channel
+       (name 'guix)
+       (url "https://git.savannah.gnu.org/git/guix.git")
+       (branch "master")
+       (introduction
+        (make-channel-introduction
+         "9edb3f66fd807b096b48283debdcddccfea34bad"
+         (openpgp-fingerprint
+          "BBB0 2DDF 2CEA F6A8 0D1D  E643 A2A0 6DF2 A33A 54FA"))))
+
+      (channel
+       (name 'nonguix)
+       (url "https://gitlab.com/nonguix/nonguix")
+       (introduction
+        (make-channel-introduction
+         "897c1a470da759236cc11798f4e0a5f7d4d59fbc"
+         (openpgp-fingerprint
+          "2A39 3FFF 68F4 EF7A 3D29  12AF 6F51 20A0 22FB B2D5"))))
+      
+      (channel
+       (name 'scn-channel)
+       (url "https://github.com/saucoide/scn-channel")
+       ;; (url "file:///home/saucoide/projects/scn-channel")
+       (branch "main"))
+      )
+
+#+end_src
 
 * Terminal
 
@@ -29,206 +99,113 @@ I am using termite as my terminal
 # Generated from ~/dotfiles/system.org
 #
 
-#Ibus settings if you need them
-#type ibus-setup in terminal to change settings and start the daemon
-#delete the hashtags of the next lines and restart
-#export GTK_IM_MODULE=ibus
-#export XMODIFIERS=@im=dbus
-#export QT_IM_MODULE=ibus
-
-# If not running interactively, don't do anything
-[[ $- != *i* ]] && return
-
-export HISTCONTROL=ignoreboth:erasedups
-
-# PS1='\u@\h:\W\$ '
-PS1='\[\e[31m\]\u\[\e[34m\]@\h:\[\e[32m\]\w$ \[\e[0m\]'
+# PS1='\[\e[31m\]\u\[\e[34m\]@\h:\[\e[32m\]\w$ \[\e[0m\]'
 
 # PATH
 
-if [ -d "$HOME/.bin" ] ;
-  then PATH="$HOME/.bin:$PATH"
-fi
+# if [ -d "$HOME/.bin" ] ;
+#   then PATH="$HOME/.bin:$PATH"
+# fi
 
-if [ -d "$HOME/.local/bin" ] ;
-  then PATH="$HOME/.local/bin:$PATH"
-fi
+# if [ -d "$HOME/.local/bin" ] ;
+#   then PATH="$HOME/.local/bin:$PATH"
+# fi
 
-export PATH=~/.local/bin:$PATH
-export PATH=~/.emacs.d/bin:$PATH
-export PATH=~/.poetry/bin:$PATH
+# export PATH=~/.local/bin:$PATH
+# export PATH=~/.emacs.d/bin:$PATH
+# export PATH=~/.poetry/bin:$PATH
 
-export EDITOR=vim
+# export EDITOR=vim
 
 # use vim as manpager
-export MANPAGER='/bin/bash -c "vim -MRn -c \"set buftype=nofile showtabline=0 ft=man ts=8 nomod nolist norelativenumber nonu noma\" -c \"normal L\" -c \"nmap q :qa<CR>\"</dev/tty <(col -b)"'
+# export MANPAGER='/bin/bash -c "vim -MRn -c \"set buftype=nofile showtabline=0 ft=man ts=8 nomod nolist norelativenumber nonu noma\" -c \"normal L\" -c \"nmap q :qa<CR>\"</dev/tty <(col -b)"'
 
-# Start SSH automatically and only run one instance
-# TODO fix this
-SSH_ENV="$HOME/.ssh/agent-environment"
+# #readable output
+# alias df='df --human-readable'
 
-function start_agent {
-    echo "Initialising new SSH agent..."
-    /usr/bin/ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
-    echo succeeded
-    chmod 600 "${SSH_ENV}"
-    . "${SSH_ENV}" > /dev/null
-    /usr/bin/ssh-add;
-}
+# #pacman unlock
+# alias unlock="sudo rm /var/lib/pacman/db.lck"
 
-# Source SSH settings, if applicable
+# #free
+# alias free="free -mt"
 
-if [ -f "${SSH_ENV}" ]; then
-    . "${SSH_ENV}" > /dev/null
-    #ps ${SSH_AGENT_PID} doesn't work under cywgin
-    ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
-        start_agent;
-    }
-else
-    start_agent;
-fi
-# ALIASES
+# #use all cores
+# alias uac="sh ~/.bin/main/000*"
 
-# list (exa is a replacement for ls)
-alias ls='exa --long --all --classify --color=always --group-directories-first'
-alias lsd='exa --long --all --classify --color=always --only-dirs'
+# #continue download
+# alias wget="wget -c"
 
-# fix obvious typos
-alias cd..='cd ..'
+# #userlist
+# alias userlist="cut -d: -f1 /etc/passwd"
 
-## Colorize the grep command output for ease of use (good for log files)##
-alias grep='grep --color=auto'
-alias egrep='egrep --color=auto'
-alias fgrep='fgrep --color=auto'
+# #merge new settings
+# alias merge="xrdb -merge ~/.Xresources"
 
-#readable output
-alias df='df --human-readable'
+# # Aliases for software managment
+# # pacman or pm
+# alias pacman='sudo pacman --color auto'
+# alias update='sudo pacman -Syyu'
 
-#pacman unlock
-alias unlock="sudo rm /var/lib/pacman/db.lck"
+# # yay as aur helper - updates everything
+# alias upall="yay -Syu"
 
-#free
-alias free="free -mt"
+# #ps
+# alias psa="ps auxf"
+# alias psgrep="ps aux | grep -v grep | grep -i -e VSZ -e"
 
-#use all cores
-alias uac="sh ~/.bin/main/000*"
+# #grub update
+# alias update-grub="sudo grub-mkconfig -o /boot/grub/grub.cfg"
 
-#continue download
-alias wget="wget -c"
+# #add new fonts
+# alias update-fc='sudo fc-cache -fv'
 
-#userlist
-alias userlist="cut -d: -f1 /etc/passwd"
+# #copy/paste all content of /etc/skel over to home folder - backup of config created - beware
+# alias skel='cp -Rf ~/.config ~/.config-backup-$(date +%Y.%m.%d-%H.%M.%S) && cp -rf /etc/skel/* ~'
+# #backup contents of /etc/skel to hidden backup folder in home/user
+# alias bupskel='cp -Rf /etc/skel ~/.skel-backup-$(date +%Y.%m.%d-%H.%M.%S)'
 
-#merge new settings
-alias merge="xrdb -merge ~/.Xresources"
+# #switch between bash and zsh
+# alias tobash="sudo chsh $USER -s /bin/bash && echo 'Now log out.'"
+# alias tozsh="sudo chsh $USER -s /bin/zsh && echo 'Now log out.'"
 
-# Aliases for software managment
-# pacman or pm
-alias pacman='sudo pacman --color auto'
-alias update='sudo pacman -Syyu'
+# #hardware info --short
+# alias hw="hwinfo --short"
 
-# yay as aur helper - updates everything
-alias upall="yay -Syu"
+# #get fastest mirrors in your neighborhood
+# alias mirror="sudo reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist"
+# alias mirrord="sudo reflector --latest 50 --number 20 --sort delay --save /etc/pacman.d/mirrorlist"
+# alias mirrors="sudo reflector --latest 50 --number 20 --sort score --save /etc/pacman.d/mirrorlist"
+# alias mirrora="sudo reflector --latest 50 --number 20 --sort age --save /etc/pacman.d/mirrorlist"
 
-#ps
-alias psa="ps auxf"
-alias psgrep="ps aux | grep -v grep | grep -i -e VSZ -e"
+# #mounting the folder Public for exchange between host and guest on virtualbox
+# alias vbm="sudo mount -t vboxsf -o rw,uid=1000,gid=1000 Public /home/$USER/Public"
 
-#grub update
-alias update-grub="sudo grub-mkconfig -o /boot/grub/grub.cfg"
+# #calendar
+# alias cal="cal -y -m"
 
-#add new fonts
-alias update-fc='sudo fc-cache -fv'
+# #youtube-dl
+# alias yta-best="youtube-dl --extract-audio --audio-format best "
+# alias yta-mp3="youtube-dl --extract-audio --audio-format mp3 "
+# alias yta-wav="youtube-dl --extract-audio --audio-format wav "
+# alias ytv-best="youtube-dl -f bestvideo+bestaudio "
 
-#copy/paste all content of /etc/skel over to home folder - backup of config created - beware
-alias skel='cp -Rf ~/.config ~/.config-backup-$(date +%Y.%m.%d-%H.%M.%S) && cp -rf /etc/skel/* ~'
-#backup contents of /etc/skel to hidden backup folder in home/user
-alias bupskel='cp -Rf /etc/skel ~/.skel-backup-$(date +%Y.%m.%d-%H.%M.%S)'
+# #Recent Installed Packages
+# alias rip="expac --timefmt='%Y-%m-%d %T' '%l\t%n %v' | sort | tail -200 | nl"
+# alias riplong="expac --timefmt='%Y-%m-%d %T' '%l\t%n %v' | sort | tail -3000 | nl"
 
-#switch between bash and zsh
-alias tobash="sudo chsh $USER -s /bin/bash && echo 'Now log out.'"
-alias tozsh="sudo chsh $USER -s /bin/zsh && echo 'Now log out.'"
+# #Cleanup orphaned packages
+# alias cleanup='sudo pacman -Rns $(pacman -Qtdq)'
 
-#hardware info --short
-alias hw="hwinfo --short"
+# #get the error messages from journalctl
+# alias jctl="journalctl -p 3 -xb"
 
-#get fastest mirrors in your neighborhood
-alias mirror="sudo reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist"
-alias mirrord="sudo reflector --latest 50 --number 20 --sort delay --save /etc/pacman.d/mirrorlist"
-alias mirrors="sudo reflector --latest 50 --number 20 --sort score --save /etc/pacman.d/mirrorlist"
-alias mirrora="sudo reflector --latest 50 --number 20 --sort age --save /etc/pacman.d/mirrorlist"
-
-#mounting the folder Public for exchange between host and guest on virtualbox
-alias vbm="sudo mount -t vboxsf -o rw,uid=1000,gid=1000 Public /home/$USER/Public"
-
-#calendar
-alias cal="cal -y -m"
-
-#youtube-dl
-alias yta-best="youtube-dl --extract-audio --audio-format best "
-alias yta-mp3="youtube-dl --extract-audio --audio-format mp3 "
-alias yta-wav="youtube-dl --extract-audio --audio-format wav "
-alias ytv-best="youtube-dl -f bestvideo+bestaudio "
-
-#Recent Installed Packages
-alias rip="expac --timefmt='%Y-%m-%d %T' '%l\t%n %v' | sort | tail -200 | nl"
-alias riplong="expac --timefmt='%Y-%m-%d %T' '%l\t%n %v' | sort | tail -3000 | nl"
-
-#Cleanup orphaned packages
-alias cleanup='sudo pacman -Rns $(pacman -Qtdq)'
-
-#get the error messages from journalctl
-alias jctl="journalctl -p 3 -xb"
-
-#emacs for important configuration files
-#know what you do in these files
-alias elightdm="sudo emacs /etc/lightdm/lightdm.conf"
-alias epacman="sudo emacs /etc/pacman.conf"
-alias egrub="sudo emacs /etc/default/grub"
-alias eoblogout="sudo emacs /etc/oblogout.conf"
-alias bls="betterlockscreen -u /usr/share/backgrounds/arcolinux/"
-
-#shopt - shell options
-shopt -s autocd # change to named directory
-shopt -s cdspell # autocorrects cd misspellings
-shopt -s cmdhist # save multi-line commands in history as single line
-shopt -s dotglob
-shopt -s histappend # do not overwrite history
-shopt -s expand_aliases # expand aliases
-
-# # ex = EXtractor for all kinds of archives
-# # usage: ex <file>
-ex ()
-{
-  if [ -f $1 ] ; then
-    case $1 in
-      ,*.tar.bz2)   tar xjf $1   ;;
-      ,*.tar.gz)    tar xzf $1   ;;
-      ,*.bz2)       bunzip2 $1   ;;
-      ,*.rar)       unrar x $1   ;;
-      ,*.gz)        gunzip $1    ;;
-      ,*.tar)       tar xf $1    ;;
-      ,*.tbz2)      tar xjf $1   ;;
-      ,*.tgz)       tar xzf $1   ;;
-      ,*.zip)       unzip $1     ;;
-      ,*.Z)         uncompress $1;;
-      ,*.7z)        7z x $1      ;;
-      ,*.deb)       ar x $1      ;;
-      ,*.tar.xz)    tar xf $1    ;;
-      ,*.tar.zst)   unzstd $1    ;;
-      ,*)           echo "'$1' cannot be extracted via ex()" ;;
-    esac
-  else
-    echo "'$1' is not a valid file"
-  fi
-}
-
-# fix for qtile & terminal apps resizing
-# (its fixed on master, should remove soon)
-unset COLUMNS
-unset LINES
-    
-neofetch
+# #emacs for important configuration files
+# #know what you do in these files
+# alias elightdm="sudo emacs /etc/lightdm/lightdm.conf"
+# alias epacman="sudo emacs /etc/pacman.conf"
+# alias egrub="sudo emacs /etc/default/grub"
+# alias eoblogout="sudo emacs /etc/oblogout.conf"
+# alias bls="betterlockscreen -u /usr/share/backgrounds/arcolinux/"
 
 #+END_SRC
 
@@ -242,216 +219,216 @@ directory that will be autoloaded, but i prefer to configure everything in a sin
 
 # PATH
 # ---------------------------------------------------------------------
-fish_add_path --prepend "~/.bin"
-fish_add_path --prepend "~/.local/bin"
-fish_add_path --prepend "~/.emacs.d/bin"
-fish_add_path --prepend "~/.poetry/bin"
-fish_add_path --prepend "~/.local/share/coursier/bin"
-# ---------------------------------------------------------------------
+# fish_add_path --prepend "~/.bin"
+# fish_add_path --prepend "~/.local/bin"
+# fish_add_path --prepend "~/.emacs.d/bin"
+# fish_add_path --prepend "~/.poetry/bin"
+# fish_add_path --prepend "~/.local/share/coursier/bin"
+# # ---------------------------------------------------------------------
 
 
-# Environment Variables
-# ---------------------------------------------------------------------
-set VISUAL "emacsclient -c -a ''"
-set EDITOR "emacsclient -t -a ''"
-set SSH_ENV "$HOME/.ssh/agent-environment"
+# # Environment Variables
+# # ---------------------------------------------------------------------
+# set VISUAL "emacsclient -c -a ''"
+# set EDITOR "emacsclient -t -a ''"
+# set SSH_ENV "$HOME/.ssh/agent-environment"
 
-# fix for qtile & terminal apps resizing
-# (its fixed on master, should be able to remove it soon)
-set --erase COLUMNS
-set --erase LINES
-
-
-# Set vim as Manpager
-set --export MANPAGER '/bin/bash -c "vim -MRn -c \"set buftype=nofile showtabline=0 ft=man ts=8 nomod nolist norelativenumber nonu noma\" -c \"normal L\" -c \"nmap q :qa<CR>\"</dev/tty <(col -b)"'
-# ---------------------------------------------------------------------
+# # fix for qtile & terminal apps resizing
+# # (its fixed on master, should be able to remove it soon)
+# set --erase COLUMNS
+# set --erase LINES
 
 
-# Aliases
-# ---------------------------------------------------------------------
-## List - using exa as a replacement for ls 
-alias ls="lsd --long --color=always --group-dirs=first --date '+%Y-%m-%d %H:%M'"
-alias lsa="lsd --long --almost-all --group-dirs=first --date '+%Y-%m-%d %H:%M'"
-alias lst="lsd --long --tree --depth=2 --color=always --date '+%Y-%m-%d %H:%M'"
-## pbcopy pbpaste alias
-alias pbcopy="xclip -selection clipboard"
-alias pbpaste="xclip -selection clipboard -o"
-## a better cat
-alias cat="bat"
-## I always miss the space
-alias cd..="cd .."
-## Colorize the grep command output 
-alias grep='grep --color=auto'
-## File system space info in readable format
-alias df='df --human-readable'
-## Memory info 
-alias free="free -mt"
-## Continue download
-alias wget="wget -c"
-## Userlist
-alias userlist="cut -d: -f1 /etc/passwd"
-## Aliases for software managment
-### Pacman
-alias pacman='sudo pacman --color auto'
-alias update='sudo pacman -Syyu'
-### Cleanup orphaned packages
-alias cleanup='sudo pacman -Rns (pacman -Qtdq)'
-### Yay as aur helper - updates everything
-alias yayupdate="yay -Syu"
-### Mirror updates
-alias mirror="sudo reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist"
-alias mirrord="sudo reflector --latest 50 --number 20 --sort delay --save /etc/pacman.d/mirrorlist"
-alias mirrors="sudo reflector --latest 50 --number 20 --sort score --save /etc/pacman.d/mirrorlist"
-## Process info
-alias psa="ps auxf"
-alias psgrep="ps aux | grep -v grep | grep -i -e VSZ -e"
-## Arcolinux
-### copy/paste all content of /etc/skel over to home folder - backup of config created - beware
-alias skel='cp -Rf ~/.config ~/.config-backup-(date +%Y.%m.%d-%H.%M.%S) && cp -rf /etc/skel/* ~'
-## backup contents of /etc/skel to hidden backup folder in home/user
-alias bupskel='cp -Rf /etc/skel ~/.skel-backup-(date +%Y.%m.%d-%H.%M.%S)'
-## Hardware info --short
-alias hardware="hwinfo --short"
-## Calendar show full year
-alias cal="cal -y -m"
-## youtube-dl
-alias yta-best="youtube-dl --extract-audio --audio-format best "
-alias yta-mp3="youtube-dl --extract-audio --audio-format mp3 "
-alias yta-wav="youtube-dl --extract-audio --audio-format wav "
-alias ytv-best="youtube-dl -f bestvideo+bestaudio "
-# ---------------------------------------------------------------------
+# # Set vim as Manpager
+# set --export MANPAGER '/bin/bash -c "vim -MRn -c \"set buftype=nofile showtabline=0 ft=man ts=8 nomod nolist norelativenumber nonu noma\" -c \"normal L\" -c \"nmap q :qa<CR>\"</dev/tty <(col -b)"'
+# # ---------------------------------------------------------------------
 
 
-# Functions
-# ---------------------------------------------------------------------
-
-# Startup greeter
-function fish_greeting
-    neofetch
-end
-
-# Use vim as default key bindings
-function fish_user_key_bindings
-  fish_vi_key_bindings
-end
-
-# Function for creating a backup file
-# ex: backup file.txt
-# result: copies file as file.txt.bak
-function backup --argument filename
-    cp $filename $filename.bak
-end
-
-# Function to extract a variety of archives
-# usage: extract <file>
-function extract
-  for arg in $argv
-    if test -f $arg
-      switch $arg
-        case "*tar.bz2" "*.tbz2"
-             tar xjf $arg
-        case "*tar.gz" "*.tgz"
-             tar xzf $arg
-        case "*.bz2"
-             bunzip2 $arg
-        case "*rar"
-             unrar x $arg
-        case "*.gz"
-             gunzip $arg
-        case "*.tar"
-             tar xf $arg
-        case "*.zip"
-             unzip $arg
-        case "*.Z"
-             uncompress $arg
-        case "*7z"
-             7z x $arg
-        case "*.deb"
-             ar x $arg
-        case "*tar.xz"
-             tar xz $arg
-        case "*tar.zst"
-             tar unzstd $arg
-        case "*"
-          set_color red
-          echo "I don't know how to extract this type of archive: `$arg`"
-          set_color normal
-      end
-    else
-        set_color red
-        echo "Not a valid file: `$arg`"
-        set_color normal
-    end
-  end
-end
-
-function pesel
-  pass pesel | pbcopy
-end
-
-function weather
-  ~/.config/fish/scripts/weather.sh
-end
-
-function webcam
-  ~/.config/fish/scripts/webcam.sh
-end
-# ---------------------------------------------------------------------
+# # Aliases
+# # ---------------------------------------------------------------------
+# ## List - using exa as a replacement for ls 
+# alias ls="lsd --long --color=always --group-dirs=first --date '+%Y-%m-%d %H:%M'"
+# alias lsa="lsd --long --almost-all --group-dirs=first --date '+%Y-%m-%d %H:%M'"
+# alias lst="lsd --long --tree --depth=2 --color=always --date '+%Y-%m-%d %H:%M'"
+# ## pbcopy pbpaste alias
+# alias pbcopy="xclip -selection clipboard"
+# alias pbpaste="xclip -selection clipboard -o"
+# ## a better cat
+# alias cat="bat"
+# ## I always miss the space
+# alias cd..="cd .."
+# ## Colorize the grep command output 
+# alias grep='grep --color=auto'
+# ## File system space info in readable format
+# alias df='df --human-readable'
+# ## Memory info 
+# alias free="free -mt"
+# ## Continue download
+# alias wget="wget -c"
+# ## Userlist
+# alias userlist="cut -d: -f1 /etc/passwd"
+# ## Aliases for software managment
+# ### Pacman
+# alias pacman='sudo pacman --color auto'
+# alias update='sudo pacman -Syyu'
+# ### Cleanup orphaned packages
+# alias cleanup='sudo pacman -Rns (pacman -Qtdq)'
+# ### Yay as aur helper - updates everything
+# alias yayupdate="yay -Syu"
+# ### Mirror updates
+# alias mirror="sudo reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist"
+# alias mirrord="sudo reflector --latest 50 --number 20 --sort delay --save /etc/pacman.d/mirrorlist"
+# alias mirrors="sudo reflector --latest 50 --number 20 --sort score --save /etc/pacman.d/mirrorlist"
+# ## Process info
+# alias psa="ps auxf"
+# alias psgrep="ps aux | grep -v grep | grep -i -e VSZ -e"
+# ## Arcolinux
+# ### copy/paste all content of /etc/skel over to home folder - backup of config created - beware
+# alias skel='cp -Rf ~/.config ~/.config-backup-(date +%Y.%m.%d-%H.%M.%S) && cp -rf /etc/skel/* ~'
+# ## backup contents of /etc/skel to hidden backup folder in home/user
+# alias bupskel='cp -Rf /etc/skel ~/.skel-backup-(date +%Y.%m.%d-%H.%M.%S)'
+# ## Hardware info --short
+# alias hardware="hwinfo --short"
+# ## Calendar show full year
+# alias cal="cal -y -m"
+# ## youtube-dl
+# alias yta-best="youtube-dl --extract-audio --audio-format best "
+# alias yta-mp3="youtube-dl --extract-audio --audio-format mp3 "
+# alias yta-wav="youtube-dl --extract-audio --audio-format wav "
+# alias ytv-best="youtube-dl -f bestvideo+bestaudio "
+# # ---------------------------------------------------------------------
 
 
-# Fish colors
-# ---------------------------------------------------------------------
+# # Functions
+# # ---------------------------------------------------------------------
+
+# # Startup greeter
+# function fish_greeting
+#     neofetch
+# end
+
+# # Use vim as default key bindings
+# function fish_user_key_bindings
+#   fish_vi_key_bindings
+# end
+
+# # Function for creating a backup file
+# # ex: backup file.txt
+# # result: copies file as file.txt.bak
+# function backup --argument filename
+#     cp $filename $filename.bak
+# end
+
+# # Function to extract a variety of archives
+# # usage: extract <file>
+# function extract
+#   for arg in $argv
+#     if test -f $arg
+#       switch $arg
+#         case "*tar.bz2" "*.tbz2"
+#              tar xjf $arg
+#         case "*tar.gz" "*.tgz"
+#              tar xzf $arg
+#         case "*.bz2"
+#              bunzip2 $arg
+#         case "*rar"
+#              unrar x $arg
+#         case "*.gz"
+#              gunzip $arg
+#         case "*.tar"
+#              tar xf $arg
+#         case "*.zip"
+#              unzip $arg
+#         case "*.Z"
+#              uncompress $arg
+#         case "*7z"
+#              7z x $arg
+#         case "*.deb"
+#              ar x $arg
+#         case "*tar.xz"
+#              tar xz $arg
+#         case "*tar.zst"
+#              tar unzstd $arg
+#         case "*"
+#           set_color red
+#           echo "I don't know how to extract this type of archive: `$arg`"
+#           set_color normal
+#       end
+#     else
+#         set_color red
+#         echo "Not a valid file: `$arg`"
+#         set_color normal
+#     end
+#   end
+# end
+
+# function pesel
+#   pass pesel | pbcopy
+# end
+
+# function weather
+#   ~/.config/fish/scripts/weather.sh
+# end
+
+# function webcam
+#   ~/.config/fish/scripts/webcam.sh
+# end
+# # ---------------------------------------------------------------------
+
+
+# # Fish colors
+# # ---------------------------------------------------------------------
 set fish_color_normal white
 set fish_color_command blue
 set fish_color_keyword yellow
 set fish_color_quote green
 set fish_color_error red
 set fish_color_param purple
-# fish_color_redirection
-# fish_color_end
-# fish_color_comment
+# # fish_color_redirection
+# # fish_color_end
+# # fish_color_comment
 set fish_color_selection black
-# fish_color_operator
-# fish_color_escape
+# # fish_color_operator
+# # fish_color_escape
 set fish_color_autosuggestion "4c566a"
-# fish_color_cwd
-# fish_color_user
-# fish_color_host
-# fish_color_host_remote
-# fish_color_cancel
-# fish_color_search_match
-# ---------------------------------------------------------------------
+# # fish_color_cwd
+# # fish_color_user
+# # fish_color_host
+# # fish_color_host_remote
+# # fish_color_cancel
+# # fish_color_search_match
+# # ---------------------------------------------------------------------
 
 
-# PATH
-# TODO fix this
-# function start_agent {
-#     echo "Initialising new SSH agent..."
-#     /usr/bin/ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
-#     echo succeeded
-#     chmod 600 "${SSH_ENV}"
-#     . "${SSH_ENV}" > /dev/null
-#     /usr/bin/ssh-add;
-# }
+# # PATH
+# # TODO fix this
+# # function start_agent {
+# #     echo "Initialising new SSH agent..."
+# #     /usr/bin/ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
+# #     echo succeeded
+# #     chmod 600 "${SSH_ENV}"
+# #     . "${SSH_ENV}" > /dev/null
+# #     /usr/bin/ssh-add;
+# # }
 
-# # Source SSH settings, if applicable
+# # # Source SSH settings, if applicable
 
-# if [ -f "${SSH_ENV}" ]; then
-#     . "${SSH_ENV}" > /dev/null
-#     #ps ${SSH_AGENT_PID} doesn't work under cywgin
-#     ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
-#         start_agent;
-#     }
-# else
-#     start_agent;
-# fi
+# # if [ -f "${SSH_ENV}" ]; then
+# #     . "${SSH_ENV}" > /dev/null
+# #     #ps ${SSH_AGENT_PID} doesn't work under cywgin
+# #     ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
+# #         start_agent;
+# #     }
+# # else
+# #     start_agent;
+# # fi
 
 # PROMPT (starship https://github.com/starship/starship)
 starship init fish | source
 
 #+END_SRC
 
-*** Starship
+** starship
 
 To customize some icons
 
@@ -473,860 +450,9 @@ symbol = " "
 disabled = true
 #+end_src
 
-** Termite
+** alacritty
 
-#+BEGIN_SRC conf :tangle .config/termite/config
-#
-# Generated from ~/dotfiles/system.org
-#
-
-[options]
-#https://github.com/thestinger/termite/blob/master/config
-allow_bold = true
-audible_bell = false
-browser = xdg-open
-clickable_url = true
-cursor_blink = system
-cursor_shape = block
-dynamic_title = true
-filter_unmatched_urls = true
-font = JetBrainsMono Nerd Font Mono 11
-geometry = 900x650
-highlight = #2f2f2f
-icon_name = terminal
-modify_other_keys = false
-mouse_autohide = false
-scroll_on_output = false
-scroll_on_keystroke = true
-scrollback_lines = 15000
-size_hints = false
-search_wrap = true
-urgent_on_bell = true
-
-[hints]
-#font = Monospace 12
-#foreground = #dcdccc
-#background = #3f3f3f
-#active_foreground = #e68080
-#active_background = #3f3f3f
-#padding = 2
-#border = #3f3f3f
-#border_width = 10
-#roundness = 2.0
-
-############################################################
-#### You can change the color coding to your liking
-#### There is a folder themes in ~/config/termite/themes
-#### Copy/paste the colors from one of the 79+ templates to this one
-#### A backup of the original config termite is present
-############################################################
-#### Use websites to make the terminal your own
-#### https://terminal.sexy
-#### https://critical.ch/xterm/
-############################################################
-#### Nord Theme
-[colors]
-cursor = #d8dee9
-cursor_foreground = #2e3440
-
-foreground = #d8dee9
-foreground_bold = #d8dee9
-background = rgba(40, 42, 54, 0.99)
-
-highlight = #4c566a
-
-color0  = #3b4252
-color1  = #bf616a
-color2  = #a3be8c
-color3  = #ebcb8b
-color4  = #81a1c1
-color5  = #b48ead
-color6  = #88c0d0
-color7  = #e5e9f0
-color8  = #4c566a
-color9  = #bf616a
-color10 = #a3be8c
-color11 = #ebcb8b
-color12 = #81a1c1
-color13 = #b48ead
-color14 = #8fbcbb
-
-#+END_SRC
-
-* Ranger
-
-** ranger config
-
-#+begin_src :tangle .config/ranger/rc.conf
-
-# Generated from ~/dotfiles/system.org #
-# ===================================================================
-# This file contains the default startup commands for ranger.
-# To change them, it is recommended to create either /etc/ranger/rc.conf
-# (system-wide) or ~/.config/ranger/rc.conf (per user) and add your custom
-# commands there.
-#
-# If you copy this whole file there, you may want to set the environment
-# variable RANGER_LOAD_DEFAULT_RC to FALSE to avoid loading it twice.
-#
-# The purpose of this file is mainly to define keybindings and settings.
-# For running more complex python code, please create a plugin in "plugins/" or
-# a command in "commands.py".
-#
-# Each line is a command that will be run before the user interface
-# is initialized.  As a result, you can not use commands which rely
-# on the UI such as :delete or :mark.
-# ===================================================================
-
-# ===================================================================
-# == Options
-# ===================================================================
-
-# Which viewmode should be used?  Possible values are:
-#     miller: Use miller columns which show multiple levels of the hierarchy
-#     multipane: Midnight-commander like multipane view showing all tabs next
-#                to each other
-# set viewmode miller
-set viewmode multipane
-
-# How many columns are there, and what are their relative widths?
-set column_ratios 1,3,4
-
-# Which files should be hidden? (regular expression)
-set hidden_filter ^\.|\.(?:pyc|pyo|bak|swp)$|^lost\+found$|^__(py)?cache__$
-
-# Show hidden files? You can toggle this by typing 'zh'
-set show_hidden false
-
-# Ask for a confirmation when running the "delete" command?
-# Valid values are "always", "never", "multiple" (default)
-# With "multiple", ranger will ask only if you delete multiple files at once.
-set confirm_on_delete multiple
-
-# Use non-default path for file preview script?
-# ranger ships with scope.sh, a script that calls external programs (see
-# README.md for dependencies) to preview images, archives, etc.
-#set preview_script ~/.config/ranger/scope.sh
-
-# Use the external preview script or display simple plain text or image previews?
-set use_preview_script true
-
-# Automatically count files in the directory, even before entering them?
-set automatically_count_files true
-
-# Open all images in this directory when running certain image viewers
-# like feh or sxiv?  You can still open selected files by marking them.
-set open_all_images true
-
-# Be aware of version control systems and display information.
-set vcs_aware true
-
-# State of the four backends git, hg, bzr, svn. The possible states are
-# disabled, local (only show local info), enabled (show local and remote
-# information).
-set vcs_backend_git enabled
-set vcs_backend_hg disabled
-set vcs_backend_bzr disabled
-set vcs_backend_svn disabled
-
-# Truncate the long commit messages to this length when shown in the statusbar.
-set vcs_msg_length 50
-
-# Use one of the supported image preview protocols
-set preview_images false
-
-# Set the preview image method. Supported methods:
-#
-# * w3m (default):
-#   Preview images in full color with the external command "w3mimgpreview"?
-#   This requires the console web browser "w3m" and a supported terminal.
-#   It has been successfully tested with "xterm" and "urxvt" without tmux.
-#
-# * iterm2:
-#   Preview images in full color using iTerm2 image previews
-#   (http://iterm2.com/images.html). This requires using iTerm2 compiled
-#   with image preview support.
-#
-#   This feature relies on the dimensions of the terminal's font.  By default, a
-#   width of 8 and height of 11 are used.  To use other values, set the options
-#   iterm2_font_width and iterm2_font_height to the desired values.
-#
-# * terminology:
-#   Previews images in full color in the terminology terminal emulator.
-#   Supports a wide variety of formats, even vector graphics like svg.
-#
-# * urxvt:
-#   Preview images in full color using urxvt image backgrounds. This
-#   requires using urxvt compiled with pixbuf support.
-#
-# * urxvt-full:
-#   The same as urxvt but utilizing not only the preview pane but the
-#   whole terminal window.
-#
-# * kitty:
-#   Preview images in full color using kitty image protocol.
-#   Requires python PIL or pillow library.
-#   If ranger does not share the local filesystem with kitty
-#   the transfer method is changed to encode the whole image;
-#   while slower, this allows remote previews,
-#   for example during an ssh session.
-#   Tmux is unsupported.
-#
-# * ueberzug:
-#   Preview images in full color with the external command "ueberzug".
-#   Images are shown by using a child window.
-#   Only for users who run X11 in GNU/Linux.
-set preview_images_method w3m
-
-# Delay in seconds before displaying an image with the w3m method.
-# Increase it in case of experiencing display corruption.
-set w3m_delay 0.02
-
-# Manually adjust the w3mimg offset when using a terminal which needs this
-set w3m_offset 0
-
-# Default iTerm2 font size (see: preview_images_method: iterm2)
-set iterm2_font_width 8
-set iterm2_font_height 11
-
-# Use a unicode "..." character to mark cut-off filenames?
-set unicode_ellipsis false
-
-# BIDI support - try to properly display file names in RTL languages (Hebrew, Arabic).
-# Requires the python-bidi pip package
-set bidi_support false
-
-# Show dotfiles in the bookmark preview box?
-set show_hidden_bookmarks true
-
-# Which colorscheme to use?  These colorschemes are available by default:
-# default, jungle, snow, solarized
-set colorscheme default
-
-# Preview files on the rightmost column?
-# And collapse (shrink) the last column if there is nothing to preview?
-set preview_files true
-set preview_directories true
-set collapse_preview true
-
-# Wrap long lines in plain text previews?
-set wrap_plaintext_previews false
-
-# Save the console history on exit?
-set save_console_history true
-
-# Draw the status bar on top of the browser window (default: bottom)
-set status_bar_on_top false
-
-# Draw a progress bar in the status bar which displays the average state of all
-# currently running tasks which support progress bars?
-set draw_progress_bar_in_status_bar true
-
-# Draw borders around columns? (separators, outline, both, or none)
-# Separators are vertical lines between columns.
-# Outline draws a box around all the columns.
-# Both combines the two.
-set draw_borders true
-
-# Display the directory name in tabs?
-set dirname_in_tabs false
-
-# Enable the mouse support?
-set mouse_enabled true
-
-# Display the file size in the main column or status bar?
-set display_size_in_main_column true
-set display_size_in_status_bar true
-
-# Display the free disk space in the status bar?
-set display_free_space_in_status_bar true
-
-# Display files tags in all columns or only in main column?
-set display_tags_in_all_columns true
-
-# Set a title for the window? Updates both `WM_NAME` and `WM_ICON_NAME`
-set update_title false
-
-# Set the tmux/screen window-name to "ranger"?
-set update_tmux_title true
-
-# Shorten the title if it gets long?  The number defines how many
-# directories are displayed at once, 0 turns off this feature.
-set shorten_title 3
-
-# Show hostname in titlebar?
-set hostname_in_titlebar true
-
-# Abbreviate $HOME with ~ in the titlebar (first line) of ranger?
-set tilde_in_titlebar false
-
-# How many directory-changes or console-commands should be kept in history?
-set max_history_size 20
-set max_console_history_size 50
-
-# Try to keep so much space between the top/bottom border when scrolling:
-set scroll_offset 8
-
-# Flush the input after each key hit?  (Noticeable when ranger lags)
-set flushinput true
-
-# Padding on the right when there's no preview?
-# This allows you to click into the space to run the file.
-set padding_right true
-
-# Save bookmarks (used with mX and `X) instantly?
-# This helps to synchronize bookmarks between multiple ranger
-# instances but leads to *slight* performance loss.
-# When false, bookmarks are saved when ranger is exited.
-set autosave_bookmarks true
-
-# Save the "`" bookmark to disk.  This can be used to switch to the last
-# directory by typing "``".
-set save_backtick_bookmark true
-
-# You can display the "real" cumulative size of directories by using the
-# command :get_cumulative_size or typing "dc".  The size is expensive to
-# calculate and will not be updated automatically.  You can choose
-# to update it automatically though by turning on this option:
-set autoupdate_cumulative_size false
-
-# Turning this on makes sense for screen readers:
-set show_cursor false
-
-# One of: size, natural, basename, atime, ctime, mtime, type, random
-set sort natural
-
-# Additional sorting options
-set sort_reverse false
-set sort_case_insensitive true
-set sort_directories_first true
-set sort_unicode false
-
-# Enable this if key combinations with the Alt Key don't work for you.
-# (Especially on xterm)
-set xterm_alt_key false
-
-# Whether to include bookmarks in cd command
-set cd_bookmarks true
-
-# Changes case sensitivity for the cd command tab completion
-set cd_tab_case sensitive
-
-# Use fuzzy tab completion with the "cd" command. For example,
-# ":cd /u/lo/b<tab>" expands to ":cd /usr/local/bin".
-set cd_tab_fuzzy false
-
-# Avoid previewing files larger than this size, in bytes.  Use a value of 0 to
-# disable this feature.
-set preview_max_size 0
-
-# The key hint lists up to this size have their sublists expanded.
-# Otherwise the submaps are replaced with "...".
-set hint_collapse_threshold 10
-
-# Add the highlighted file to the path in the titlebar
-set show_selection_in_titlebar true
-
-# The delay that ranger idly waits for user input, in milliseconds, with a
-# resolution of 100ms.  Lower delay reduces lag between directory updates but
-# increases CPU load.
-set idle_delay 2000
-
-# When the metadata manager module looks for metadata, should it only look for
-# a ".metadata.json" file in the current directory, or do a deep search and
-# check all directories above the current one as well?
-set metadata_deep_search false
-
-# Clear all existing filters when leaving a directory
-set clear_filters_on_dir_change false
-
-# Disable displaying line numbers in main column.
-# Possible values: false, absolute, relative.
-set line_numbers false
-
-# When line_numbers=relative show the absolute line number in the
-# current line.
-set relative_current_zero false
-
-# Start line numbers from 1 instead of 0
-set one_indexed false
-
-# Save tabs on exit
-set save_tabs_on_exit false
-
-# Enable scroll wrapping - moving down while on the last item will wrap around to
-# the top and vice versa.
-set wrap_scroll false
-
-# Set the global_inode_type_filter to nothing.  Possible options: d, f and l for
-# directories, files and symlinks respectively.
-set global_inode_type_filter
-
-# This setting allows to freeze the list of files to save I/O bandwidth.  It
-# should be 'false' during start-up, but you can toggle it by pressing F.
-set freeze_files false
-
-# Print file sizes in bytes instead of the default human-readable format.
-set size_in_bytes false
-
-# Warn at startup if RANGER_LEVEL env var is greater than 0, in other words
-# give a warning when you nest ranger in a subshell started by ranger.
-# Special value "error" makes the warning more visible.
-set nested_ranger_warning true
-
-# ===================================================================
-# == Local Options
-# ===================================================================
-# You can set local options that only affect a single directory.
-
-# Examples:
-# setlocal path=~/downloads sort mtime
-
-# ===================================================================
-# == Command Aliases in the Console
-# ===================================================================
-
-alias e     edit
-alias q     quit
-alias q!    quit!
-alias qa    quitall
-alias qa!   quitall!
-alias qall  quitall
-alias qall! quitall!
-alias setl  setlocal
-
-alias filter     scout -prts
-alias find       scout -aets
-alias mark       scout -mr
-alias unmark     scout -Mr
-alias search     scout -rs
-alias search_inc scout -rts
-alias travel     scout -aefklst
-
-# ===================================================================
-# == Define keys for the browser
-# ===================================================================
-
-# Basic
-map     Q quitall
-map     q quit
-copymap q ZZ ZQ
-
-map R     reload_cwd
-map F     set freeze_files!
-map <C-r> reset
-map <C-l> redraw_window
-map <C-c> abort
-map <esc> change_mode normal
-map ~ set viewmode!
-
-map i display_file
-map <A-j> scroll_preview 1
-map <A-k> scroll_preview -1
-map ? help
-map W display_log
-map w taskview_open
-map S shell $SHELL
-
-map :  console
-map ;  console
-map !  console shell%space
-map @  console -p6 shell  %%s
-map #  console shell -p%space
-map s  console shell%space
-map r  chain draw_possible_programs; console open_with%space
-map f  console find%space
-map cd console cd%space
-
-map <C-p> chain console; eval fm.ui.console.history_move(-1)
-
-# Change the line mode
-map Mf linemode filename
-map Mi linemode fileinfo
-map Mm linemode mtime
-map Mh linemode humanreadablemtime
-map Mp linemode permissions
-map Ms linemode sizemtime
-map MH linemode sizehumanreadablemtime
-map Mt linemode metatitle
-
-# Tagging / Marking
-map t       tag_toggle
-map ut      tag_remove
-map "<any>  tag_toggle tag=%any
-map <Space> mark_files toggle=True
-map v       mark_files all=True toggle=True
-map uv      mark_files all=True val=False
-map V       toggle_visual_mode
-map uV      toggle_visual_mode reverse=True
-
-# For the nostalgics: Midnight Commander bindings
-map <F1> help
-map <F2> rename_append
-map <F3> display_file
-map <F4> edit
-map <F5> copy
-map <F6> cut
-map <F7> console mkdir%space
-map <F8> console delete
-#map <F8> console trash
-map <F10> exit
-
-# In case you work on a keyboard with dvorak layout
-map <UP>       move up=1
-map <DOWN>     move down=1
-map <LEFT>     move left=1
-map <RIGHT>    move right=1
-map <HOME>     move to=0
-map <END>      move to=-1
-map <PAGEDOWN> move down=1   pages=True
-map <PAGEUP>   move up=1     pages=True
-map <CR>       move right=1
-#map <DELETE>   console delete
-map <INSERT>   console touch%space
-
-# VIM-like
-copymap <UP>       k
-copymap <DOWN>     j
-copymap <LEFT>     h
-copymap <RIGHT>    l
-copymap <HOME>     gg
-copymap <END>      G
-copymap <PAGEDOWN> <C-F>
-copymap <PAGEUP>   <C-B>
-
-map J  move down=0.5  pages=True
-map K  move up=0.5    pages=True
-copymap J <C-D>
-copymap K <C-U>
-
-# Jumping around
-map H     history_go -1
-map L     history_go 1
-map ]     move_parent 1
-map [     move_parent -1
-map }     traverse
-map {     traverse_backwards
-map )     jump_non
-
-map gh cd ~
-map ge cd /etc
-map gu cd /usr
-map gd cd /dev
-map gl cd -r .
-map gL cd -r %f
-map go cd /opt
-map gv cd /var
-map gm cd /media
-map gi eval fm.cd('/run/media/' + os.getenv('USER'))
-map gM cd /mnt
-map gs cd /srv
-map gp cd /tmp
-map gr cd /
-map gR eval fm.cd(ranger.RANGERDIR)
-map g/ cd /
-map g? cd /usr/share/doc/ranger
-
-# External Programs
-map E  edit
-map du shell -p du --max-depth=1 -h --apparent-size
-map dU shell -p du --max-depth=1 -h --apparent-size | sort -rh
-map yp yank path
-map yd yank dir
-map yn yank name
-map y. yank name_without_extension
-
-# Filesystem Operations
-map =  chmod
-
-map cw console rename%space
-map a  rename_append
-map A  eval fm.open_console('rename ' + fm.thisfile.relative_path.replace("%", "%%"))
-map I  eval fm.open_console('rename ' + fm.thisfile.relative_path.replace("%", "%%"), position=7)
-
-map pp paste
-map po paste overwrite=True
-map pP paste append=True
-map pO paste overwrite=True append=True
-map pl paste_symlink relative=False
-map pL paste_symlink relative=True
-map phl paste_hardlink
-map pht paste_hardlinked_subtree
-map pd console paste dest=
-map p`<any> paste dest=%any_path
-map p'<any> paste dest=%any_path
-
-map dD console delete
-map dT console trash
-
-map dd cut
-map ud uncut
-map da cut mode=add
-map dr cut mode=remove
-map dt cut mode=toggle
-
-map yy copy
-map uy uncut
-map ya copy mode=add
-map yr copy mode=remove
-map yt copy mode=toggle
-
-# Temporary workarounds
-map dgg eval fm.cut(dirarg=dict(to=0), narg=quantifier)
-map dG  eval fm.cut(dirarg=dict(to=-1), narg=quantifier)
-map dj  eval fm.cut(dirarg=dict(down=1), narg=quantifier)
-map dk  eval fm.cut(dirarg=dict(up=1), narg=quantifier)
-map ygg eval fm.copy(dirarg=dict(to=0), narg=quantifier)
-map yG  eval fm.copy(dirarg=dict(to=-1), narg=quantifier)
-map yj  eval fm.copy(dirarg=dict(down=1), narg=quantifier)
-map yk  eval fm.copy(dirarg=dict(up=1), narg=quantifier)
-
-# Searching
-map /  console search%space
-map n  search_next
-map N  search_next forward=False
-map ct search_next order=tag
-map cs search_next order=size
-map ci search_next order=mimetype
-map cc search_next order=ctime
-map cm search_next order=mtime
-map ca search_next order=atime
-
-# Tabs
-map <C-n>     tab_new
-map <C-w>     tab_close
-map <TAB>     tab_move 1
-map <S-TAB>   tab_move -1
-map <A-Right> tab_move 1
-map <A-Left>  tab_move -1
-map gt        tab_move 1
-map gT        tab_move -1
-map gn        tab_new
-map gc        tab_close
-map uq        tab_restore
-map <a-1>     tab_open 1
-map <a-2>     tab_open 2
-map <a-3>     tab_open 3
-map <a-4>     tab_open 4
-map <a-5>     tab_open 5
-map <a-6>     tab_open 6
-map <a-7>     tab_open 7
-map <a-8>     tab_open 8
-map <a-9>     tab_open 9
-map <a-r>     tab_shift 1
-map <a-l>     tab_shift -1
-
-# Sorting
-map or set sort_reverse!
-map oz set sort=random
-map os chain set sort=size;      set sort_reverse=False
-map ob chain set sort=basename;  set sort_reverse=False
-map on chain set sort=natural;   set sort_reverse=False
-map om chain set sort=mtime;     set sort_reverse=False
-map oc chain set sort=ctime;     set sort_reverse=False
-map oa chain set sort=atime;     set sort_reverse=False
-map ot chain set sort=type;      set sort_reverse=False
-map oe chain set sort=extension; set sort_reverse=False
-
-map oS chain set sort=size;      set sort_reverse=True
-map oB chain set sort=basename;  set sort_reverse=True
-map oN chain set sort=natural;   set sort_reverse=True
-map oM chain set sort=mtime;     set sort_reverse=True
-map oC chain set sort=ctime;     set sort_reverse=True
-map oA chain set sort=atime;     set sort_reverse=True
-map oT chain set sort=type;      set sort_reverse=True
-map oE chain set sort=extension; set sort_reverse=True
-
-map dc get_cumulative_size
-
-# Settings
-map zc    set collapse_preview!
-map zd    set sort_directories_first!
-map zh    set show_hidden!
-map <C-h> set show_hidden!
-copymap <C-h> <backspace>
-copymap <backspace> <backspace2>
-map zI    set flushinput!
-map zi    set preview_images!
-map zm    set mouse_enabled!
-map zp    set preview_files!
-map zP    set preview_directories!
-map zs    set sort_case_insensitive!
-map zu    set autoupdate_cumulative_size!
-map zv    set use_preview_script!
-map zf    console filter%space
-copymap zf zz
-
-# Filter stack
-map .d filter_stack add type d
-map .f filter_stack add type f
-map .l filter_stack add type l
-map .m console filter_stack add mime%space
-map .n console filter_stack add name%space
-map .# console filter_stack add hash%space
-map ." filter_stack add duplicate
-map .' filter_stack add unique
-map .| filter_stack add or
-map .& filter_stack add and
-map .! filter_stack add not
-map .r filter_stack rotate
-map .c filter_stack clear
-map .* filter_stack decompose
-map .p filter_stack pop
-map .. filter_stack show
-
-# Bookmarks
-map `<any>  enter_bookmark %any
-map '<any>  enter_bookmark %any
-map m<any>  set_bookmark %any
-map um<any> unset_bookmark %any
-
-map m<bg>   draw_bookmarks
-copymap m<bg>  um<bg> `<bg> '<bg>
-
-# Generate all the chmod bindings with some python help:
-eval for arg in "rwxXst": cmd("map +u{0} shell -f chmod u+{0} %s".format(arg))
-eval for arg in "rwxXst": cmd("map +g{0} shell -f chmod g+{0} %s".format(arg))
-eval for arg in "rwxXst": cmd("map +o{0} shell -f chmod o+{0} %s".format(arg))
-eval for arg in "rwxXst": cmd("map +a{0} shell -f chmod a+{0} %s".format(arg))
-eval for arg in "rwxXst": cmd("map +{0}  shell -f chmod u+{0} %s".format(arg))
-
-eval for arg in "rwxXst": cmd("map -u{0} shell -f chmod u-{0} %s".format(arg))
-eval for arg in "rwxXst": cmd("map -g{0} shell -f chmod g-{0} %s".format(arg))
-eval for arg in "rwxXst": cmd("map -o{0} shell -f chmod o-{0} %s".format(arg))
-eval for arg in "rwxXst": cmd("map -a{0} shell -f chmod a-{0} %s".format(arg))
-eval for arg in "rwxXst": cmd("map -{0}  shell -f chmod u-{0} %s".format(arg))
-
-# ===================================================================
-# == Define keys for the console
-# ===================================================================
-# Note: Unmapped keys are passed directly to the console.
-
-# Basic
-cmap <tab>   eval fm.ui.console.tab()
-cmap <s-tab> eval fm.ui.console.tab(-1)
-cmap <ESC>   eval fm.ui.console.close()
-cmap <CR>    eval fm.ui.console.execute()
-cmap <C-l>   redraw_window
-
-copycmap <ESC> <C-c>
-copycmap <CR>  <C-j>
-
-# Move around
-cmap <up>    eval fm.ui.console.history_move(-1)
-cmap <down>  eval fm.ui.console.history_move(1)
-cmap <left>  eval fm.ui.console.move(left=1)
-cmap <right> eval fm.ui.console.move(right=1)
-cmap <home>  eval fm.ui.console.move(right=0, absolute=True)
-cmap <end>   eval fm.ui.console.move(right=-1, absolute=True)
-cmap <a-b> eval fm.ui.console.move_word(left=1)
-cmap <a-f> eval fm.ui.console.move_word(right=1)
-
-copycmap <a-b> <a-left>
-copycmap <a-f> <a-right>
-
-# Line Editing
-cmap <backspace>  eval fm.ui.console.delete(-1)
-cmap <delete>     eval fm.ui.console.delete(0)
-cmap <C-w>        eval fm.ui.console.delete_word()
-cmap <A-d>        eval fm.ui.console.delete_word(backward=False)
-cmap <C-k>        eval fm.ui.console.delete_rest(1)
-cmap <C-u>        eval fm.ui.console.delete_rest(-1)
-cmap <C-y>        eval fm.ui.console.paste()
-
-# And of course the emacs way
-copycmap <ESC>       <C-g>
-copycmap <up>        <C-p>
-copycmap <down>      <C-n>
-copycmap <left>      <C-b>
-copycmap <right>     <C-f>
-copycmap <home>      <C-a>
-copycmap <end>       <C-e>
-copycmap <delete>    <C-d>
-copycmap <backspace> <C-h>
-
-# Note: There are multiple ways to express backspaces.  <backspace> (code 263)
-# and <backspace2> (code 127).  To be sure, use both.
-copycmap <backspace> <backspace2>
-
-# This special expression allows typing in numerals:
-cmap <allow_quantifiers> false
-
-# ===================================================================
-# == Pager Keybindings
-# ===================================================================
-
-# Movement
-pmap  <down>      pager_move  down=1
-pmap  <up>        pager_move  up=1
-pmap  <left>      pager_move  left=4
-pmap  <right>     pager_move  right=4
-pmap  <home>      pager_move  to=0
-pmap  <end>       pager_move  to=-1
-pmap  <pagedown>  pager_move  down=1.0  pages=True
-pmap  <pageup>    pager_move  up=1.0    pages=True
-pmap  <C-d>       pager_move  down=0.5  pages=True
-pmap  <C-u>       pager_move  up=0.5    pages=True
-
-copypmap <UP>       k  <C-p>
-copypmap <DOWN>     j  <C-n> <CR>
-copypmap <LEFT>     h
-copypmap <RIGHT>    l
-copypmap <HOME>     g
-copypmap <END>      G
-copypmap <C-d>      d
-copypmap <C-u>      u
-copypmap <PAGEDOWN> n  f  <C-F>  <Space>
-copypmap <PAGEUP>   p  b  <C-B>
-
-# Basic
-pmap     <C-l> redraw_window
-pmap     <ESC> pager_close
-copypmap <ESC> q Q i <F3>
-pmap E      edit_file
-
-# ===================================================================
-# == Taskview Keybindings
-# ===================================================================
-
-# Movement
-tmap <up>        taskview_move up=1
-tmap <down>      taskview_move down=1
-tmap <home>      taskview_move to=0
-tmap <end>       taskview_move to=-1
-tmap <pagedown>  taskview_move down=1.0  pages=True
-tmap <pageup>    taskview_move up=1.0    pages=True
-tmap <C-d>       taskview_move down=0.5  pages=True
-tmap <C-u>       taskview_move up=0.5    pages=True
-
-copytmap <UP>       k  <C-p>
-copytmap <DOWN>     j  <C-n> <CR>
-copytmap <HOME>     g
-copytmap <END>      G
-copytmap <C-u>      u
-copytmap <PAGEDOWN> n  f  <C-F>  <Space>
-copytmap <PAGEUP>   p  b  <C-B>
-
-# Changing priority and deleting tasks
-tmap J          eval -q fm.ui.taskview.task_move(-1)
-tmap K          eval -q fm.ui.taskview.task_move(0)
-tmap dd         eval -q fm.ui.taskview.task_remove()
-tmap <pagedown> eval -q fm.ui.taskview.task_move(-1)
-tmap <pageup>   eval -q fm.ui.taskview.task_move(0)
-tmap <delete>   eval -q fm.ui.taskview.task_remove()
-
-# Basic
-tmap <C-l> redraw_window
-tmap <ESC> taskview_close
-copytmap <ESC> q Q w <C-c>
-
-# Enable devicons from the devicons plugin
-default_linemode devicons
-#+end_src
-
-** Add icons to ranger
-
-from: https://github.com/alexanderjeurissen/ranger_devicons
+TODO: config alacritty theme
 
 * Rofi
 
@@ -1969,56 +1095,9 @@ I use dunst for simple notifications
 
 #+END_SRC
 
-* Vim
+* Neovim
 
-** vimrc
-
-#+BEGIN_SRC conf :tangle .vimrc
-set number
-set hlsearch
-set incsearch
-set wildmenu
-
-set ttimeout
-set ttimeoutlen=100
-
-set laststatus=2
-set splitbelow splitright
-
-set tabstop=4
-set shiftwidth=4
-
-"packadd! dracula
-syntax enable
-"colorscheme dracula
-
-filetype plugin indent on
-
-let g:lightline = {
-      \ 'colorscheme': 'nord',
-      \ }
-
-if has('mouse')
-  set mouse=a
-endif
-
-" CUSTOM COMMANDS
-
-:command W w
-:command Wq wq
-:command Q q
-
-" Add optional packages.
-"
-" The matchit plugin makes the % command work better, but it is not backwards
-" compatible.
-" The ! means the package won't be loaded right away but when plugins are
-" loaded during initialization.
-if has('syntax') && has('eval')
-  packadd! matchit
-endif
-
-#+END_SRC
+TODO: add basic config
 
 * Qtile
 
@@ -2039,23 +1118,25 @@ function run {
   fi
 }
 
-setxkbmap -option "ctrl:nocaps"
-run numlockx on
+# setxkbmap -option "ctrl:nocaps"
 run dunst &
 run nm-applet &
-run blueberry-tray &
-run volumeicon &
-run xfce4-power-manager &
-run picom --config $HOME/.config/picom/picom.conf &
-run /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
-run udiskie &
-# run spotify &
+# run blueberry-tray &
+# run volumeicon &
+# run xfce4-power-manager &
+# run picom --config $HOME/.config/picom/picom.conf &
+# run /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
+# run udiskie &
 
 #+END_SRC
 
-** config.py
+** TODO config.py
 
-#+BEGIN_SRC python :tangle .config/qtile/config.py
+TODO Fix:
+
+emacsclient doesnt launch
+media control keys
+#+begin_src python :tangle .config/qtile/config.py
 # -*- coding: utf-8 -*-
 #
 # Generated from ~/dotfiles/system.org
@@ -2076,51 +1157,329 @@ run udiskie &
 #
 # The above copyright notice and this permission notice shall be includ ed in all copies
 # or substantial portions of the Software.
-
-##### IMPORTS #####
 import os
-import re
+import pathlib
 import socket
 import subprocess
-from libqtile import qtile
-from libqtile.config import Key, Screen, Group, Drag, Click, Match
-from libqtile.command import lazy
-from libqtile import layout, bar, widget, hook
-from typing import List  # noqa: F401
-from libqtile.config import ScratchPad, DropDown
 
-import random
-import pathlib
-from mailwatcher import main_wrapper as get_mails
-from inoreader_rss_counter import main_wrapper as get_feeds
+from libqtile import bar, layout, widget, hook
+from libqtile.config import Click, Drag, Group, Key, Match, Screen
+from libqtile.lazy import lazy
+from libqtile.utils import guess_terminal
 
-##### DEFINING CONSTANTS & DEFAULT PROGRAMS #####
 
-mod = "mod4"   # mod key to SUPER/WINDOWS
-TRANS_FONT_SIZE = 60  # font size used for the separator effect on the bar, adjust for different resolutions
+# Main Modifier
+mod = "mod4"
 
-MY_TERMINAL = "termite"
+# Programs & Constants'
+TERMINAL = guess_terminal()
 TEXT_EDITOR = "emacsclient -c -a ''"
 EMAIL_CLIENT = "emacs"
 FILE_MANAGER = "thunar"
-TERMINAL_FILE_MANAGER = "ranger"
 BROWSER = "firefox"
 SYS_MONITOR = "xfce4-taskmanager"
 
 MY_CONFIG = "~/.config/qtile/config.py"
 
-## Numpad keys ##
-NUMPAD = {  0: "KP_Insert",
-            1: "KP_End",
-            2: "KP_Down",
-            3: "KP_Next",
-            4: "KP_Left",
-            5: "KP_Begin",
-            6: "KP_Right",
-            7: "KP_Home",
-            8: "KP_Up",
-            9: "KP_Prior"
-    }
+# Prompt format
+prompt = "{0}@{1}: ".format(os.environ["USER"], socket.gethostname())
+
+# Colors
+COLORS = {
+          "white":"ffffff",
+          "background":"#2e3440",           # panel background
+          "active_background":"#3B4252",    # background for current group
+          "group_highlight":"#ff5555",      # border line color for current group
+          "border_line":"#8d62a9",          # border line color for other tab and odd widgets
+          "border_focus":"#5e81ac",
+          "win_name":"#81a1c1",             # current window name
+          "frost0":"#5e81ac",               # Theme colors (nord)
+          "frost1":"#81a1c1",
+          "frost2":"#434C5E",
+          "frost3":"#4C566A",
+          "aurora0":"#bf616a",
+}
+
+# Custom Functions
+@lazy.function
+def float_to_front():
+    for group in qtile.groups:
+        for window in group.windows:
+            if window.floating:
+                window.cmd_bring_to_front()
+                
+def get_wallpaper():
+    wp_path = pathlib.Path.home() / ".config/qtile/wallpapers"
+    wallpapers = list(filter(lambda x: x.suffix in (".png",".jpg"), wp_path.glob("*")))
+    return random.choice(wallpapers)
+
+def launch_rofi():
+    # qtile.cmd_spawn('rofi -show drun')
+    lazy.spawn_cmd('rofi -show drun')
+
+# Key bindings
+keys = [
+    
+    # Basics
+    Key([mod], "y", lazy.spawncmd(), desc='launch prompt'),
+    Key([mod], "k", lazy.window.kill(), desc='Kill active window'),
+    Key([mod], "q", lazy.window.kill(), desc='Kill active window'),
+    Key([mod, "shift"], "r", lazy.restart(), desc='Restart Qtile'),
+    Key([mod, "shift"], "q", lazy.shutdown(), desc='Shutdown Qtile'),
+    Key([mod, "control"], "r", lazy.reload_config(), desc="Reload the config"),
+    #Key([mod], "x", lazy.spawn('arcolinux-logout')),
+
+    # Window Control
+
+    ## Focus
+    Key([mod], "Down", lazy.layout.down(), desc = "Move focus down"),
+    Key([mod], "Up", lazy.layout.up(), desc = "Move focus up"),
+    Key([mod], "Right", lazy.layout.left(), desc = "Move focus to right"),
+    Key([mod], "Left", lazy.layout.right(),desc="Move focus to left"),
+    # Key([mod], "h", lazy.layout.left(), desc="Move focus to left"),
+    # Key([mod], "l", lazy.layout.right(), desc="Move focus to right"),
+    # Key([mod], "j", lazy.layout.down(), desc="Move focus down"),
+    # Key([mod], "k", lazy.layout.up(), desc="Move focus up"),
+    Key([mod], "space", lazy.layout.next(), desc="Move window focus to other window"),
+
+    ## Toggle Fullscreen
+    Key([mod], "f", lazy.window.toggle_fullscreen(), desc = "Toggle fullscreen for the current window"),
+    
+    ## Move
+    Key([mod, "shift"], "Down", lazy.layout.shuffle_down(), desc = "Move window down"),
+    Key([mod, "shift"], "Up", lazy.layout.shuffle_up(), desc = "Move window up"),
+    Key([mod, "shift"], "Left", lazy.layout.shuffle_left(), desc = "Move window left"),
+    Key([mod, "shift"], "Right", lazy.layout.shuffle_right(), desc = "Move window right"),
+    # Key([mod, "shift"], "h", lazy.layout.shuffle_left(), desc="Move window to the left"),
+    # Key([mod, "shift"], "l", lazy.layout.shuffle_right(), desc="Move window to the right"),
+    # Key([mod, "shift"], "j", lazy.layout.shuffle_down(), desc="Move window down"),
+    # Key([mod, "shift"], "k", lazy.layout.shuffle_up(), desc="Move window up"),
+
+    ## Resize
+    Key([mod], "n",
+        lazy.layout.normalize(),
+        desc="Reset all window sizes"),
+    Key([mod, "control"], "Down",
+        lazy.layout.grow_down(),
+        lazy.layout.shrink(),
+        desc = "Increase size down"),
+    Key([mod, "control"], "Up",
+        lazy.layout.grow_up(),
+        lazy.layout.grow(),
+        desc = "Increase size up"),
+    Key([mod, "control"], "Left",
+        lazy.layout.grow_left(),
+        lazy.layout.shrink(),
+        lazy.layout.decrease_ratio(),
+        desc = "Increase size left"),
+    Key([mod, "control"], "Right",
+        lazy.layout.grow_right(),
+        lazy.layout.grow(),
+        lazy.layout.increase_ratio(),
+        desc = "Increase size right"),
+    # Key([mod, "control"], "h", lazy.layout.grow_left(), desc="Grow window to the left"),
+    # Key([mod, "control"], "l", lazy.layout.grow_right(), desc="Grow window to the right"),
+    # Key([mod, "control"], "j", lazy.layout.grow_down(), desc="Grow window down"),
+    # Key([mod, "control"], "k", lazy.layout.grow_up(), desc="Grow window up"),
+
+
+    # Layout Control
+    
+    ## Switching layouts
+    Key([mod], "Tab", lazy.next_layout(), desc='Toggle through layouts'),
+    Key([mod], "c", lazy.to_layout_index(0), desc='switch to COLUMNS layout'),
+    Key([mod], "t", lazy.to_layout_index(1), desc='switch to MONADTALL layout'),
+    Key([mod], "m", lazy.to_layout_index(2), desc='switch to MAX layout'),
+
+    ## Layout specific
+    Key([mod], "Return", lazy.layout.toggle_split(),lazy.layout.flip(),
+        desc = "Switch between Stack/Tile modes"),
+    
+    ## Float
+    Key([mod, "shift"], "f", lazy.window.toggle_floating(), desc='toggle floating'),
+    Key([mod, "control"], "f", float_to_front, desc='Surface all floating windows'),
+
+    
+    # Application Launching
+
+    ## Super + Key
+    Key([mod], "space", lazy.spawn('rofi -show drun'), desc='Launch rofi drun'),
+    Key([mod], "e", lazy.spawn(FILE_MANAGER), desc='Launch file manager'),
+    Key([mod], "Escape", lazy.spawn('xkill'), desc = 'Click to kill window'),
+
+    ## (CONTROL + ALT + KEY) // alt+super+key?
+    Key(["control", "mod1"], "t", lazy.spawn(TERMINAL), desc='terminal'),
+    Key(["control", "mod1"], "f", lazy.spawn(f"{BROWSER}"), desc='Launch browser'),
+    Key(["control", "mod1"], "n", lazy.spawn(TEXT_EDITOR), desc='Launch text editor'),
+
+    ## Screenshots
+    Key([], "Print", lazy.spawn('flameshot gui'), desc='Take a Screenshot'),
+    Key([mod], "Print", lazy.spawn('flameshot launcher'), desc='Screenshot Menu'),
+
+    ## Volume & Media keys
+    # TODO:
+    # Key([], "XF86AudioRaiseVolume", lazy.spawn("amixer -D pulse -q sset Master 5%+")),
+    # Key([], "XF86AudioLowerVolume", lazy.spawn("amixer -D pulse -q sset Master 5%-")),
+    # Key([], "XF86AudioMute", lazy.spawn("amixer -D pulse -q set Master toggle")),
+
+    # Key([], "XF86AudioPlay", lazy.spawn("playerctl play-pause")),
+    # Key([], "XF86AudioNext", lazy.spawn("playerctl next")),
+    # Key([], "XF86AudioPrev", lazy.spawn("playerctl previous")),
+    # Key([], "XF86AudioStop", lazy.spawn("playerctl stop")),
+]
+
+# Mouse
+follow_mouse_focus = False
+dgroups_key_binder = None
+dgroups_app_rules = []  # type: list
+bring_front_click = False
+cursor_warp = False
+## Drag floating layouts.
+mouse = [
+    Drag([mod], "Button1", lazy.window.set_position_floating(), start=lazy.window.get_position()),
+    Drag([mod], "Button3", lazy.window.set_size_floating(), start=lazy.window.get_size()),
+    Click([mod], "Button2", lazy.window.bring_to_front()),
+]
+
+# floating_types = ["notification", "toolbar", "splash", "dialog"]
+
+# @hook.subscribe.client_new
+# def set_floating(window):
+#     if (window.window.get_wm_transient_for()
+#             or window.window.get_wm_type() in floating_types):
+#         window.floating = True
+
+floating_layout = layout.Floating(
+    float_rules=[
+        # Run the utility of `xprop` to see the wm class and name of an X client.
+        ,*layout.Floating.default_float_rules,
+        Match(wm_class="confirmreset"),  # gitk
+        Match(wm_class="makebranch"),  # gitk
+        Match(wm_class="maketag"),  # gitk
+        Match(wm_class="ssh-askpass"),  # ssh-askpass
+        Match(title="branchdialog"),  # gitk
+        Match(title="pinentry"),  # GPG key password entry
+        Match(wm_class='confirm'),
+        Match(wm_class='dialog'),
+        Match(wm_class='download'),
+        Match(wm_class='error'),
+        Match(wm_class='file_progress'),
+        Match(wm_class='notification'),
+        Match(wm_class='splash'),
+        Match(wm_class='toolbar'),
+        Match(wm_class='Arandr'),
+        Match(wm_class='Arcolinux-tweak-tool.py'),
+        Match(wm_class='arcolinux-logout'),
+        Match(title='Open File'),
+    ],
+    border_width=1,
+    border_focus="#bf616a", # TODO: change color
+)
+
+# Groups
+groups = [Group(i, layout="columns") for i in "123456789"]
+
+## Keybindings
+
+### Goto last group
+keys.append(Key([mod], "BackSpace", lazy.screen.toggle_group()))
+
+### Number keys for each group
+for number, group in enumerate(groups, start=1):
+    #Mod+Num = Switch group/view
+    #Mod+Shift+Num = Send window to group & switch to it
+    #Mod+Control+Num = Send window to group
+    keys.append(Key([mod], str(number), lazy.group[group.name].toscreen()))
+    keys.append(Key([mod, "shift"], str(number), lazy.window.togroup(group.name, switch_group=True)))
+    keys.append(Key([mod, "control"], str(number), lazy.window.togroup(group.name, switch_group=False)))
+
+# Layouts
+# TODO change colors
+layout_theme = {"border_width": 2,
+                "margin": 3,
+                "border_focus": "00FF00",
+                "border_normal": "1D2330"
+                }
+layouts = [
+    layout.Columns(**layout_theme, border_focus_stack = "bf616a"),
+    layout.Max(**layout_theme),
+    # layout.MonadTall(**layout_theme),
+]
+
+# Screens & Widgets
+auto_fullscreen = True
+focus_on_window_activation = "smart"
+reconfigure_screens = True
+# If things like steam games want to auto-minimize themselves when losing
+# focus, should we respect this or not?
+auto_minimize = True
+
+widget_defaults = dict(
+    font="Ubuntu Mono",
+    fontsize = 12,
+    padding = 2,
+    background=COLORS["white"]
+)
+extension_defaults = widget_defaults.copy()   # ???
+
+#TODO CHANGE ALL THIS 
+screens = [
+    Screen(
+        top=bar.Bar(
+            [
+              widget.Image(
+                        filename = "~/.config/qtile/icons/arcolinux.png",
+                        background =  COLORS["background"],
+                        margin = 2,
+                        #margin_x = 0,
+                        #margin_y = 0,
+                        mouse_callbacks = {'Button1': lazy.spawn("rofi -show drun")}
+                   ),
+                widget.GroupBox(),
+                widget.CurrentLayout(),
+                widget.Prompt(),
+                widget.WindowName(),
+                widget.Chord(
+                    chords_colors={
+                        "launch": ("#ff0000", "#ffffff"),
+                    },
+                    name_transform=lambda name: name.upper(),
+                ),
+                widget.TextBox("default config", name="default"),
+                widget.TextBox("Press &lt;M-r&gt; to spawn", foreground="#d75f5f"),
+                # NB Systray is incompatible with Wayland, consider using StatusNotifier instead
+                # widget.StatusNotifier(),
+                widget.Systray(),
+                widget.Clock(format="%Y-%m-%d %a %I:%M %p"),
+                widget.QuickExit(),
+            ],
+            24,
+            # border_width=[2, 0, 2, 0],  # Draw top and bottom borders
+            # border_color=["ff00ff", "000000", "ff00ff", "000000"]  # Borders are magenta
+        ),
+    ),
+]
+
+# Startup Applications
+@hook.subscribe.startup_once
+def autostart():
+    autostart_script = pathlib.Path.home() / ".config/qtile/autostart.sh"
+    subprocess.call([autostart_script])
+
+# XXX: Gasp! We're lying here. In fact, nobody really uses or cares about this
+# string besides java UI toolkits; you can see several discussions on the
+# mailing lists, GitHub issues, and other WM documentation that suggest setting
+# this string if your java app doesn't work correctly. We may as well just lie
+# and say that we're a working one by default.
+#
+# We choose LG3D to maximize irony: it is a 3D non-reparenting WM written in
+# java that happens to be on java's whitelist.
+wmname = "LG3D"
+#+end_src
+
+OLD - TO DELETE
+#+BEGIN_SRC python 
+##### DEFINING CONSTANTS & DEFAULT PROGRAMS #####
 
 ## Colors ##
 COLORS = {
@@ -2140,13 +1499,6 @@ COLORS = {
 
 ##### DEFINING MY FUNCTIONS #####
 
-@lazy.function
-def float_to_front():
-    for group in qtile.groups:
-        for window in group.windows:
-            if window.floating:
-                window.cmd_bring_to_front()
-
 def bar_transition(col_from, col_to):
     return widget.TextBox(text='◢',
                           background = col_from,
@@ -2155,10 +1507,6 @@ def bar_transition(col_from, col_to):
                           font="Ubuntu Mono derivative Powerline",
                           fontsize=TRANS_FONT_SIZE)
 
-def get_wallpaper():
-    wp_path = pathlib.Path.home() / ".config/qtile/wallpapers"
-    wallpapers = list(filter(lambda x: x.suffix in (".png",".jpg"), wp_path.glob("*")))
-    return random.choice(wallpapers)
 
 def open_htop():
     qtile.cmd_spawn(f'{MY_TERMINAL} -e htop')
@@ -2178,245 +1526,12 @@ def open_feeds():
 def toggle_calendar():
     qtile.cmd_spawn(f'{MY_TERMINAL} -e cal;bash') # TODO find something better for this
 
-def toggle_rofi():
-    qtile.cmd_spawn('rofi -show drun')
-
 def logout():
     qtile.cmd_spawn("archlinux-logout")
 
 def open_pamac():
     qtile.cmd_spawn("pamac-manager")
 
-##### GROUPS #####
-# fin the wm_class etc using xprop | grep WM_CLASS or similar
-
-group_names = {"SYS": {'layout': 'columns'},
-               "COM": {'layout': 'max'},
-               "WWW": {'layout': 'columns'},
-               "DEV": {'layout': 'columns'},
-               "MUS": {'layout': 'max', "matches":[Match(title="Spotify Free")]},
-               "VID": {'layout': 'columns', "matches":[Match(wm_class="smplayer")]},
-               "NTS": {'layout': 'max'},
-               "DOC": {'layout': 'columns'},
-               "VMS": {'layout': 'max'}}
-
-groups = [Group(name, **kwargs) for name, kwargs in group_names.items()]
-
-
-##### KEYBINDINGS #####
-keys = [
-    ### BASICS
-
-         Key([mod], "y", lazy.spawncmd(),
-             desc='launch prompt'),
-         Key([mod], "k", lazy.window.kill(),
-             desc='Kill active window'),
-         Key([mod], "q", lazy.window.kill(),
-             desc='Kill active window'),
-         Key([mod, "shift"], "r", lazy.restart(),
-             desc='Restart Qtile'),
-         Key([mod, "shift"], "q", lazy.shutdown(),
-             desc='Shutdown Qtile'),
-         #Key([mod], "x", lazy.spawn('arcolinux-logout')),
-
-    ### WINDOW CONTROL
-
-         ## Focus
-         Key([mod], "Down", lazy.layout.down(),
-             desc = "Switch focus to window below"),
-         Key([mod], "Up", lazy.layout.up(),
-             desc = "Switch focus to window above"),
-         Key([mod], "Right", lazy.layout.left(),
-             desc = "Switch focus to window to the right"),
-         Key([mod], "Left", lazy.layout.right(),
-             desc = "Switch focus to window to the right"),
-
-         ## Toggle Fullscreen
-         Key([mod], "f", lazy.window.toggle_fullscreen(),
-             desc = "Toggle fullscreen for the current window"),
-
-         ## Move
-         Key([mod, "shift"], "Down", lazy.layout.shuffle_down(),
-             desc = "Move window down"),
-         Key([mod, "shift"], "Up", lazy.layout.shuffle_up(),
-             desc = "Move window up"),
-         Key([mod, "shift"], "Left", lazy.layout.shuffle_left(),
-             desc = "Move window left"),
-         Key([mod, "shift"], "Right", lazy.layout.shuffle_right(),
-             desc = "Move window right"),
-
-         ## Resize
-         Key([mod, "control"], "Down",
-             lazy.layout.grow_down(),
-             lazy.layout.shrink(),
-             desc = "Increase size down"),
-         Key([mod, "control"], "Up",
-             lazy.layout.grow_up(),
-             lazy.layout.grow(),
-             desc = "Increase size up"),
-         Key([mod, "control"], "Left",
-             lazy.layout.grow_left(),
-             lazy.layout.shrink(),
-             lazy.layout.decrease_ratio(),
-             desc = "Increase size left"),
-         Key([mod, "control"], "Right",
-             lazy.layout.grow_right(),
-             lazy.layout.grow(),
-             lazy.layout.increase_ratio(),
-             desc = "Increase size right"),
-
-         # Float
-         Key([mod, "shift"], "f", lazy.window.toggle_floating(),
-             desc='toggle floating'),
-
-    ### LAYOUT CONTROL
-
-         ## Switching layouts
-         Key([mod], "Tab", lazy.next_layout(),
-             desc='Toggle through layouts'),
-         Key([mod], "c", lazy.to_layout_index(0),
-             desc='switch to COLUMNS layout'),
-         Key([mod], "t", lazy.to_layout_index(1),
-             desc='switch to MONADTALL layout'),
-         Key([mod], "m", lazy.to_layout_index(2),
-             desc='switch to MAX layout'),
-         #Key([mod, "shift"], "m", lazy.to_layout_index(3),
-             #desc='switch to TREETAB layout'),
-
-         Key([mod, "control"], "f", float_to_front,
-             desc='switch to FLOATING layout'),
-
-         ## Reset sizes
-         Key([mod], "n", lazy.layout.normalize(),
-             desc='normalize window size ratios'),
-
-        ## Layout specific
-         Key([mod], "Return", lazy.layout.toggle_split(),lazy.layout.flip(),
-             desc = "Switch between Stack/Tile modes"),
-
-    ### APPLICATION LAUNCHING
-
-         ## Screenshots
-          Key([], "Print", lazy.spawn('flameshot gui'),
-             desc='Take a Screenshot'),
-          Key([mod], "Print", lazy.spawn('flameshot launcher'),
-             desc='Screenshot Menu'),
-         ## Super + Key
-
-         Key([mod], "space", lazy.spawn('rofi -show drun'),
-             desc='Launch rofi drun'),
-
-          Key([mod], "r", lazy.spawn(TERMINAL_FILE_MANAGER),
-             desc='Launch terminal file manager'),
-
-         Key([mod], "e", lazy.spawn(FILE_MANAGER),
-             desc='Launch file manager'),
-
-         Key([mod], "Escape", lazy.spawn('xkill'),
-             desc = 'Click to kill window'),
-
-        ## (CONTROL + ALT + KEY) // alt+super+key?
-
-         Key(["control", "mod1"], "t", lazy.spawn(MY_TERMINAL),
-             desc='terminal'),
-
-         Key([mod], "KP_Enter", lazy.spawn(MY_TERMINAL),
-             desc='terminal'),
-
-         Key(["control", "mod1"], "f", lazy.spawn(f"{BROWSER}"),
-             desc='Launch browser'),
-
-         Key(["control", "mod1"], "e", lazy.spawn(f"{MY_TERMINAL} -e vifm"),
-             desc='Launch vifm'),
-
-         Key(["control", "mod1"], "n", lazy.spawn(TEXT_EDITOR),
-             desc='Launch text editor'),
-
-         #Key([mod], "v", lazy.spawn('pavucontrol')),    # this is pulseaudio volume control, migth want to bind it to something
-
-         ## Volume & Media keys
-         Key([], "XF86AudioRaiseVolume", lazy.spawn("amixer -D pulse -q sset Master 5%+")),
-         Key([], "XF86AudioLowerVolume", lazy.spawn("amixer -D pulse -q sset Master 5%-")),
-         Key([], "XF86AudioMute", lazy.spawn("amixer -D pulse -q set Master toggle")),
-
-         Key([], "XF86AudioPlay", lazy.spawn("playerctl play-pause")),
-         Key([], "XF86AudioNext", lazy.spawn("playerctl next")),
-         Key([], "XF86AudioPrev", lazy.spawn("playerctl previous")),
-         Key([], "XF86AudioStop", lazy.spawn("playerctl stop")),
-
-]
-
-
-### GROUP KEYBINDINGS
-for number, group in enumerate(groups, start=1):
-    #Mod+Num = Switch group/view
-    #Mod+Shift+Num = Send window to group & switch to it
-    #Mod+Control+Num = Send window to group
-    keys.append(Key([mod], str(number), lazy.group[group.name].toscreen()))
-    keys.append(Key([mod], NUMPAD[number], lazy.group[group.name].toscreen()))
-    keys.append(Key([mod, "shift"], str(number), lazy.window.togroup(group.name, switch_group=True)))
-    keys.append(Key([mod, "shift"], NUMPAD[number], lazy.window.togroup(group.name, switch_group=True)))
-    keys.append(Key([mod, "control"], str(number), lazy.window.togroup(group.name, switch_group=False)))
-    keys.append(Key([mod, "control"], NUMPAD[number], lazy.window.togroup(group.name, switch_group=False)))
-
-### TOGGLE LAST GROUP
-keys.append(Key([mod], "BackSpace", lazy.screen.toggle_group()))
-
-
-##### ADDING DROPDOWN TERMINAL #####
-    ### Appending group
-groups.append(ScratchPad("scratchpad", [DropDown("term",
-                                                "/usr/bin/termite",
-                                                opacity=0.88,
-                                                height=0.33,
-                                                width=0.8)]
-                        )
-)
-
-    ### Setting the key binding
-keys.extend([Key([], "F4", lazy.group["scratchpad"].dropdown_toggle("term"))])
-
-
-##### THE LAYOUTS #####
-
-    ### DEFAULT LAYOUT THEME SETTINGS #####
-layout_theme = {"border_width": 2,
-                "margin": 3,
-                "border_focus": COLORS["frost1"],
-                "border_normal": "1D2330"
-                }
-
-    ### LAYOUTS
-layouts = [
-    layout.Columns(**layout_theme, border_focus_stack = "bf616a"),
-    layout.MonadTall(**layout_theme),
-    layout.Max(**layout_theme),
-    #layout.TreeTab(
-         #font = "Ubuntu",
-         #fontsize = 10,
-         #sections = ["FIRST", "SECOND"],
-         #section_fontsize = 11,
-         #bg_color = "141414",
-         #active_bg = "bf616a",
-         #active_fg = "000000",
-         #inactive_bg = "4c566a",
-         #inactive_fg = "a7a7a7",
-         #padding_y = 5,
-         #section_top = 10,
-         #panel_width = 150
-         #)
-    #layout.RatioTile(**layout_theme),
-    #layout.VerticalTile(**layout_theme),
-    #layout.Floating(**layout_theme),
-    #layout.Tile(shift_windows=True, **layout_theme)
-    #layout.MonadWide(**layout_theme),
-    #layout.Bsp(**layout_theme),
-    #layout.Stack(stacks=2, **layout_theme),
-]
-
-
-##### PROMPT FORMAT #####
-prompt = "{0}@{1}: ".format(os.environ["USER"], socket.gethostname())
 
 ##### DEFAULT WIDGET SETTINGS #####
 widget_defaults = dict(
@@ -2628,80 +1743,6 @@ if __name__ in ["config", "__main__"]:
 
 
 ##### FLOATING WINDOWS #####
-
-float_theme = {"border_width": 1,
-               "border_focus": COLORS["background"]
-               }
-
-floating_types = ["notification", "toolbar", "splash", "dialog"]
-
-@hook.subscribe.client_new
-def set_floating(window):
-    if (window.window.get_wm_transient_for()
-            or window.window.get_wm_type() in floating_types):
-        window.floating = True
-
-floating_layout = layout.Floating(float_rules=[
-                    ,*layout.Floating.default_float_rules,
-                    Match(wm_class='makebranch'),  # gitk
-                    Match(wm_class='confirmreset'),  # gitk
-                    Match(wm_class='maketag'),  # gitk
-                    Match(title='branchdialog'),  # gitk
-                    Match(wm_class='ssh-askpass'),  # ssh-askpass
-                    Match(title='pinentry'),  # GPG key password entry
-                    Match(wm_class='confirm'),
-                    Match(wm_class='dialog'),
-                    Match(wm_class='download'),
-                    Match(wm_class='error'),
-                    Match(wm_class='file_progress'),
-                    Match(wm_class='notification'),
-                    Match(wm_class='splash'),
-                    Match(wm_class='toolbar'),
-                    Match(wm_class='Arandr'),
-                    Match(wm_class='Arcolinux-tweak-tool.py'),
-                    Match(wm_class='arcolinux-logout'),
-                    Match(title='Open File'),
-                    ],
-                    ,**float_theme
-                    )
-
-auto_fullscreen = True
-focus_on_window_activation = "smart"
-
-##### DRAG FLOATING WINDOWS #####
-mouse = [
-    Drag([mod], "Button1", lazy.window.set_position_floating(),
-         start=lazy.window.get_position()),
-    Drag([mod], "Button3", lazy.window.set_size_floating(),
-         start=lazy.window.get_size()),
-    Click([mod], "Button2", lazy.window.bring_to_front())
-]
-
-dgroups_key_binder = None
-dgroups_app_rules = []  # type: List
-main = None
-follow_mouse_focus = False
-bring_front_click = False
-cursor_warp = False
-
-
-
-##### STARTUP APPLICATIONS #####
-@hook.subscribe.startup_once
-def autostart():
-    autostart_script = pathlib.Path.home() / ".config/qtile/autostart.sh"
-    subprocess.call([autostart_script])
-
-# XXX: Gasp! We're lying here. In fact, nobody really uses or cares about this
-# string besides java UI toolkits; you can see several discussions on the
-# mailing lists, GitHub issues, and other WM documentation that suggest setting
-# this string if your java app doesn't work correctly. We may as well just lie
-# and say that we're a working one by default.
-#
-# We choose LG3D to maximize irony: it is a 3D non-reparenting WM written in
-# java that happens to be on java's whitelist.
-wmname = "LG3D"
-
 #+END_SRC
 
 ** inoreader_rss_counter.py
@@ -2710,7 +1751,7 @@ One fo the bar widgets in my qtile config displays the number of unread RSS read
 
 To get the password from kwallet it is using =keyring= so that dependency needs to be installed
 
-#+BEGIN_SRC python :tangle .config/qtile/inoreader_rss_counter.py
+#+BEGIN_SRC python 
 # Generated from ~/dotfiles/system.org
 
 import requests
@@ -2764,7 +1805,7 @@ if __name__ == "__main__":
 
 Similarly i have a script to count unread emails
 
-#+BEGIN_SRC python :tangle .config/qtile/mailwatcher.py
+#+BEGIN_SRC python 
 # Generated from ~/dotfiles/system.org
 
 import imaplib
@@ -2797,241 +1838,3 @@ if __name__ == "__main__":
 
 #+END_SRC
 
-* Picom
-
-picom is a standalone compositor, we need it to use with qtile
-
-** picom.conf
-
-#+BEGIN_SRC conf :tangle .config/qtile/picom.conf
-# Generated from ~/dotfiles/system.org
-# Thank you code_nomad: http://9m.no/ꪯ鵞
-# and Arch Wiki contributors: https://wiki.archlinux.org/index.php/Compton
-
-#################################
-#
-# Backend
-#
-#################################
-
-# Backend to use: "xrender" or "glx".
-# GLX backend is typically much faster but depends on a sane driver.
-backend = "glx";
-#backend = "xrender"
-
-#################################
-#
-# GLX backend
-#
-#################################
-
-glx-no-stencil = true;
-
-# GLX backend: Copy unmodified regions from front buffer instead of redrawing them all.
-# My tests with nvidia-drivers show a 10% decrease in performance when the whole screen is modified,
-# but a 20% increase when only 1/4 is.
-# My tests on nouveau show terrible slowdown.
-glx-copy-from-front = false;
-
-# GLX backend: Use MESA_copy_sub_buffer to do partial screen update.
-# My tests on nouveau shows a 200% performance boost when only 1/4 of the screen is updated.
-# May break VSync and is not available on some drivers.
-# Overrides --glx-copy-from-front.
-# glx-use-copysubbuffermesa = true;
-
-# GLX backend: Avoid rebinding pixmap on window damage.
-# Probably could improve performance on rapid window content changes, but is known to break things on some drivers (LLVMpipe).
-# Recommended if it works.
-# glx-no-rebind-pixmap = true;
-
-# GLX backend: GLX buffer swap method we assume.
-# Could be undefined (0), copy (1), exchange (2), 3-6, or buffer-age (-1).
-# undefined is the slowest and the safest, and the default value.
-# copy is fastest, but may fail on some drivers,
-# 2-6 are gradually slower but safer (6 is still faster than 0).
-# Usually, double buffer means 2, triple buffer means 3.
-# buffer-age means auto-detect using GLX_EXT_buffer_age, supported by some drivers.
-# Useless with --glx-use-copysubbuffermesa.
-# Partially breaks --resize-damage.
-# Defaults to undefined.
-#glx-swap-method = "undefined";
-
-#################################
-#
-# Shadows
-#
-#################################
-
-# Enabled client-side shadows on windows.
-shadow = false;
-# The blur radius for shadows. (default 12)
-shadow-radius = 5;
-# The left offset for shadows. (default -15)
-shadow-offset-x = -5;
-# The top offset for shadows. (default -15)
-shadow-offset-y = -5;
-# The translucency for shadows. (default .75)
-shadow-opacity = 0.5;
-
-log-level = "warn";
-#change your username here
-#log-file = "/home/erik/.config/compton.log";
-
-# Set if you want different colour shadows
-# shadow-red = 0.0;
-# shadow-green = 0.0;
-# shadow-blue = 0.0;
-
-# The shadow exclude options are helpful if you have shadows enabled. Due to the way compton draws its shadows, certain applications will have visual glitches
-# (most applications are fine, only apps that do weird things with xshapes or argb are affected).
-# This list includes all the affected apps I found in my testing. The "! name~=''" part excludes shadows on any "Unknown" windows, this prevents a visual glitch with the XFWM alt tab switcher.
-shadow-exclude = [
-    "! name~=''",
-    "name = 'Notification'",
-    "name = 'Plank'",
-    "name = 'Docky'",
-    "name = 'Kupfer'",
-    "name = 'xfce4-notifyd'",
-    "name *= 'VLC'",
-    "name *= 'compton'",
-    "name *= 'Chromium'",
-    "name *= 'Chrome'",
-    "class_g = 'Firefox' && argb",
-    "class_g = 'Conky'",
-    "class_g = 'Kupfer'",
-    "class_g = 'Synapse'",
-    "class_g ?= 'Notify-osd'",
-    "class_g ?= 'Cairo-dock'",
-    "class_g = 'Cairo-clock'",
-    "class_g ?= 'Xfce4-notifyd'",
-    "class_g ?= 'Xfce4-power-manager'",
-    "_GTK_FRAME_EXTENTS@:c",
-    "_NET_WM_STATE@:32a *= '_NET_WM_STATE_HIDDEN'"
-];
-# Avoid drawing shadow on all shaped windows (see also: --detect-rounded-corners)
-shadow-ignore-shaped = false;
-
-#################################
-#
-# Opacity
-#
-#################################
-
-inactive-opacity = 1;
-active-opacity = 1;
-frame-opacity = 1;
-inactive-opacity-override = false;
-
-# Dim inactive windows. (0.0 - 1.0)
-# inactive-dim = 0.2;
-# Do not let dimness adjust based on window opacity.
-# inactive-dim-fixed = true;
-# Blur background of transparent windows. Bad performance with X Render backend. GLX backend is preferred.
-# blur-background = true;
-# Blur background of opaque windows with transparent frames as well.
-# blur-background-frame = true;
-# Do not let blur radius adjust based on window opacity.
-blur-background-fixed = false;
-blur-background-exclude = [
-    "window_type = 'dock'",
-    "window_type = 'desktop'",
-    "_GTK_FRAME_EXTENTS@:c"
-];
-
-#################################
-#
-# Fading
-#
-#################################
-
-# Fade windows during opacity changes.
-fading = false;
-# The time between steps in a fade in milliseconds. (default 10).
-fade-delta = 4;
-# Opacity change between steps while fading in. (default 0.028).
-fade-in-step = 0.03;
-# Opacity change between steps while fading out. (default 0.03).
-fade-out-step = 0.03;
-# Fade windows in/out when opening/closing
-# no-fading-openclose = true;
-
-# Specify a list of conditions of windows that should not be faded.
-fade-exclude = [ ];
-
-#################################
-#
-# Other
-#
-#################################
-
-# Try to detect WM windows and mark them as active.
-mark-wmwin-focused = true;
-# Mark all non-WM but override-redirect windows active (e.g. menus).
-mark-ovredir-focused = true;
-# Use EWMH _NET_WM_ACTIVE_WINDOW to determine which window is focused instead of using FocusIn/Out events.
-# Usually more reliable but depends on a EWMH-compliant WM.
-use-ewmh-active-win = true;
-# Detect rounded corners and treat them as rectangular when --shadow-ignore-shaped is on.
-detect-rounded-corners = true;
-
-# Detect _NET_WM_OPACITY on client windows, useful for window managers not passing _NET_WM_OPACITY of client windows to frame windows.
-# This prevents opacity being ignored for some apps.
-# For example without this enabled my xfce4-notifyd is 100% opacity no matter what.
-detect-client-opacity = true;
-
-# Specify refresh rate of the screen.
-# If not specified or 0, compton will try detecting this with X RandR extension.
-refresh-rate = 0;
-
-# Vertical synchronization: match the refresh rate of the monitor
-# this breaks transparency in virtualbox - put a "#" before next line to fix that
-vsync = true;
-
-# Enable DBE painting mode, intended to use with VSync to (hopefully) eliminate tearing.
-# Reported to have no effect, though.
-dbe = false;
-
-# Limit compton to repaint at most once every 1 / refresh_rate second to boost performance.
-# This should not be used with --vsync drm/opengl/opengl-oml as they essentially does --sw-opti's job already,
-# unless you wish to specify a lower refresh rate than the actual value.
-#sw-opti = true;
-
-# Unredirect all windows if a full-screen opaque window is detected, to maximize performance for full-screen windows, like games.
-# Known to cause flickering when redirecting/unredirecting windows.
-unredir-if-possible = false;
-
-# Specify a list of conditions of windows that should always be considered focused.
-focus-exclude = [ ];
-
-# Use WM_TRANSIENT_FOR to group windows, and consider windows in the same group focused at the same time.
-detect-transient = true;
-# Use WM_CLIENT_LEADER to group windows, and consider windows in the same group focused at the same time.
-# WM_TRANSIENT_FOR has higher priority if --detect-transient is enabled, too.
-detect-client-leader = true;
-
-#################################
-#
-# Window type settings
-#
-#################################
-
-wintypes:
-{
-  tooltip = { fade = true; shadow = true; opacity = 0.9; focus = true;};
-  dock = { shadow = false; }
-  dnd = { shadow = false; }
-  popup_menu = { opacity = 0.9; }
-  dropdown_menu = { opacity = 0.9; }
-};
-
-######################
-#
-# XSync
-# See: https://github.com/yshui/compton/commit/b18d46bcbdc35a3b5620d817dd46fbc76485c20d
-#
-######################
-
-# Use X Sync fence to sync clients' draw calls. Needed on nvidia-drivers with GLX backend for some users.
-xrender-sync-fence = true;
-
-#+END_SRC
