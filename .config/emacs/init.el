@@ -163,6 +163,7 @@
  ;; using undo-fu to get redo functionality
 (use-package undo-fu
     :config
+    (setq evil-undo-system "undo-fu")
     (define-key evil-normal-state-map "u" 'undo-fu-only-undo)
     (define-key evil-normal-state-map "\C-r" 'undo-fu-only-redo))
 
@@ -375,7 +376,7 @@
   :config
   (rg-enable-menu))
 
-(use-package lsp-pyright)
+;; (use-package lsp-pyright)
 
 ;; (use-package pyvenv
 ;;   :init
@@ -402,14 +403,14 @@
 (use-package scala-mode
   :interpreter ("scala" . scala-mode))
 
-(use-package lsp-metals
-  :ensure t
-  :custom
-  ;; Metals claims to support range formatting by default but it supports range
-  ;; formatting of multiline strings only. You might want to disable it so that
-  ;; emacs can use indentation provided by scala-mode.
-  (lsp-metals-server-args '("-J-Dmetals.allow-multiline-string-formatting=off"))
-  :hook (scala-mode . lsp))
+;; (use-package lsp-metals
+;;   :ensure t
+;;   :custom
+;;   ;; Metals claims to support range formatting by default but it supports range
+;;   ;; formatting of multiline strings only. You might want to disable it so that
+;;   ;; emacs can use indentation provided by scala-mode.
+;;   (lsp-metals-server-args '("-J-Dmetals.allow-multiline-string-formatting=off"))
+;;   :hook (scala-mode . lsp))
 
 (use-package rustic
   :config

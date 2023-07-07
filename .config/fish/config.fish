@@ -59,6 +59,9 @@ alias vim="nvim"
 ## yabai toggle
 alias stopyabai="brew services stop yabai"
 alias startyabai="brew services start yabai"
+## docker/podman
+alias docker="podman"
+alias docker-compose="podman-compose"
 # ---------------------------------------------------------------------
 
 
