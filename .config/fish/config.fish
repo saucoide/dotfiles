@@ -14,12 +14,6 @@
 # set EDITOR "emacsclient -t -a ''"
 # set SSH_ENV "$HOME/.ssh/agent-environment"
 
-# # fix for qtile & terminal apps resizing
-# # (its fixed on master, should be able to remove it soon)
-# set --erase COLUMNS
-# set --erase LINES
-
-
 # # Set vim as Manpager
 # set --export MANPAGER '/bin/bash -c "vim -MRn -c \"set buftype=nofile showtabline=0 ft=man ts=8 nomod nolist norelativenumber nonu noma\" -c \"normal L\" -c \"nmap q :qa<CR>\"</dev/tty <(col -b)"'
 # # ---------------------------------------------------------------------
@@ -84,9 +78,9 @@
 # # ---------------------------------------------------------------------
 
 # # Startup greeter
-# function fish_greeting
-#     neofetch
-# end
+function fish_greeting
+    neofetch
+end
 
 # # Use vim as default key bindings
 # function fish_user_key_bindings

@@ -233,12 +233,6 @@ directory that will be autoloaded, but i prefer to configure everything in a sin
 # set EDITOR "emacsclient -t -a ''"
 # set SSH_ENV "$HOME/.ssh/agent-environment"
 
-# # fix for qtile & terminal apps resizing
-# # (its fixed on master, should be able to remove it soon)
-# set --erase COLUMNS
-# set --erase LINES
-
-
 # # Set vim as Manpager
 # set --export MANPAGER '/bin/bash -c "vim -MRn -c \"set buftype=nofile showtabline=0 ft=man ts=8 nomod nolist norelativenumber nonu noma\" -c \"normal L\" -c \"nmap q :qa<CR>\"</dev/tty <(col -b)"'
 # # ---------------------------------------------------------------------
@@ -303,9 +297,9 @@ directory that will be autoloaded, but i prefer to configure everything in a sin
 # # ---------------------------------------------------------------------
 
 # # Startup greeter
-# function fish_greeting
-#     neofetch
-# end
+function fish_greeting
+    neofetch
+end
 
 # # Use vim as default key bindings
 # function fish_user_key_bindings
@@ -1136,6 +1130,7 @@ TODO Fix:
 
 emacsclient doesnt launch
 media control keys
+border colors are all wrong
 #+begin_src python :tangle .config/qtile/config.py
 # -*- coding: utf-8 -*-
 #
@@ -1159,6 +1154,7 @@ media control keys
 # or substantial portions of the Software.
 import os
 import pathlib
+import random
 import socket
 import subprocess
 
@@ -1166,6 +1162,9 @@ from libqtile import bar, layout, widget, hook
 from libqtile.config import Click, Drag, Group, Key, Match, Screen
 from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal
+
+from mailwatcher import main_wrapper as mailwatcher
+from inoreader import main_wrapper as inoreader
 
 
 # Main Modifier
@@ -1186,18 +1185,22 @@ prompt = "{0}@{1}: ".format(os.environ["USER"], socket.gethostname())
 
 # Colors
 COLORS = {
-          "white":"ffffff",
-          "background":"#2e3440",           # panel background
-          "active_background":"#3B4252",    # background for current group
-          "group_highlight":"#ff5555",      # border line color for current group
-          "border_line":"#8d62a9",          # border line color for other tab and odd widgets
-          "border_focus":"#5e81ac",
-          "win_name":"#81a1c1",             # current window name
-          "frost0":"#5e81ac",               # Theme colors (nord)
-          "frost1":"#81a1c1",
-          "frost2":"#434C5E",
-          "frost3":"#4C566A",
-          "aurora0":"#bf616a",
+    "white":"ffffff",
+    "background_0":"#2e3440",           # backgrounds 0 darkest - 3 lighest
+    "background_1":"#3B4252",           
+    "background_2":"#434c5e",          
+    "background_3":"#4c566a",          
+    "group_highlight":"#ff5555",      # border line color for current group
+    "border_line":"#8d62a9",          # border line color for other tab and odd widgets
+    "border_focus":"#5e81ac",
+    "win_name":"#81a1c1",             # current window name
+    "frost0":"#5e81ac",               # Theme colors (nord)
+    "frost1":"#81a1c1",
+    "frost2":"#434C5E",
+    "frost3":"#4C566A",
+    "nord_white": "#c7cdd8",
+    "nord_red":"#bf616a",
+    "lime": "#50fa7b",
 }
 
 # Custom Functions
@@ -1214,7 +1217,6 @@ def get_wallpaper():
     return random.choice(wallpapers)
 
 def launch_rofi():
-    # qtile.cmd_spawn('rofi -show drun')
     lazy.spawn_cmd('rofi -show drun')
 
 # Key bindings
@@ -1282,14 +1284,13 @@ keys = [
     # Key([mod, "control"], "j", lazy.layout.grow_down(), desc="Grow window down"),
     # Key([mod, "control"], "k", lazy.layout.grow_up(), desc="Grow window up"),
 
-
     # Layout Control
     
     ## Switching layouts
     Key([mod], "Tab", lazy.next_layout(), desc='Toggle through layouts'),
     Key([mod], "c", lazy.to_layout_index(0), desc='switch to COLUMNS layout'),
-    Key([mod], "t", lazy.to_layout_index(1), desc='switch to MONADTALL layout'),
-    Key([mod], "m", lazy.to_layout_index(2), desc='switch to MAX layout'),
+    Key([mod], "t", lazy.to_layout_index(0), desc='switch to COLUMNS layout'),
+    Key([mod], "m", lazy.to_layout_index(1), desc='switch to MAX layout'),
 
     ## Layout specific
     Key([mod], "Return", lazy.layout.toggle_split(),lazy.layout.flip(),
@@ -1299,7 +1300,6 @@ keys = [
     Key([mod, "shift"], "f", lazy.window.toggle_floating(), desc='toggle floating'),
     Key([mod, "control"], "f", float_to_front, desc='Surface all floating windows'),
 
-    
     # Application Launching
 
     ## Super + Key
@@ -1368,7 +1368,6 @@ floating_layout = layout.Floating(
         Match(wm_class='splash'),
         Match(wm_class='toolbar'),
         Match(wm_class='Arandr'),
-        Match(wm_class='Arcolinux-tweak-tool.py'),
         Match(wm_class='arcolinux-logout'),
         Match(title='Open File'),
     ],
@@ -1397,13 +1396,12 @@ for number, group in enumerate(groups, start=1):
 # TODO change colors
 layout_theme = {"border_width": 2,
                 "margin": 3,
-                "border_focus": "00FF00",
+                "border_focus": COLORS["lime"],
                 "border_normal": "1D2330"
                 }
 layouts = [
     layout.Columns(**layout_theme, border_focus_stack = "bf616a"),
     layout.Max(**layout_theme),
-    # layout.MonadTall(**layout_theme),
 ]
 
 # Screens & Widgets
@@ -1418,7 +1416,7 @@ widget_defaults = dict(
     font="Ubuntu Mono",
     fontsize = 12,
     padding = 2,
-    background=COLORS["white"]
+    background=COLORS["background_0"]
 )
 extension_defaults = widget_defaults.copy()   # ???
 
@@ -1427,36 +1425,82 @@ screens = [
     Screen(
         top=bar.Bar(
             [
-              widget.Image(
-                        filename = "~/.config/qtile/icons/arcolinux.png",
-                        background =  COLORS["background"],
-                        margin = 2,
-                        #margin_x = 0,
-                        #margin_y = 0,
-                        mouse_callbacks = {'Button1': lazy.spawn("rofi -show drun")}
-                   ),
-                widget.GroupBox(),
-                widget.CurrentLayout(),
-                widget.Prompt(),
-                widget.WindowName(),
-                widget.Chord(
-                    chords_colors={
-                        "launch": ("#ff0000", "#ffffff"),
-                    },
-                    name_transform=lambda name: name.upper(),
+                widget.Image(
+                    filename = "~/.config/qtile/icons/arcolinux.png",
+                    margin = 3,
+                    mouse_callbacks = {'Button1': lazy.spawn("rofi -show drun")}
                 ),
-                widget.TextBox("default config", name="default"),
-                widget.TextBox("Press &lt;M-r&gt; to spawn", foreground="#d75f5f"),
+                widget.GroupBox(
+                    font="UbuntuMono Nerd Font",
+                    fontsize=18,
+                    margin_x=5,
+                    padding_x=5,
+                    borderwidth=3,
+                    block_highlight_text_color=COLORS["white"],
+                    active=COLORS["nord_white"],
+                    inactive=COLORS["background_2"],
+                    highlight_color=COLORS["background_1"],
+                    highlight_method="line",
+                    this_current_screen_border=COLORS["nord_red"],
+                    this_screen_border=COLORS["nord_red"],
+                    rounded=False,
+                    disable_dag=True,
+                ),
+                widget.CurrentLayoutIcon(
+                    custom_icon_paths=[os.path.expanduser("~/.config/qtile/icons")],
+                    background = COLORS["background_0"],
+                    padding = 0,
+                    scale=0.6
+                ),
+                widget.Prompt(),
+                widget.WindowTabs(
+                    foreground=COLORS["nord_white"],
+                ),
+                widget.GenPollText(
+                    func=mailwatcher,
+                    update_interval=600,
+                    fmt="󰇮 {} |",
+                ),
+                widget.GenPollText(
+                    func=inoreader,
+                    update_interval=600,
+                    fmt=" {} |",
+                ),
+                widget.CPU(
+                    format="CPU {freq_current}GHz {load_percent}% |",
+                    update_interval=5,
+                ),
+                widget.ThermalSensor(
+                    format="{temp:.0f}{unit} |",
+                    update_interval=5,
+                ),
+                widget.Volume(
+                    fmt=" {} |",
+                    volume_app = "pulseaudio",
+                    # TODO add volum control commands
+                ),
+                # TODO
+                # -- volume
+                # -- battery
+
+
+                
                 # NB Systray is incompatible with Wayland, consider using StatusNotifier instead
                 # widget.StatusNotifier(),
                 widget.Systray(),
-                widget.Clock(format="%Y-%m-%d %a %I:%M %p"),
-                widget.QuickExit(),
+                widget.Clock(format="%Y-%m-%d %H:%M"),  # TODO: open a calendar, maybe weather?
+                #TODO temporary - should replace this with a proper logout/hibernate/etc menu
+                widget.QuickExit(
+                    font="UbuntuMono Nerd Font",
+                    default_text="[󰐥]"
+                ),
             ],
             24,
             # border_width=[2, 0, 2, 0],  # Draw top and bottom borders
             # border_color=["ff00ff", "000000", "ff00ff", "000000"]  # Borders are magenta
         ),
+        wallpaper = get_wallpaper(),
+        wallpaper_mode = 'fill',
     ),
 ]
 
@@ -1477,310 +1521,66 @@ def autostart():
 wmname = "LG3D"
 #+end_src
 
-OLD - TO DELETE
-#+BEGIN_SRC python 
-##### DEFINING CONSTANTS & DEFAULT PROGRAMS #####
-
-## Colors ##
-COLORS = {
-          "white":"ffffff",
-          "background":"#2e3440",           # panel background
-          "active_background":"#3B4252",    # background for current group
-          "group_highlight":"#ff5555",      # border line color for current group
-          "border_line":"#8d62a9",          # border line color for other tab and odd widgets
-          "border_focus":"#5e81ac",
-          "win_name":"#81a1c1",             # current window name
-          "frost0":"#5e81ac",               # Theme colors (nord)
-          "frost1":"#81a1c1",
-          "frost2":"#434C5E",
-          "frost3":"#4C566A",
-          "aurora0":"#bf616a",
-    }
-
-##### DEFINING MY FUNCTIONS #####
-
-def bar_transition(col_from, col_to):
-    return widget.TextBox(text='◢',
-                          background = col_from,
-                          foreground = col_to,
-                          padding=-5,
-                          font="Ubuntu Mono derivative Powerline",
-                          fontsize=TRANS_FONT_SIZE)
-
-
-def open_htop():
-    qtile.cmd_spawn(f'{MY_TERMINAL} -e htop')
-
-def open_sys_monitor():
-    qtile.cmd_spawn(SYS_MONITOR)
-
-def open_audio_settings():
-    qtile.cmd_spawn("pavucontrol")
-
-def open_mail():
-    qtile.cmd_spawn(EMAIL_CLIENT)
-
-def open_feeds():
-    qtile.cmd_spawn(f"{BROWSER} --new-window https://www.inoreader.com")
-
-def toggle_calendar():
-    qtile.cmd_spawn(f'{MY_TERMINAL} -e cal;bash') # TODO find something better for this
-
-def logout():
-    qtile.cmd_spawn("archlinux-logout")
-
-def open_pamac():
-    qtile.cmd_spawn("pamac-manager")
-
-
-##### DEFAULT WIDGET SETTINGS #####
-widget_defaults = dict(
-    font="Ubuntu Mono derivative Powerline",
-    fontsize = 12,
-    padding = 2,
-    background=COLORS["white"]
-)
-
-extension_defaults = widget_defaults.copy()   # ???
-
-##### WIDGETS #####
-
-def init_widgets_list():
-
-    widgets_list = [
-
-              widget.Image(
-                        filename = "~/.config/qtile/icons/arcolinux.png",
-                        background =  COLORS["background"],
-                        margin = 2,
-                        #margin_x = 0,
-                        #margin_y = 0,
-                        mouse_callbacks = {'Button1': toggle_rofi}
-                   ),
-             #widget.Sep(
-                        #linewidth = 0,
-                        #padding = 0+,
-                        #foreground = COLORS["white"],
-                        #background = COLORS["background"]
-                        #),
-               widget.GroupBox(font="Ubuntu Bold",
-                        fontsize = 9,
-                        margin_y = 3,
-                        margin_x = 0,
-                        padding_y = 5,
-                        padding_x = 5,
-                        borderwidth = 3,
-                        active = COLORS["white"],
-                        inactive = COLORS["white"],
-                        rounded = False,
-                        highlight_color = COLORS['active_background'],
-                        highlight_method = "line",
-                        this_current_screen_border = COLORS["group_highlight"],
-                        this_screen_border = COLORS["border_line"],
-                        other_current_screen_border = COLORS["background"],
-                        other_screen_border = COLORS["background"],
-                        foreground = COLORS["white"],
-                        background = COLORS["background"],
-                        disable_drag = True
-                        ),
-               widget.TextBox(text='⟋',
-                          background = COLORS["background"],
-                          foreground = COLORS["frost1"],
-                          padding=0,
-                          fontsize=50),
-               widget.Prompt(
-                        prompt=prompt,
-                        font="Ubuntu Mono",
-                        padding=10,
-                        foreground = COLORS["group_highlight"],
-                        background = COLORS["active_background"]
-                        ),
-               widget.Sep(
-                        linewidth = 0,
-                        padding = 2,
-                        foreground = COLORS["white"],
-                        background = COLORS["background"]
-                        ),
-               widget.TaskList(
-                        background = COLORS["background"],
-                        foreground = "#d8dee9",
-                        font = "Ubuntu Mono",
-                        fontsize = 12,
-                        icon_size = 8,
-                        border = COLORS["active_background"],
-                        highlight_method = "block",
-                        max_title_width = 120,
-                        txt_floating = "🗗 ",
-                        txt_maximized = "🗖 ",
-                        margin = 0,
-                        padding = 5,
-                        ),
-                widget.CurrentLayoutIcon(
-                        custom_icon_paths=[os.path.expanduser("~/.config/qtile/icons")],
-                        background = COLORS["background"],
-                        padding = 0,
-                        scale=0.7
-                        ),
-               widget.CurrentLayout(
-                        foreground = COLORS["white"],
-                        background = COLORS["background"],
-                        padding = 5
-                        ),
-               bar_transition(COLORS["background"], COLORS["frost0"]),
-               widget.GenPollText(
-                   background = COLORS["frost0"],
-                   func = get_mails,
-                   update_interval = 600,
-                   mouse_callbacks = {'Button1':open_mail}
-                   ),
-               bar_transition(COLORS["frost0"], COLORS["frost1"]),
-               widget.TextBox(
-                        text = "",
-                        foreground = COLORS["white"],
-                        background = COLORS["frost1"],
-                        mouse_callbacks = {'Button1': open_feeds}
-                   ),
-               widget.GenPollText(
-                   background = COLORS["frost1"],
-                   func = get_feeds,
-                   update_interval = 600,
-                   mouse_callbacks={'Button1': open_feeds}
-                   ),
-               bar_transition(COLORS["frost1"], COLORS["frost2"]),
-               widget.CPU(
-                        foreground = COLORS["white"],
-                        background = COLORS["frost2"],
-                        padding = 0,
-                        format = "CPU {load_percent}% | ",
-                        mouse_callbacks={'Button1': open_htop, 'Button3': open_sys_monitor}
-                        ),
-               widget.Memory(
-                        foreground = COLORS["white"],
-                        background = COLORS["frost2"],
-                        measure_mem = "G",
-                        measure_swap = "G",
-                        format = 'RAM {MemUsed: .1f}/{MemTotal: .1f}GB',
-                        padding = 0,
-                        mouse_callbacks={'Button1': open_htop, 'Button3': open_sys_monitor}
-                        ),
-               bar_transition(COLORS["frost2"], COLORS["frost3"]),
-               widget.ThermalSensor(
-                        foreground=COLORS["white"],
-                        background=COLORS["frost3"],
-                        padding = 0,
-                        update_interval = 10,
-                        ),
-               bar_transition(COLORS["frost3"], COLORS["frost0"]),
-               widget.TextBox(
-                        text = "",
-                        foreground = COLORS["white"],
-                        background = COLORS["frost0"],
-                        mouse_callbacks = {'Button1': open_audio_settings}
-                   ),
-               widget.Volume(
-                        foreground = COLORS["white"],
-                        background = COLORS["frost0"],
-                        padding = 0,
-                        volume_app = "pulseaudio",
-                        device = "pulse"
-                        ),
-               bar_transition(COLORS["frost0"], COLORS["frost1"]),
-               widget.CheckUpdates(
-                        update_interval = 1800,
-                        foreground = COLORS["white"],
-                        background = COLORS["frost1"],
-                        color_have_updates = COLORS["aurora0"],
-                        display_format = '{updates} ⟳',
-                        distro = "Arch_checkupdates",
-                        mouse_callbacks = {'Button1': open_pamac}
-                        ),
-               bar_transition(COLORS["frost1"], COLORS["frost2"]),
-                #widget.Systray(
-                        #background=COLORS["frost2"],
-                        #padding = 5
-                        #),
-               #bar_transition(COLORS["frost2"], COLORS["frost3"]),
-               widget.Clock(
-                        foreground = COLORS["white"],
-                        background = COLORS["frost2"],
-                        format="%d-%b-%Y [%H:%M] ",
-                        padding = 2,
-                        mouse_callbacks = {'Button1': toggle_calendar}
-                        ),
-               # bar_transition(COLORS["frost3"], COLORS["frost0"]),
-               #widget.Battery(
-                        #font="Ubuntu Mono",
-                        #update_interval = 10,
-                        #fontsize = 12,
-                        #foreground = COLORS["white"],
-                        #background = COLORS["frost3"],
-                        #),
-               widget.TextBox(
-                        text = "[⏻]",
-                        background = COLORS["frost3"],
-                        mouse_callbacks = {'Button1': logout}
-                   ),
-               #widget.QuickExit(
-                        #background = COLORS["frost3"],
-                        #countdown_format = "[{}s]",
-                        #default_text = "[⏼]" # ⏻ ⏼ ⏽ ⭘ ⏾
-                   #)
-              ]
-    return widgets_list
-
-##### SCREENS ##### (TRIPLE MONITOR SETUP)
-
-def init_screens():
-    return [Screen(top=bar.Bar(widgets=init_widgets_list(), opacity=0.95, size=20),
-                    wallpaper = get_wallpaper(),
-                    wallpaper_mode = 'fill')
-            ]
-
-if __name__ in ["config", "__main__"]:
-    screens = init_screens()
-    widgets_list = init_widgets_list()
-
-
-
-##### FLOATING WINDOWS #####
-#+END_SRC
-
-** inoreader_rss_counter.py
+** inoreader.py
 
 One fo the bar widgets in my qtile config displays the number of unread RSS readers on my inoreader account, which is the result of this python script
 
 To get the password from kwallet it is using =keyring= so that dependency needs to be installed
 
-#+BEGIN_SRC python 
+#+BEGIN_SRC python :tangle .config/qtile/inoreader.py
 # Generated from ~/dotfiles/system.org
 
 import requests
-import keyring
+import subprocess
 from pathlib import Path
+import logging
+
+logger = logging.getLogger(__name__)
 
 def main():
 
     BASE_URL = "https://www.inoreader.com/reader/api/0"
     LOGIN_URL = "https://www.inoreader.com/accounts/ClientLogin"
 
-    EMAIL = keyring.get_password("Passwords", 'ino_user')
-    PW = keyring.get_password("Passwords", 'ino_pw')
-    APP_ID = keyring.get_password("Passwords", 'ino_id')
-    APP_KEY = keyring.get_password("Passwords", 'ino_key')
-
-
-    resp = requests.post(LOGIN_URL, data={'Email':EMAIL,'Passwd':PW})
+    username = subprocess.run(
+        ["pass", "inoreader_user"],
+        check=True,
+        capture_output=True,
+        encoding="utf-8",
+    ).stdout.strip()
+    password = subprocess.run(
+        ["pass", "inoreader_password"],
+        check=True,
+        capture_output=True,
+        encoding="utf-8",
+    ).stdout.strip()
+    app_id = subprocess.run(
+        ["pass", "inoreader_appid"],
+        check=True,
+        capture_output=True,
+        encoding="utf-8",
+    ).stdout.strip()
+    app_key = subprocess.run(
+        ["pass", "inoreader_appkey"],
+        check=True,
+        capture_output=True,
+        encoding="utf-8",
+    ).stdout.strip()
+    
+    resp = requests.post(LOGIN_URL,
+                         data={'Email':username,
+                               'Passwd':password,})
 
     content = {}
     for line in resp.text.split('\n'):
         if line:
             key, val = line.split("=")
             content[key] = val
+            
     token = content['Auth']
-
     headers = {'Authorization': 'GoogleLogin auth=' + token,
-            'Appid': APP_ID,
-            'AppKey': APP_KEY}
+               'Appid': app_id,
+               'AppKey': app_key}
 
     resp = requests.get(BASE_URL + "/unread-count", headers=headers)
     unreadcounts = resp.json()
@@ -1792,7 +1592,8 @@ def main():
 def main_wrapper():
     try:
         return main()
-    except:
+    except Exception as e:
+        logger.exception(e)
         return "Err"
 
 
@@ -1805,32 +1606,45 @@ if __name__ == "__main__":
 
 Similarly i have a script to count unread emails
 
-#+BEGIN_SRC python 
+#+BEGIN_SRC python :tangle .config/qtile/mailwatcher.py
 # Generated from ~/dotfiles/system.org
 
 import imaplib
-import keyring
+import subprocess
 from pathlib import Path
+import logging
+
+logger = logging.getLogger(__name__)
 
 def main():
 
-    EMAIL = keyring.get_password('Passwords', 'email_user')
-    PW = keyring.get_password('Passwords', 'email_pw')
+    email = subprocess.run(
+        ["pass", "email_user"],
+        check=True,
+        capture_output=True,
+        encoding="utf-8",
+    ).stdout.strip()
+    password = subprocess.run(
+        ["pass", "email_password"],
+        check=True,
+        capture_output=True,
+        encoding="utf-8",
+    ).stdout.strip()
     SMTP_SERVER = "imap.gmail.com"
     SMTP_PORT = 993
 
     mail = imaplib.IMAP4_SSL(SMTP_SERVER)
-    mail.login(EMAIL,PW)
+    mail.login(email, password)
     mail.select("inbox")
     _, mail_ids = mail.search(None,"UNSEEN")
     unread = len(mail_ids[0].split())
-
-    return f"🖂 {unread}"
+    return str(unread)
 
 def main_wrapper():
     try:
         return main()
-    except:
+    except Exception as e:
+        logger.exception(e)
         return "Err"
 
 if __name__ == "__main__":

@@ -20,6 +20,7 @@
 # or substantial portions of the Software.
 import os
 import pathlib
+import random
 import socket
 import subprocess
 
@@ -27,6 +28,9 @@ from libqtile import bar, layout, widget, hook
 from libqtile.config import Click, Drag, Group, Key, Match, Screen
 from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal
+
+from mailwatcher import main_wrapper as mailwatcher
+from inoreader import main_wrapper as inoreader
 
 
 # Main Modifier
@@ -47,18 +51,22 @@ prompt = "{0}@{1}: ".format(os.environ["USER"], socket.gethostname())
 
 # Colors
 COLORS = {
-          "white":"ffffff",
-          "background":"#2e3440",           # panel background
-          "active_background":"#3B4252",    # background for current group
-          "group_highlight":"#ff5555",      # border line color for current group
-          "border_line":"#8d62a9",          # border line color for other tab and odd widgets
-          "border_focus":"#5e81ac",
-          "win_name":"#81a1c1",             # current window name
-          "frost0":"#5e81ac",               # Theme colors (nord)
-          "frost1":"#81a1c1",
-          "frost2":"#434C5E",
-          "frost3":"#4C566A",
-          "aurora0":"#bf616a",
+    "white":"ffffff",
+    "background_0":"#2e3440",           # backgrounds 0 darkest - 3 lighest
+    "background_1":"#3B4252",           
+    "background_2":"#434c5e",          
+    "background_3":"#4c566a",          
+    "group_highlight":"#ff5555",      # border line color for current group
+    "border_line":"#8d62a9",          # border line color for other tab and odd widgets
+    "border_focus":"#5e81ac",
+    "win_name":"#81a1c1",             # current window name
+    "frost0":"#5e81ac",               # Theme colors (nord)
+    "frost1":"#81a1c1",
+    "frost2":"#434C5E",
+    "frost3":"#4C566A",
+    "nord_white": "#c7cdd8",
+    "nord_red":"#bf616a",
+    "lime": "#50fa7b",
 }
 
 # Custom Functions
@@ -75,7 +83,6 @@ def get_wallpaper():
     return random.choice(wallpapers)
 
 def launch_rofi():
-    # qtile.cmd_spawn('rofi -show drun')
     lazy.spawn_cmd('rofi -show drun')
 
 # Key bindings
@@ -143,14 +150,13 @@ keys = [
     # Key([mod, "control"], "j", lazy.layout.grow_down(), desc="Grow window down"),
     # Key([mod, "control"], "k", lazy.layout.grow_up(), desc="Grow window up"),
 
-
     # Layout Control
     
     ## Switching layouts
     Key([mod], "Tab", lazy.next_layout(), desc='Toggle through layouts'),
     Key([mod], "c", lazy.to_layout_index(0), desc='switch to COLUMNS layout'),
-    Key([mod], "t", lazy.to_layout_index(1), desc='switch to MONADTALL layout'),
-    Key([mod], "m", lazy.to_layout_index(2), desc='switch to MAX layout'),
+    Key([mod], "t", lazy.to_layout_index(0), desc='switch to COLUMNS layout'),
+    Key([mod], "m", lazy.to_layout_index(1), desc='switch to MAX layout'),
 
     ## Layout specific
     Key([mod], "Return", lazy.layout.toggle_split(),lazy.layout.flip(),
@@ -160,7 +166,6 @@ keys = [
     Key([mod, "shift"], "f", lazy.window.toggle_floating(), desc='toggle floating'),
     Key([mod, "control"], "f", float_to_front, desc='Surface all floating windows'),
 
-    
     # Application Launching
 
     ## Super + Key
@@ -229,7 +234,6 @@ floating_layout = layout.Floating(
         Match(wm_class='splash'),
         Match(wm_class='toolbar'),
         Match(wm_class='Arandr'),
-        Match(wm_class='Arcolinux-tweak-tool.py'),
         Match(wm_class='arcolinux-logout'),
         Match(title='Open File'),
     ],
@@ -258,13 +262,12 @@ for number, group in enumerate(groups, start=1):
 # TODO change colors
 layout_theme = {"border_width": 2,
                 "margin": 3,
-                "border_focus": "00FF00",
+                "border_focus": COLORS["lime"],
                 "border_normal": "1D2330"
                 }
 layouts = [
     layout.Columns(**layout_theme, border_focus_stack = "bf616a"),
     layout.Max(**layout_theme),
-    # layout.MonadTall(**layout_theme),
 ]
 
 # Screens & Widgets
@@ -279,7 +282,7 @@ widget_defaults = dict(
     font="Ubuntu Mono",
     fontsize = 12,
     padding = 2,
-    background=COLORS["white"]
+    background=COLORS["background_0"]
 )
 extension_defaults = widget_defaults.copy()   # ???
 
@@ -288,36 +291,82 @@ screens = [
     Screen(
         top=bar.Bar(
             [
-              widget.Image(
-                        filename = "~/.config/qtile/icons/arcolinux.png",
-                        background =  COLORS["background"],
-                        margin = 2,
-                        #margin_x = 0,
-                        #margin_y = 0,
-                        mouse_callbacks = {'Button1': lazy.spawn("rofi -show drun")}
-                   ),
-                widget.GroupBox(),
-                widget.CurrentLayout(),
-                widget.Prompt(),
-                widget.WindowName(),
-                widget.Chord(
-                    chords_colors={
-                        "launch": ("#ff0000", "#ffffff"),
-                    },
-                    name_transform=lambda name: name.upper(),
+                widget.Image(
+                    filename = "~/.config/qtile/icons/arcolinux.png",
+                    margin = 3,
+                    mouse_callbacks = {'Button1': lazy.spawn("rofi -show drun")}
                 ),
-                widget.TextBox("default config", name="default"),
-                widget.TextBox("Press &lt;M-r&gt; to spawn", foreground="#d75f5f"),
+                widget.GroupBox(
+                    font="UbuntuMono Nerd Font",
+                    fontsize=18,
+                    margin_x=5,
+                    padding_x=5,
+                    borderwidth=3,
+                    block_highlight_text_color=COLORS["white"],
+                    active=COLORS["nord_white"],
+                    inactive=COLORS["background_2"],
+                    highlight_color=COLORS["background_1"],
+                    highlight_method="line",
+                    this_current_screen_border=COLORS["nord_red"],
+                    this_screen_border=COLORS["nord_red"],
+                    rounded=False,
+                    disable_dag=True,
+                ),
+                widget.CurrentLayoutIcon(
+                    custom_icon_paths=[os.path.expanduser("~/.config/qtile/icons")],
+                    background = COLORS["background_0"],
+                    padding = 0,
+                    scale=0.6
+                ),
+                widget.Prompt(),
+                widget.WindowTabs(
+                    foreground=COLORS["nord_white"],
+                ),
+                widget.GenPollText(
+                    func=mailwatcher,
+                    update_interval=600,
+                    fmt="󰇮 {} |",
+                ),
+                widget.GenPollText(
+                    func=inoreader,
+                    update_interval=600,
+                    fmt=" {} |",
+                ),
+                widget.CPU(
+                    format="CPU {freq_current}GHz {load_percent}% |",
+                    update_interval=5,
+                ),
+                widget.ThermalSensor(
+                    format="{temp:.0f}{unit} |",
+                    update_interval=5,
+                ),
+                widget.Volume(
+                    fmt=" {} |",
+                    volume_app = "pulseaudio",
+                    # TODO add volum control commands
+                ),
+                # TODO
+                # -- volume
+                # -- battery
+
+
+                
                 # NB Systray is incompatible with Wayland, consider using StatusNotifier instead
                 # widget.StatusNotifier(),
                 widget.Systray(),
-                widget.Clock(format="%Y-%m-%d %a %I:%M %p"),
-                widget.QuickExit(),
+                widget.Clock(format="%Y-%m-%d %H:%M"),  # TODO: open a calendar, maybe weather?
+                #TODO temporary - should replace this with a proper logout/hibernate/etc menu
+                widget.QuickExit(
+                    font="UbuntuMono Nerd Font",
+                    default_text="[󰐥]"
+                ),
             ],
             24,
             # border_width=[2, 0, 2, 0],  # Draw top and bottom borders
             # border_color=["ff00ff", "000000", "ff00ff", "000000"]  # Borders are magenta
         ),
+        wallpaper = get_wallpaper(),
+        wallpaper_mode = 'fill',
     ),
 ]
 
