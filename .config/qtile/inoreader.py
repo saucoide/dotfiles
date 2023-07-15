@@ -2,10 +2,14 @@
 
 import requests
 import subprocess
-from pathlib import Path
+import pathlib
 import logging
 
+
+LOGFILE = pathlib.Path().home() / ".local/share/qtile/inoreader.log"
 logger = logging.getLogger(__name__)
+handler = logging.FileHandler(LOGFILE)
+logger.addHandler(handler)
 
 def main():
 
@@ -55,7 +59,6 @@ def main():
     resp = requests.get(BASE_URL + "/unread-count", headers=headers)
     unreadcounts = resp.json()
     unread = unreadcounts['unreadcounts'][0]['count']
-
     return str(unread)
 
 

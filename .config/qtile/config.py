@@ -219,11 +219,7 @@ floating_layout = layout.Floating(
     float_rules=[
         # Run the utility of `xprop` to see the wm class and name of an X client.
         *layout.Floating.default_float_rules,
-        Match(wm_class="confirmreset"),  # gitk
-        Match(wm_class="makebranch"),  # gitk
-        Match(wm_class="maketag"),  # gitk
         Match(wm_class="ssh-askpass"),  # ssh-askpass
-        Match(title="branchdialog"),  # gitk
         Match(title="pinentry"),  # GPG key password entry
         Match(wm_class='confirm'),
         Match(wm_class='dialog'),
@@ -259,15 +255,18 @@ for number, group in enumerate(groups, start=1):
     keys.append(Key([mod, "control"], str(number), lazy.window.togroup(group.name, switch_group=False)))
 
 # Layouts
-# TODO change colors
-layout_theme = {"border_width": 2,
-                "margin": 3,
-                "border_focus": COLORS["lime"],
-                "border_normal": "1D2330"
-                }
 layouts = [
-    layout.Columns(**layout_theme, border_focus_stack = "bf616a"),
-    layout.Max(**layout_theme),
+    layout.Columns(
+        margin=2,
+        border_width= 2,
+        border_normal=COLORS["background_0"],
+        border_focus=COLORS["lime"],
+        border_focus_stack=COLORS["nord_red"]),
+    layout.Max(
+        margin=0,
+        border_width=1,
+        border_focus=COLORS["frost3"],
+        ),
 ]
 
 # Screens & Widgets
@@ -347,23 +346,15 @@ screens = [
                 ),
                 # TODO
                 # -- volume
-                # -- battery
-
-
-                
-                # NB Systray is incompatible with Wayland, consider using StatusNotifier instead
-                # widget.StatusNotifier(),
                 widget.Systray(),
-                widget.Clock(format="%Y-%m-%d %H:%M"),  # TODO: open a calendar, maybe weather?
+                widget.Clock(format="%Y-%m-%d %H:%M |"),  # TODO: open a calendar, maybe weather?
                 #TODO temporary - should replace this with a proper logout/hibernate/etc menu
                 widget.QuickExit(
                     font="UbuntuMono Nerd Font",
-                    default_text="[󰐥]"
+                    default_text="󰐥 "
                 ),
             ],
             24,
-            # border_width=[2, 0, 2, 0],  # Draw top and bottom borders
-            # border_color=["ff00ff", "000000", "ff00ff", "000000"]  # Borders are magenta
         ),
         wallpaper = get_wallpaper(),
         wallpaper_mode = 'fill',

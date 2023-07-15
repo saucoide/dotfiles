@@ -3,6 +3,10 @@
 #+DESCRIPTION: laptop's config
 #+STARTUP: content
 
+TODO - battery widget not working
+TODO - volume not working
+TODO - brightness not working
+TODO - bluetooth/partially done, needs cleanup and fixing
 * About
 
 This is the configuration I use for a thinkpad t480s laptop.
@@ -91,7 +95,6 @@ Guix channel configuration
 * Terminal
 
 I am using termite as my terminal
-
 ** bashrc
 
 #+BEGIN_SRC conf :tangle .bashrc
@@ -212,7 +215,8 @@ I am using termite as my terminal
 ** fish
 
 The recommended way to config fish is to add separate functions to the ~/functions~
-directory that will be autoloaded, but i prefer to configure everything in a single file, so i'll just replace ~config.fish~
+directory that will be autoloaded, but i prefer to configure everything in a single file,
+so i'll just replace ~config.fish~
 
 #+BEGIN_SRC sh :tangle .config/fish/config.fish
 
@@ -226,41 +230,35 @@ directory that will be autoloaded, but i prefer to configure everything in a sin
 # fish_add_path --prepend "~/.local/share/coursier/bin"
 # # ---------------------------------------------------------------------
 
-
 # # Environment Variables
 # # ---------------------------------------------------------------------
 # set VISUAL "emacsclient -c -a ''"
 # set EDITOR "emacsclient -t -a ''"
 # set SSH_ENV "$HOME/.ssh/agent-environment"
 
-# # Set vim as Manpager
-# set --export MANPAGER '/bin/bash -c "vim -MRn -c \"set buftype=nofile showtabline=0 ft=man ts=8 nomod nolist norelativenumber nonu noma\" -c \"normal L\" -c \"nmap q :qa<CR>\"</dev/tty <(col -b)"'
-# # ---------------------------------------------------------------------
-
-
 # # Aliases
 # # ---------------------------------------------------------------------
 # ## List - using exa as a replacement for ls 
-# alias ls="lsd --long --color=always --group-dirs=first --date '+%Y-%m-%d %H:%M'"
-# alias lsa="lsd --long --almost-all --group-dirs=first --date '+%Y-%m-%d %H:%M'"
-# alias lst="lsd --long --tree --depth=2 --color=always --date '+%Y-%m-%d %H:%M'"
+alias ls="lsd --long --color=always --group-dirs=first --date '+%Y-%m-%d %H:%M'"
+alias lsa="lsd --long --almost-all --group-dirs=first --date '+%Y-%m-%d %H:%M'"
+alias lst="lsd --long --tree --depth=2 --color=always --date '+%Y-%m-%d %H:%M'"
 # ## pbcopy pbpaste alias
 # alias pbcopy="xclip -selection clipboard"
 # alias pbpaste="xclip -selection clipboard -o"
 # ## a better cat
-# alias cat="bat"
+alias cat="bat"
 # ## I always miss the space
-# alias cd..="cd .."
+alias cd..="cd .."
 # ## Colorize the grep command output 
-# alias grep='grep --color=auto'
+alias grep='grep --color=auto'
 # ## File system space info in readable format
-# alias df='df --human-readable'
+alias df='df --human-readable'
 # ## Memory info 
-# alias free="free -mt"
+alias free="free -mt"
 # ## Continue download
-# alias wget="wget -c"
+alias wget="wget -c"
 # ## Userlist
-# alias userlist="cut -d: -f1 /etc/passwd"
+alias userlist="cut -d: -f1 /etc/passwd"
 # ## Aliases for software managment
 # ### Pacman
 # alias pacman='sudo pacman --color auto'
@@ -270,41 +268,25 @@ directory that will be autoloaded, but i prefer to configure everything in a sin
 # ### Yay as aur helper - updates everything
 # alias yayupdate="yay -Syu"
 # ### Mirror updates
-# alias mirror="sudo reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist"
-# alias mirrord="sudo reflector --latest 50 --number 20 --sort delay --save /etc/pacman.d/mirrorlist"
-# alias mirrors="sudo reflector --latest 50 --number 20 --sort score --save /etc/pacman.d/mirrorlist"
-# ## Process info
-# alias psa="ps auxf"
-# alias psgrep="ps aux | grep -v grep | grep -i -e VSZ -e"
-# ## Arcolinux
-# ### copy/paste all content of /etc/skel over to home folder - backup of config created - beware
-# alias skel='cp -Rf ~/.config ~/.config-backup-(date +%Y.%m.%d-%H.%M.%S) && cp -rf /etc/skel/* ~'
-# ## backup contents of /etc/skel to hidden backup folder in home/user
-# alias bupskel='cp -Rf /etc/skel ~/.skel-backup-(date +%Y.%m.%d-%H.%M.%S)'
-# ## Hardware info --short
-# alias hardware="hwinfo --short"
+alias mirror="sudo reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist"
+alias mirrord="sudo reflector --latest 50 --number 20 --sort delay --save /etc/pacman.d/mirrorlist"
+alias mirrors="sudo reflector --latest 50 --number 20 --sort score --save /etc/pacman.d/mirrorlist"
 # ## Calendar show full year
 # alias cal="cal -y -m"
-# ## youtube-dl
-# alias yta-best="youtube-dl --extract-audio --audio-format best "
-# alias yta-mp3="youtube-dl --extract-audio --audio-format mp3 "
-# alias yta-wav="youtube-dl --extract-audio --audio-format wav "
-# alias ytv-best="youtube-dl -f bestvideo+bestaudio "
 # # ---------------------------------------------------------------------
-
 
 # # Functions
 # # ---------------------------------------------------------------------
 
 # # Startup greeter
-function fish_greeting
-    neofetch
-end
+# function fish_greeting
+#     ""
+# end
 
 # # Use vim as default key bindings
-# function fish_user_key_bindings
-#   fish_vi_key_bindings
-# end
+function fish_user_key_bindings
+  fish_vi_key_bindings
+end
 
 # # Function for creating a backup file
 # # ex: backup file.txt
@@ -315,58 +297,58 @@ end
 
 # # Function to extract a variety of archives
 # # usage: extract <file>
-# function extract
-#   for arg in $argv
-#     if test -f $arg
-#       switch $arg
-#         case "*tar.bz2" "*.tbz2"
-#              tar xjf $arg
-#         case "*tar.gz" "*.tgz"
-#              tar xzf $arg
-#         case "*.bz2"
-#              bunzip2 $arg
-#         case "*rar"
-#              unrar x $arg
-#         case "*.gz"
-#              gunzip $arg
-#         case "*.tar"
-#              tar xf $arg
-#         case "*.zip"
-#              unzip $arg
-#         case "*.Z"
-#              uncompress $arg
-#         case "*7z"
-#              7z x $arg
-#         case "*.deb"
-#              ar x $arg
-#         case "*tar.xz"
-#              tar xz $arg
-#         case "*tar.zst"
-#              tar unzstd $arg
-#         case "*"
-#           set_color red
-#           echo "I don't know how to extract this type of archive: `$arg`"
-#           set_color normal
-#       end
-#     else
-#         set_color red
-#         echo "Not a valid file: `$arg`"
-#         set_color normal
-#     end
-#   end
-# end
+function extract
+  for arg in $argv
+    if test -f $arg
+      switch $arg
+        case "*tar.bz2" "*.tbz2"
+             tar xjf $arg
+        case "*tar.gz" "*.tgz"
+             tar xzf $arg
+        case "*.bz2"
+             bunzip2 $arg
+        case "*rar"
+             unrar x $arg
+        case "*.gz"
+             gunzip $arg
+        case "*.tar"
+             tar xf $arg
+        case "*.zip"
+             unzip $arg
+        case "*.Z"
+             uncompress $arg
+        case "*7z"
+             7z x $arg
+        case "*.deb"
+             ar x $arg
+        case "*tar.xz"
+             tar xz $arg
+        case "*tar.zst"
+             tar unzstd $arg
+        case "*"
+          set_color red
+          echo "I don't know how to extract this type of archive: `$arg`"
+          set_color normal
+      end
+    else
+        set_color red
+        echo "Not a valid file: `$arg`"
+        set_color normal
+    end
+  end
+end
 
-# function pesel
-#   pass pesel | pbcopy
-# end
+function pesel
+  pass pesel | pbcopy
+end
 
-# function weather
-#   ~/.config/fish/scripts/weather.sh
-# end
+function weather
+  ~/.config/fish/scripts/weather.sh
+end
 
-# function webcam
-#   ~/.config/fish/scripts/webcam.sh
-# end
+function webcam
+  ~/.config/fish/scripts/webcam.sh
+end
 # # ---------------------------------------------------------------------
 
 
@@ -653,7 +635,7 @@ textbox-prompt-colon {
 
  #+END_SRC
 
-* Dunst (Notifications)
+* Dunst
 
 I use dunst for simple notifications
 
@@ -1115,16 +1097,17 @@ function run {
 # setxkbmap -option "ctrl:nocaps"
 run dunst &
 run nm-applet &
+run udiskie &
+run cbatticon $
 # run blueberry-tray &
 # run volumeicon &
 # run xfce4-power-manager &
 # run picom --config $HOME/.config/picom/picom.conf &
 # run /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
-# run udiskie &
 
 #+END_SRC
 
-** TODO config.py
+** config.py
 
 TODO Fix:
 
@@ -1353,11 +1336,7 @@ floating_layout = layout.Floating(
     float_rules=[
         # Run the utility of `xprop` to see the wm class and name of an X client.
         ,*layout.Floating.default_float_rules,
-        Match(wm_class="confirmreset"),  # gitk
-        Match(wm_class="makebranch"),  # gitk
-        Match(wm_class="maketag"),  # gitk
         Match(wm_class="ssh-askpass"),  # ssh-askpass
-        Match(title="branchdialog"),  # gitk
         Match(title="pinentry"),  # GPG key password entry
         Match(wm_class='confirm'),
         Match(wm_class='dialog'),
@@ -1393,15 +1372,18 @@ for number, group in enumerate(groups, start=1):
     keys.append(Key([mod, "control"], str(number), lazy.window.togroup(group.name, switch_group=False)))
 
 # Layouts
-# TODO change colors
-layout_theme = {"border_width": 2,
-                "margin": 3,
-                "border_focus": COLORS["lime"],
-                "border_normal": "1D2330"
-                }
 layouts = [
-    layout.Columns(**layout_theme, border_focus_stack = "bf616a"),
-    layout.Max(**layout_theme),
+    layout.Columns(
+        margin=2,
+        border_width= 2,
+        border_normal=COLORS["background_0"],
+        border_focus=COLORS["lime"],
+        border_focus_stack=COLORS["nord_red"]),
+    layout.Max(
+        margin=0,
+        border_width=1,
+        border_focus=COLORS["frost3"],
+        ),
 ]
 
 # Screens & Widgets
@@ -1481,23 +1463,15 @@ screens = [
                 ),
                 # TODO
                 # -- volume
-                # -- battery
-
-
-                
-                # NB Systray is incompatible with Wayland, consider using StatusNotifier instead
-                # widget.StatusNotifier(),
                 widget.Systray(),
-                widget.Clock(format="%Y-%m-%d %H:%M"),  # TODO: open a calendar, maybe weather?
+                widget.Clock(format="%Y-%m-%d %H:%M |"),  # TODO: open a calendar, maybe weather?
                 #TODO temporary - should replace this with a proper logout/hibernate/etc menu
                 widget.QuickExit(
                     font="UbuntuMono Nerd Font",
-                    default_text="[󰐥]"
+                    default_text="󰐥 "
                 ),
             ],
             24,
-            # border_width=[2, 0, 2, 0],  # Draw top and bottom borders
-            # border_color=["ff00ff", "000000", "ff00ff", "000000"]  # Borders are magenta
         ),
         wallpaper = get_wallpaper(),
         wallpaper_mode = 'fill',
@@ -1532,10 +1506,14 @@ To get the password from kwallet it is using =keyring= so that dependency needs 
 
 import requests
 import subprocess
-from pathlib import Path
+import pathlib
 import logging
 
+
+LOGFILE = pathlib.Path().home() / ".local/share/qtile/inoreader.log"
 logger = logging.getLogger(__name__)
+handler = logging.FileHandler(LOGFILE)
+logger.addHandler(handler)
 
 def main():
 
@@ -1585,7 +1563,6 @@ def main():
     resp = requests.get(BASE_URL + "/unread-count", headers=headers)
     unreadcounts = resp.json()
     unread = unreadcounts['unreadcounts'][0]['count']
-
     return str(unread)
 
 
@@ -1611,10 +1588,13 @@ Similarly i have a script to count unread emails
 
 import imaplib
 import subprocess
-from pathlib import Path
+import pathlib
 import logging
 
+LOGFILE = pathlib.Path().home() / ".local/share/qtile/mailwatcher.log"
 logger = logging.getLogger(__name__)
+handler = logging.FileHandler(LOGFILE)
+logger.addHandler(handler)
 
 def main():
 
@@ -1652,3 +1632,70 @@ if __name__ == "__main__":
 
 #+END_SRC
 
+* GPG
+
+configuring gpg-agent to cache passphrase for a day
+https://wiki.archlinux.org/title/GnuPG#gpg-agent
+
+#+begin_src conf :tangle .gnupg/gpg-agent.conf
+# Generated from ~/dotfiles/system.org
+max-cache-ttl 86000
+default-cache-ttl 86000
+allow-preset-passphrase
+pinentry-program /home/saucoide/.guix-profile/bin/pinentry
+#+end_src
+
+
+* Lenovo Specific
+
+** TODO SD Card reader
+According to the archwiki, the SD card has a high power consumption, so i'm using the
+following script to toggle it on demand, while remainig disabled
+
+
+TODO------
+check if disabling it persists on reboot
+
+#+begin_src bash :tangle scripts/sdcard.sh :tangle-mode (identity #o755)
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Check if the driver is enabled
+if [[ -d "/sys/bus/usb/devices/2-3/driver" ]]; then
+    status="Enabled"
+else
+    status="Disabled"
+fi
+
+ 
+# Update status
+if [[ $# -eq 0 ]]; then
+    echo "SD Card reader status: ${status}"
+elif [[ "${1}" == "on" ]]; then
+    if [[ ${status} == "Disabled" ]]; then
+        echo 2-3 >> /sys/bus/usb/drivers/usb/bind
+        echo "Enabled SD Card reader."
+    else
+        echo "SD Card reader already enabled. No action taken."
+    fi
+elif [[ "${1}" == "off" ]]; then
+    if [[ ${status} == "Enabled" ]]; then
+        echo 2-3 >> /sys/bus/usb/drivers/usb/unbind
+        echo "Disabled SD Card reader."
+    else
+        echo "SD Card reader already disabled. No action taken."
+    fi
+else
+    echo "SD Card reader status: ${status}"
+fi
+
+#+end_src
+
+** Undervolting
+
+I'm using ~intel-undervolt~ and undervolted by -90mv
+
+set on ~/etc/intel-undervolt.conf~: =undervolt 2 'CPU Cache' -100=
+
+Apply & enable systemd service, archwiki for details

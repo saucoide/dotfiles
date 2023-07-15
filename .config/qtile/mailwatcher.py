@@ -2,10 +2,13 @@
 
 import imaplib
 import subprocess
-from pathlib import Path
+import pathlib
 import logging
 
+LOGFILE = pathlib.Path().home() / ".local/share/qtile/mailwatcher.log"
 logger = logging.getLogger(__name__)
+handler = logging.FileHandler(LOGFILE)
+logger.addHandler(handler)
 
 def main():
 
