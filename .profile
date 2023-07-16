@@ -8,3 +8,6 @@ GUIX_PROFILE="$HOME/.guix-profile"
 
 # fish as default non-login shell
 export SHELL=/usr/bin/fish
+
+# Add a few places to $PATH
+export PATH=$HOME/scripts:$PATH

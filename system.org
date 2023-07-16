@@ -3,9 +3,7 @@
 #+DESCRIPTION: laptop's config
 #+STARTUP: content
 
-TODO - battery widget not working
 TODO - volume not working
-TODO - brightness not working
 TODO - bluetooth/partially done, needs cleanup and fixing
 * About
 
@@ -52,6 +50,8 @@ GUIX_PROFILE="$HOME/.guix-profile"
 # fish as default non-login shell
 export SHELL=/usr/bin/fish
 
+# Add a few places to $PATH
+export PATH=$HOME/scripts:$PATH
 #+end_src
 
 * Guix
@@ -1098,10 +1098,9 @@ function run {
 run dunst &
 run nm-applet &
 run udiskie &
-run cbatticon $
+run xfce4-power-manager &
 # run blueberry-tray &
 # run volumeicon &
-# run xfce4-power-manager &
 # run picom --config $HOME/.config/picom/picom.conf &
 # run /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 
