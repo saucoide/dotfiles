@@ -3,8 +3,8 @@
 #+DESCRIPTION: laptop's config
 #+STARTUP: content
 
-TODO - volume not working
 TODO - bluetooth/partially done, needs cleanup and fixing
+TODO - emacsclient doesnt launch
 * About
 
 This is the configuration I use for a thinkpad t480s laptop.
@@ -1108,11 +1108,6 @@ run xfce4-power-manager &
 
 ** config.py
 
-TODO Fix:
-
-emacsclient doesnt launch
-media control keys
-border colors are all wrong
 #+begin_src python :tangle .config/qtile/config.py
 # -*- coding: utf-8 -*-
 #
@@ -1300,9 +1295,10 @@ keys = [
 
     ## Volume & Media keys
     # TODO:
-    # Key([], "XF86AudioRaiseVolume", lazy.spawn("amixer -D pulse -q sset Master 5%+")),
-    # Key([], "XF86AudioLowerVolume", lazy.spawn("amixer -D pulse -q sset Master 5%-")),
-    # Key([], "XF86AudioMute", lazy.spawn("amixer -D pulse -q set Master toggle")),
+    Key([], "XF86AudioRaiseVolume", lazy.spawn("pactl set-sink-volume @DEFAULT_SINK@ +5%")),
+    Key([], "XF86AudioLowerVolume", lazy.spawn("pactl set-sink-volume @DEFAULT_SINK@ -5%")),
+    Key([], "XF86AudioMute", lazy.spawn("pactl set-sink-mute @DEFAULT_SINK@ toggle")),
+    Key([], "XF86AudioMicMute", lazy.spawn("pactl set-source-mute @DEFAULT_SOURCE@ toggle")),
 
     # Key([], "XF86AudioPlay", lazy.spawn("playerctl play-pause")),
     # Key([], "XF86AudioNext", lazy.spawn("playerctl next")),
@@ -1455,13 +1451,10 @@ screens = [
                     format="{temp:.0f}{unit} |",
                     update_interval=5,
                 ),
-                widget.Volume(
+                widget.PulseVolume(
                     fmt=" {} |",
-                    volume_app = "pulseaudio",
-                    # TODO add volum control commands
-                ),
-                # TODO
-                # -- volume
+                    update_interval=1,
+                ), 
                 widget.Systray(),
                 widget.Clock(format="%Y-%m-%d %H:%M |"),  # TODO: open a calendar, maybe weather?
                 #TODO temporary - should replace this with a proper logout/hibernate/etc menu
@@ -1652,8 +1645,9 @@ According to the archwiki, the SD card has a high power consumption, so i'm usin
 following script to toggle it on demand, while remainig disabled
 
 
-TODO------
-check if disabling it persists on reboot
+TODO
+- Disabling does not persist on boot
+  I need to try to find a way to make this autostart (but needs sudo)
 
 #+begin_src bash :tangle scripts/sdcard.sh :tangle-mode (identity #o755)
 #!/usr/bin/env bash

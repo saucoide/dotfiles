@@ -184,9 +184,10 @@ keys = [
 
     ## Volume & Media keys
     # TODO:
-    # Key([], "XF86AudioRaiseVolume", lazy.spawn("amixer -D pulse -q sset Master 5%+")),
-    # Key([], "XF86AudioLowerVolume", lazy.spawn("amixer -D pulse -q sset Master 5%-")),
-    # Key([], "XF86AudioMute", lazy.spawn("amixer -D pulse -q set Master toggle")),
+    Key([], "XF86AudioRaiseVolume", lazy.spawn("pactl set-sink-volume @DEFAULT_SINK@ +5%")),
+    Key([], "XF86AudioLowerVolume", lazy.spawn("pactl set-sink-volume @DEFAULT_SINK@ -5%")),
+    Key([], "XF86AudioMute", lazy.spawn("pactl set-sink-mute @DEFAULT_SINK@ toggle")),
+    Key([], "XF86AudioMicMute", lazy.spawn("pactl set-source-mute @DEFAULT_SOURCE@ toggle")),
 
     # Key([], "XF86AudioPlay", lazy.spawn("playerctl play-pause")),
     # Key([], "XF86AudioNext", lazy.spawn("playerctl next")),
@@ -339,13 +340,10 @@ screens = [
                     format="{temp:.0f}{unit} |",
                     update_interval=5,
                 ),
-                widget.Volume(
+                widget.PulseVolume(
                     fmt=" {} |",
-                    volume_app = "pulseaudio",
-                    # TODO add volum control commands
-                ),
-                # TODO
-                # -- volume
+                    update_interval=1,
+                ), 
                 widget.Systray(),
                 widget.Clock(format="%Y-%m-%d %H:%M |"),  # TODO: open a calendar, maybe weather?
                 #TODO temporary - should replace this with a proper logout/hibernate/etc menu
