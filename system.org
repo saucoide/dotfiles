@@ -2727,17 +2727,13 @@ allow-preset-passphrase
 pinentry-program /home/saucoide/.guix-profile/bin/pinentry
 #+end_src
 
-* TODO Lenovo Specific
+* Lenovo Specific
+** SD Card reader
 
-** TODO SD Card reader
 According to the archwiki, the SD card has a high power consumption, so i'm using the
 following script to toggle it on demand, while remainig disabled
 
-TODO
-- Disabling does not persist on boot
-  I need to try to find a way to make this autostart (but needs sudo)
-
-#+begin_src bash :tangle scripts/sdcard.sh :tangle-mode (identity #o755)
+#+begin_src bash :tangle scripts/sdcard :tangle-mode (identity #o755)
 #!/usr/bin/env bash
 
 set -euo pipefail
@@ -2774,9 +2770,21 @@ fi
 #+end_src
 
 And a systemd Unit to handle it on startup
+=/etc/systemd/system/sdcardoff.service=
+and copy the script above to
+=/usr/share/scripts/sdcard=
 
-#+begin_src
+#+begin_src conf
+[Unit]
+Description=SD Card Reader Disable
 
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/usr/share/scripts/sdcard
+
+[Install]
+WantedBy=default.target
 #+end_src
 
 ** Undervolting

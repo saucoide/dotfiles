@@ -1,0 +1,13 @@
+#!/usr/bin/env python3
+
+from getpass import getpass
+
+def main():
+    pw =getpass("pw: ")
+    print(" ".join([str(i).zfill(2) for i in range(1, len(pw) + 1)]))
+    print(" ".join([" |" for _ in range(1, len(pw) + 1)]))
+    print(" ".join([f" {char}" for char in pw]))
+
+
+if __name__ == "__main__":
+    main()
