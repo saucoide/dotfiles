@@ -38,7 +38,7 @@ mod = "mod4"
 
 # Programs & Constants'
 TERMINAL = guess_terminal()
-TEXT_EDITOR = "emacsclient -c -a ''"
+TEXT_EDITOR = "emacsclient --create-frame --alternate-editor ''"
 EMAIL_CLIENT = "emacs"
 FILE_MANAGER = "thunar"
 BROWSER = "firefox"
@@ -348,14 +348,8 @@ screens = [
                 widget.Clock(format="%Y-%m-%d %H:%M |"),  # TODO: open a calendar, maybe weather?
                 widget.TextBox(
                     fmt="󰐥 ",
-                    # margin =
                     mouse_callbacks = {'Button1': lazy.spawn("rofi -show drun")}
                 ),
-                #TODO temporary - should replace this with a proper logout/hibernate/etc menu
-                # widget.QuickExit(
-                #     font="UbuntuMono Nerd Font",
-                #     default_text="󰐥 "
-                # ),
             ],
             24,
         ),
