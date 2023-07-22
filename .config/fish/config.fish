@@ -45,9 +45,7 @@ alias userlist="cut -d: -f1 /etc/passwd"
 # ### Yay as aur helper - updates everything
 # alias yayupdate="yay -Syu"
 # ### Mirror updates
-alias mirror="sudo reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist"
-alias mirrord="sudo reflector --latest 50 --number 20 --sort delay --save /etc/pacman.d/mirrorlist"
-alias mirrors="sudo reflector --latest 50 --number 20 --sort score --save /etc/pacman.d/mirrorlist"
+alias mirrors="sudo reflector --latest 50 --sort rate --save /etc/pacman.d/mirrorlist"
 # ## Calendar show full year
 # alias cal="cal -y -m"
 # # ---------------------------------------------------------------------

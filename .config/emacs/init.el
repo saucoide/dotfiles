@@ -184,18 +184,25 @@
     (set-fringe-mode 3) 		; margins
     (menu-bar-mode -1)) 		; disable menu bar
 
-(use-package emacs
-    :config
-    (if my/is-windows
-        (progn
-            ;; Windows
-            (set-face-attribute 'default nil :font "Consolas" :height 100) ; default font
-            (set-face-attribute 'fixed-pitch nil :font "Consolas" :height 100) ; monospace font 
-            (set-face-attribute 'variable-pitch nil :font "Consolas" :height 100)) ; variable width font
-        ;; Linux
-        (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font" :height 100) ; default font
-        (set-face-attribute 'fixed-pitch nil :font "JetBrainsMono Nerd Font" :height 100) ; monospace font
-        (set-face-attribute 'variable-pitch nil :font "JetBrainsMono Nerd Font" :height 100))) ; variable width font
+(defun set-fonts-after-frame (frame)
+  (if (display-graphic-p frame)
+      (progn
+        (add-to-list 'default-frame-alist '(font . "JetBrainsMono Nerd Font"))
+        (set-face-attribute 'default nil
+                            :font "JetBrainsMono Nerd Font"
+                            :height 120)
+        (set-face-attribute 'fixed-pitch nil
+                            :font "JetBrainsMono Nerd Font"
+                            :height 120) ; monospace font
+        (set-face-attribute 'variable-pitch nil
+                            :font "JetBrainsMono Nerd Font"
+                            :height 120)
+        )
+    )
+  )
+
+(mapc 'set-fonts-after-frame (frame-list))
+(add-hook 'after-make-frame-functions 'set-fonts-after-frame)
 
 (global-display-line-numbers-mode t)
 (setq display-line-numbers-type 't)
@@ -222,7 +229,15 @@
 ;; all the icons is needed for doom-modeline
 ;; run M-x all-the-icons-install-fonts 
 ;; in WINDOWS that will only download the fonts, and then you need to install them manually
-(use-package all-the-icons)
+;; (use-package all-the-icons)
+(use-package nerd-icons
+  :config
+  (setq nerd-icons-font-family "JetBrainsMono Nerd Font"))
+  ;; (insert (nerd-icons-octicon "nf-oct-mark_github" :height 10)))
+
+(use-package nerd-icons-completion
+  :config
+  (nerd-icons-completion-mode))
 
 ;; doom-modeline to replace the standard modeline
 (use-package doom-modeline
@@ -236,26 +251,33 @@
     (doom-modeline-mode 1))
 
 (use-package dashboard
-    :config
-    (dashboard-setup-startup-hook)
-    ;; :requires page-break-lines
-    :config
-    (setq dashboard-startup-banner "~/.config/emacs/logo.png")
-    ;; (setq dashboard-startup-banner "~/.config/emacs/logo.txt")
-	;; (setq dashboard-center-content t)
-    (setq dashboard-set-navigator t)
-	(setq dashboard-agenda-time-string-format "%Y-%m-%d %a")
-	(setq dashboard-match-agenda-entry "CATEGORY={TODO}")
-	(setq dashboard-filter-agenda-entry 'dashboard-no-filter-agenda)
-	;; (setq dashboard-agenda-release-buffers t)
-    (unless my/is-windows
-        (setq dashboard-set-file-icons t)
-        (setq dashboard-set-heading-icons t))
-    ;; (setq dashboard-footer-icon nil)
-    (setq dashboard-items '((recents  . 5)
-                            (bookmarks . 5)
-                            (projects . 5)
-                            (agenda . 10))))
+  :config
+  (dashboard-setup-startup-hook)
+  ;; :requires page-break-lines
+  :config
+  (setq dashboard-startup-banner "~/.config/emacs/logo.png")
+  ;; (setq dashboard-startup-banner "~/.config/emacs/logo.txt")
+  (setq dashboard-center-content nil)
+  (setq dashboard-set-navigator t)
+  (setq dashboard-agenda-time-string-format "%Y-%m-%d %a")
+  (setq dashboard-match-agenda-entry "CATEGORY={TODO}")
+  (setq dashboard-filter-agenda-entry 'dashboard-no-filter-agenda)
+  ;; (setq dashboard-agenda-release-buffers t)
+  (setq dashboard-display-icons-p t)
+  (setq dashboard-icon-type 'nerd-icons)
+  (setq dashboard-set-file-icons t)
+  (setq dashboard-set-heading-icons t)
+  ;; Explicitly set icons because of a bug in dashboard.el
+  (setq dashboard-heading-icons '((recents   . "nf-oct-history")
+                                  (bookmarks . "nf-oct-bookmark")
+                                  (agenda    . "nf-oct-calendar")
+                                  (projects  . "nf-oct-rocket")
+                                  (registers . "nf-oct-database")))
+  ;; (setq dashboard-footer-icon t)
+  (setq dashboard-items '((recents  . 5)
+                          (bookmarks . 5)
+                          (projects . 5)
+                          (agenda . 10))))
 
 ;; Set dashboard to be the initial buffer that opens when using emacsclient
 (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
@@ -269,9 +291,11 @@
              (format (if (buffer-modified-p)  " * %s" " - %s") project-name))))))
 
 ;; show icons on dired
-(use-package all-the-icons-dired
-    :hook (dired-mode . all-the-icons-dired-mode))
-
+;; (use-package all-the-icons-dired
+;;     :hook (dired-mode . all-the-icons-dired-mode))
+;; show icons on dired
+(use-package nerd-icons-dired
+    :hook (dired-mode . nerd-icons-dired-mode))
 ;; dired-single forces a single dired buffer instead of a new one everytime
 (use-package dired-single)
 (use-package dired-hide-dotfiles)

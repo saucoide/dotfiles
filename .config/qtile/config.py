@@ -221,7 +221,7 @@ floating_layout = layout.Floating(
         # Run the utility of `xprop` to see the wm class and name of an X client.
         *layout.Floating.default_float_rules,
         Match(wm_class="ssh-askpass"),  # ssh-askpass
-        Match(title="pinentry"),  # GPG key password entry
+        Match(wm_class="pinentry"),
         Match(wm_class='confirm'),
         Match(wm_class='dialog'),
         Match(wm_class='download'),
@@ -346,11 +346,16 @@ screens = [
                 ), 
                 widget.Systray(),
                 widget.Clock(format="%Y-%m-%d %H:%M |"),  # TODO: open a calendar, maybe weather?
-                #TODO temporary - should replace this with a proper logout/hibernate/etc menu
-                widget.QuickExit(
-                    font="UbuntuMono Nerd Font",
-                    default_text="󰐥 "
+                widget.TextBox(
+                    fmt="󰐥 ",
+                    # margin =
+                    mouse_callbacks = {'Button1': lazy.spawn("rofi -show drun")}
                 ),
+                #TODO temporary - should replace this with a proper logout/hibernate/etc menu
+                # widget.QuickExit(
+                #     font="UbuntuMono Nerd Font",
+                #     default_text="󰐥 "
+                # ),
             ],
             24,
         ),

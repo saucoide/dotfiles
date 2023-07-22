@@ -3,8 +3,8 @@
 #+DESCRIPTION: laptop's config
 #+STARTUP: content
 
-TODO - bluetooth/partially done, needs cleanup and fixing
-TODO - emacsclient doesnt launch
+TOOD - create systemd unit to handle turning off SD card on autostart
+
 * About
 
 This is the configuration I use for a thinkpad t480s laptop.
@@ -29,12 +29,102 @@ Emacs configuration is in a separate [[emacs_config.org][]] file.
 2. Install the base packages with pacman
 
 #+begin_src bash
+
 # This list might be different depending on what base install of arch is done
-pacman -S git fish
+pacman -Syyu git fish alacritty starship lsd 
+
+# Packaging
+pacman -Syyu reflector
+systemctl enable reflector.timer
+
+# AUR helper
+pacman -S base-devel
+git clone https://aur.archlinux.org/yay.git
+cd yay
+makepkg -si
+
+# Clock synchronization
+# To change timezones - timedatectl commands
+pacman -Syyu ntp
+systemctl enable ntpd.service
+
+# Python deps (for my modules in qtile)
+pacman -Syyu python-pip python-pipx python-keyring python-psutil python-requests
+
+# Network
+pacman -Syyu networkmanager network-manager-applet
+
+# Firewall
+pacman -Syyu ufw
+systemctl start ufw.service
+systemctl enable ufw.service
+ufw default deny
+ufw limit ssh
+ufw allow from 192.168.0.0/24 to any port 80  # incoming http over lan
+ufw allow from 192.168.0.0/24 to any port 442  # incoming https over lan
+# to allow all on LAN
+# ufw alllow from 192.168.0.0/24
+# ufw allow Transmission  # torrent client
+
+# Screens
+pacman -Syyu arandr
+
+# Libinput / Mouse / Trackpoint / Touchscreen...
+pacman -Syyu xinput
+
+# Battery
+pacman -Syyu xfce4-power-manager
+
+# Audio
+pacman -Syyu pipewire pipewire-alsa pipewire-pulse pavucontrol
+
+# Volume mounting
+pacman -Syyu udiskie
+
+# Bluetooth
+pacman -Syyu bluez bluez-utils blueman
+systemctl start bluetooth.service
+
+# Printers / CUPS
+pacman -Syyu cups cups-pdf system-config-printer
+systemctl start cups.socket
+
+# GPG 
+pacman -Syyu ???
+
+# Login Manager & Screenlock
+pacman -Syyu lightdm light-locker lightdm-slick-greeter
+
+# Appearance
+pacman -Syyu lxappearance-gtk3 papirus-icon-theme arc-theme kvantum-qt5
+yay -Syyu xcursor-breeze
+
+# Fonts
+pacman -Syyu font-manager ttf-jetbrains-mono-nerd ttf-ubuntu-mono-nerd
+
 #+end_src
    
 3. Install Guix
-4. 
+
+#+begin_src bash
+
+#+end_src
+   
+#+begin_src scheme tangle: TODO/manifest.scm
+
+;; GPG
+pinentry
+
+#+end_src
+
+4. Other settings
+
+#+begin_src bash
+
+# TRIM SSDs
+systemctl enable fstrim.timer
+
+#+end_src
 
 * .profile
 
@@ -93,8 +183,7 @@ Guix channel configuration
 #+end_src
 
 * Terminal
-
-I am using termite as my terminal
+I am using alacritty as my terminal
 ** bashrc
 
 #+BEGIN_SRC conf :tangle .bashrc
@@ -268,9 +357,7 @@ alias userlist="cut -d: -f1 /etc/passwd"
 # ### Yay as aur helper - updates everything
 # alias yayupdate="yay -Syu"
 # ### Mirror updates
-alias mirror="sudo reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist"
-alias mirrord="sudo reflector --latest 50 --number 20 --sort delay --save /etc/pacman.d/mirrorlist"
-alias mirrors="sudo reflector --latest 50 --number 20 --sort score --save /etc/pacman.d/mirrorlist"
+alias mirrors="sudo reflector --latest 50 --sort rate --save /etc/pacman.d/mirrorlist"
 # ## Calendar show full year
 # alias cal="cal -y -m"
 # # ---------------------------------------------------------------------
@@ -430,10 +517,83 @@ disabled = true
 
 TODO: config alacritty theme
 
+* Lightdm
+
+This file does not get tangled as it's not the user's =~/.config=
+copy manually to =/etc/lightdm/lightdm-gtk-greeter.conf=
+
+#+begin_src conf
+
+# LightDM GTK+ Configuration
+# Available configuration options listed below.
+#
+# Appearance:
+#  theme-name = GTK+ theme to use
+#  icon-theme-name = Icon theme to use
+#  cursor-theme-name = Cursor theme to use
+#  cursor-theme-size = Cursor size to use
+#  background = Background file to use, either an image path or a color (e.g. #772953)
+#  user-background = false|true ("true" by default)  Display user background (if available)
+#  transition-duration = Length of time (in milliseconds) to transition between background images ("500" by default)
+#  transition-type = ease-in-out|linear|none  ("ease-in-out" by default)
+#
+# Fonts:
+#  font-name = Font to use
+#  xft-antialias = false|true  Whether to antialias Xft fonts
+#  xft-dpi = Resolution for Xft in dots per inch (e.g. 96)
+#  xft-hintstyle = none|slight|medium|hintfull  What degree of hinting to use
+#  xft-rgba = none|rgb|bgr|vrgb|vbgr  Type of subpixel antialiasing
+#
+# Login window:
+#  active-monitor = Monitor to display greeter window (name or number). Use #cursor value to display greeter at monitor with cursor. Can be a semicolon separated list
+#  position = x y ("50% 50%" by default)  Login window position
+#  default-user-image = Image used as default user icon, path or #icon-name
+#  hide-user-image = false|true ("false" by default)
+#
+# Panel:
+#  panel-position = top|bottom ("top" by default)
+#  clock-format = strftime-format string, e.g. %H:%M
+#  indicators = semi-colon ";" separated list of allowed indicator modules. Built-in indicators include "~a11y", "~language", "~session", "~power", "~clock", "~host", "~spacer". Unity indicators can be represented by short name (e.g. "sound", "power"), service file name, or absolute path
+#
+# Accessibility:
+#  a11y-states = states of accessibility features: "name" - save state on exit, "-name" - disabled at start (default value for unlisted), "+name" - enabled at start. Allowed names: contrast, font, keyboard, reader.
+#  keyboard = command to launch on-screen keyboard (e.g. "onboard")
+#  keyboard-position = x y[;width height] ("50%,center -0;50% 25%" by default)  Works only for "onboard"
+#  reader = command to launch screen reader (e.g. "orca")
+#  at-spi-enabled = false|true ("true" by default) Enables accessibility at-spi-command if the greeter is built with it enabled
+#
+# Security:
+#  allow-debugging = false|true ("false" by default)
+#  screensaver-timeout = Timeout (in seconds) until the screen blanks when the greeter is called as lockscreen
+#
+# Template for per-monitor configuration:
+#  [monitor: name]
+#  background = overrides default value
+#  user-background = overrides default value
+#  laptop = false|true ("false" by default) Marks monitor as laptop display
+#  transition-duration = overrides default value
+#
+[greeter]
+background=/usr/share/backgrounds/nord_arch.png
+#user-background=
+theme-name=Arc-Dark-solid
+icon-theme-name=Papirus-Dark
+font-name=Cantarell
+#xft-antialias=
+#xft-dpi=
+#xft-hintstyle=
+#xft-rgba=
+#indicators=
+#clock-format=
+#keyboard=
+#reader=
+position=10%,start 50%,center
+screensaver-timeout=3600
+
+#+end_src
+
 * Rofi
-
 I use a custom rofi theme with nord colors
-
 ** config
 
 #+BEGIN_SRC conf :tangle .config/rofi/config.rasi
@@ -1099,10 +1259,19 @@ run dunst &
 run nm-applet &
 run udiskie &
 run xfce4-power-manager &
-# run blueberry-tray &
-# run volumeicon &
-# run picom --config $HOME/.config/picom/picom.conf &
-# run /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
+run blueman-applet &
+run light-locker &
+
+# Using xinput to set input settings
+# xinput list # list devices
+# xinput list-props {device} # list devices
+# xinput set-prop {device} {property} {value}
+# Touchpad settings
+xinput -set-prop "Elan Touchpad" "libinput Tapping Enabled" 1
+
+# Trackpoint settings
+xinput set-prop "Elan TrackPoint" "libinput Accel Speed" -0.4
+
 
 #+END_SRC
 
@@ -1149,7 +1318,7 @@ mod = "mod4"
 
 # Programs & Constants'
 TERMINAL = guess_terminal()
-TEXT_EDITOR = "emacsclient -c -a ''"
+TEXT_EDITOR = "emacsclient --create-frame --alternate-editor ''"
 EMAIL_CLIENT = "emacs"
 FILE_MANAGER = "thunar"
 BROWSER = "firefox"
@@ -1332,7 +1501,7 @@ floating_layout = layout.Floating(
         # Run the utility of `xprop` to see the wm class and name of an X client.
         ,*layout.Floating.default_float_rules,
         Match(wm_class="ssh-askpass"),  # ssh-askpass
-        Match(title="pinentry"),  # GPG key password entry
+        Match(wm_class="pinentry"),
         Match(wm_class='confirm'),
         Match(wm_class='dialog'),
         Match(wm_class='download'),
@@ -1457,10 +1626,9 @@ screens = [
                 ), 
                 widget.Systray(),
                 widget.Clock(format="%Y-%m-%d %H:%M |"),  # TODO: open a calendar, maybe weather?
-                #TODO temporary - should replace this with a proper logout/hibernate/etc menu
-                widget.QuickExit(
-                    font="UbuntuMono Nerd Font",
-                    default_text="󰐥 "
+                widget.TextBox(
+                    fmt="󰐥 ",
+                    mouse_callbacks = {'Button1': lazy.spawn("rofi -show drun")}
                 ),
             ],
             24,
@@ -1637,8 +1805,7 @@ allow-preset-passphrase
 pinentry-program /home/saucoide/.guix-profile/bin/pinentry
 #+end_src
 
-
-* Lenovo Specific
+* TODO Lenovo Specific
 
 ** TODO SD Card reader
 According to the archwiki, the SD card has a high power consumption, so i'm using the
@@ -1691,4 +1858,11 @@ I'm using ~intel-undervolt~ and undervolted by -90mv
 
 set on ~/etc/intel-undervolt.conf~: =undervolt 2 'CPU Cache' -100=
 
-Apply & enable systemd service, archwiki for details
+#+begin_src bash
+# install
+pacman -Syyu intel-undervolt
+# edit /etc/intel-undervolt.conf and then:
+intel-undervolt apply
+intel-undervolt read
+systemctl enable intel-undervolt
+#+end_src
