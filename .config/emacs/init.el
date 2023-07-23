@@ -730,7 +730,6 @@
   ;; US date format is no good
   (setq mu4e-headers-date-format "%Y-%m-%d")
 
-  (add-to-list 'mu4e-view-actions '("View in browser" . mu4e-action-view-in-browser))
 
   ;; Prefer always the plaintext version if it exists
   (with-eval-after-load "mm-decode"
@@ -796,7 +795,11 @@
   ;; (setq mu4e-headers-encrypted-mark '("x" . "🔑 "))
   ;; (setq mu4e-headers-signed-mark    '("s" . "🖊 "))
 
-
+  ;; View as html
+  ;; (add-to-list 'mu4e-view-actions
+  ;;              '("xWidget View" . mu4e-action-view-with-xwidget) t)
+  ;; (add-to-list 'mu4e-view-actions
+  ;;              '("View in browser" . mu4e-action-view-in-browser) t)
   
   ;; Shortcuts
   (setq mu4e-maildir-shortcuts

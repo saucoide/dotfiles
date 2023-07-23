@@ -9,8 +9,9 @@ This is the configuration I use for a thinkpad t480s laptop.
 
 It uses Archlinux with Qtile window manager.
 
-Both pacman and guix are used, but I try to keep the things installed
-with pacman to a minimum. 
+Both pacman and guix are used, i try to use guix where possible, but mostly only for
+terminal applications since i've been having problems with themes/icons on other programs
+unfortunately
 
 This file is a literate config written in org-mode, use =org-babel-tangle= to
 write the code blocks, and GNU Stow to symlink them into the home directory
@@ -99,6 +100,9 @@ yay -Syyu xcursor-breeze
 
 # Fonts
 pacman -Syyu font-manager ttf-jetbrains-mono-nerd ttf-ubuntu-mono-nerd
+
+# Image viewing & manipulation
+pacman -Syyu ristretto pinta gimp
 
 #+end_src
    
@@ -192,115 +196,7 @@ I am using alacritty as my terminal
 #
 # Generated from ~/dotfiles/system.org
 #
-
-# PS1='\[\e[31m\]\u\[\e[34m\]@\h:\[\e[32m\]\w$ \[\e[0m\]'
-
-# PATH
-
-# if [ -d "$HOME/.bin" ] ;
-#   then PATH="$HOME/.bin:$PATH"
-# fi
-
-# if [ -d "$HOME/.local/bin" ] ;
-#   then PATH="$HOME/.local/bin:$PATH"
-# fi
-
-# export PATH=~/.local/bin:$PATH
-# export PATH=~/.emacs.d/bin:$PATH
-# export PATH=~/.poetry/bin:$PATH
-
-# export EDITOR=vim
-
-# use vim as manpager
-# export MANPAGER='/bin/bash -c "vim -MRn -c \"set buftype=nofile showtabline=0 ft=man ts=8 nomod nolist norelativenumber nonu noma\" -c \"normal L\" -c \"nmap q :qa<CR>\"</dev/tty <(col -b)"'
-
-# #readable output
-# alias df='df --human-readable'
-
-# #pacman unlock
-# alias unlock="sudo rm /var/lib/pacman/db.lck"
-
-# #free
-# alias free="free -mt"
-
-# #use all cores
-# alias uac="sh ~/.bin/main/000*"
-
-# #continue download
-# alias wget="wget -c"
-
-# #userlist
-# alias userlist="cut -d: -f1 /etc/passwd"
-
-# #merge new settings
-# alias merge="xrdb -merge ~/.Xresources"
-
-# # Aliases for software managment
-# # pacman or pm
-# alias pacman='sudo pacman --color auto'
-# alias update='sudo pacman -Syyu'
-
-# # yay as aur helper - updates everything
-# alias upall="yay -Syu"
-
-# #ps
-# alias psa="ps auxf"
-# alias psgrep="ps aux | grep -v grep | grep -i -e VSZ -e"
-
-# #grub update
-# alias update-grub="sudo grub-mkconfig -o /boot/grub/grub.cfg"
-
-# #add new fonts
-# alias update-fc='sudo fc-cache -fv'
-
-# #copy/paste all content of /etc/skel over to home folder - backup of config created - beware
-# alias skel='cp -Rf ~/.config ~/.config-backup-$(date +%Y.%m.%d-%H.%M.%S) && cp -rf /etc/skel/* ~'
-# #backup contents of /etc/skel to hidden backup folder in home/user
-# alias bupskel='cp -Rf /etc/skel ~/.skel-backup-$(date +%Y.%m.%d-%H.%M.%S)'
-
-# #switch between bash and zsh
-# alias tobash="sudo chsh $USER -s /bin/bash && echo 'Now log out.'"
-# alias tozsh="sudo chsh $USER -s /bin/zsh && echo 'Now log out.'"
-
-# #hardware info --short
-# alias hw="hwinfo --short"
-
-# #get fastest mirrors in your neighborhood
-# alias mirror="sudo reflector -f 30 -l 30 --number 10 --verbose --save /etc/pacman.d/mirrorlist"
-# alias mirrord="sudo reflector --latest 50 --number 20 --sort delay --save /etc/pacman.d/mirrorlist"
-# alias mirrors="sudo reflector --latest 50 --number 20 --sort score --save /etc/pacman.d/mirrorlist"
-# alias mirrora="sudo reflector --latest 50 --number 20 --sort age --save /etc/pacman.d/mirrorlist"
-
-# #mounting the folder Public for exchange between host and guest on virtualbox
-# alias vbm="sudo mount -t vboxsf -o rw,uid=1000,gid=1000 Public /home/$USER/Public"
-
-# #calendar
-# alias cal="cal -y -m"
-
-# #youtube-dl
-# alias yta-best="youtube-dl --extract-audio --audio-format best "
-# alias yta-mp3="youtube-dl --extract-audio --audio-format mp3 "
-# alias yta-wav="youtube-dl --extract-audio --audio-format wav "
-# alias ytv-best="youtube-dl -f bestvideo+bestaudio "
-
-# #Recent Installed Packages
-# alias rip="expac --timefmt='%Y-%m-%d %T' '%l\t%n %v' | sort | tail -200 | nl"
-# alias riplong="expac --timefmt='%Y-%m-%d %T' '%l\t%n %v' | sort | tail -3000 | nl"
-
-# #Cleanup orphaned packages
-# alias cleanup='sudo pacman -Rns $(pacman -Qtdq)'
-
-# #get the error messages from journalctl
-# alias jctl="journalctl -p 3 -xb"
-
-# #emacs for important configuration files
-# #know what you do in these files
-# alias elightdm="sudo emacs /etc/lightdm/lightdm.conf"
-# alias epacman="sudo emacs /etc/pacman.conf"
-# alias egrub="sudo emacs /etc/default/grub"
-# alias eoblogout="sudo emacs /etc/oblogout.conf"
-# alias bls="betterlockscreen -u /usr/share/backgrounds/arcolinux/"
-
+    
 #+END_SRC
 ** neofetch
 
@@ -1327,29 +1223,8 @@ set fish_color_autosuggestion "4c566a"
 # # fish_color_search_match
 # # ---------------------------------------------------------------------
 
-
-# # PATH
-# # TODO fix this
-# # function start_agent {
-# #     echo "Initialising new SSH agent..."
-# #     /usr/bin/ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
-# #     echo succeeded
-# #     chmod 600 "${SSH_ENV}"
-# #     . "${SSH_ENV}" > /dev/null
-# #     /usr/bin/ssh-add;
-# # }
-
-# # # Source SSH settings, if applicable
-
-# # if [ -f "${SSH_ENV}" ]; then
-# #     . "${SSH_ENV}" > /dev/null
-# #     #ps ${SSH_AGENT_PID} doesn't work under cywgin
-# #     ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
-# #         start_agent;
-# #     }
-# # else
-# #     start_agent;
-# # fi
+# direnv for my .envrc files
+direnv hook fish | source
 
 # PROMPT (starship https://github.com/starship/starship)
 starship init fish | source
@@ -3652,7 +3527,6 @@ keys = [
     Key([mod, "shift"], "r", lazy.restart(), desc='Restart Qtile'),
     Key([mod, "shift"], "q", lazy.shutdown(), desc='Shutdown Qtile'),
     Key([mod, "control"], "r", lazy.reload_config(), desc="Reload the config"),
-    #Key([mod], "x", lazy.spawn('arcolinux-logout')),
 
     # Window Control
 
@@ -3788,7 +3662,6 @@ floating_layout = layout.Floating(
         Match(wm_class='splash'),
         Match(wm_class='toolbar'),
         Match(wm_class='Arandr'),
-        Match(wm_class='arcolinux-logout'),
         Match(title='Open File'),
     ],
     border_width=1,
@@ -3910,7 +3783,7 @@ screens = [
                 ),
                 widget.TextBox(
                     fmt="󰐥 ",
-                    mouse_callbacks={'Button1': lazy.spawn("exit-menu")}
+                    mouse_callbacks={'Button1': lazy.spawn("logout-menu")}
                 ),
             ],
             24,
@@ -4003,6 +3876,7 @@ def main():
                'AppKey': app_key}
 
     resp = requests.get(BASE_URL + "/unread-count", headers=headers)
+    resp.raise_for_status()
     unreadcounts = resp.json()
     unread = unreadcounts['unreadcounts'][0]['count']
     return str(unread)

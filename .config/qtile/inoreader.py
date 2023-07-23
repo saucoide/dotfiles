@@ -57,6 +57,7 @@ def main():
                'AppKey': app_key}
 
     resp = requests.get(BASE_URL + "/unread-count", headers=headers)
+    resp.raise_for_status()
     unreadcounts = resp.json()
     unread = unreadcounts['unreadcounts'][0]['count']
     return str(unread)

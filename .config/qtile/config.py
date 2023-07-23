@@ -95,7 +95,6 @@ keys = [
     Key([mod, "shift"], "r", lazy.restart(), desc='Restart Qtile'),
     Key([mod, "shift"], "q", lazy.shutdown(), desc='Shutdown Qtile'),
     Key([mod, "control"], "r", lazy.reload_config(), desc="Reload the config"),
-    #Key([mod], "x", lazy.spawn('arcolinux-logout')),
 
     # Window Control
 
@@ -231,7 +230,6 @@ floating_layout = layout.Floating(
         Match(wm_class='splash'),
         Match(wm_class='toolbar'),
         Match(wm_class='Arandr'),
-        Match(wm_class='arcolinux-logout'),
         Match(title='Open File'),
     ],
     border_width=1,
@@ -353,7 +351,7 @@ screens = [
                 ),
                 widget.TextBox(
                     fmt="󰐥 ",
-                    mouse_callbacks={'Button1': lazy.spawn("exit-menu")}
+                    mouse_callbacks={'Button1': lazy.spawn("logout-menu")}
                 ),
             ],
             24,

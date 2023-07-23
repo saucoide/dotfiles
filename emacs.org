@@ -58,7 +58,7 @@ TODO - update the key bindings from macflop
   - [[#toc-org][Toc-Org]]
 - [[#org-roam][Org Roam]]
 - [[#email---mu4e][Email - mu4e]]
-  - [[#getting-emails-from-the-account---mbsync][Getting emails from the account - mbsync]]
+  - [[#getting-emails---mbsyncisync][Getting emails - mbsync/isync]]
   - [[#receiving-emails---mu4e][Receiving emails - mu4e]]
   - [[#sending-emails][Sending Emails]]
   - [[#email-formatting][Email Formatting]]
@@ -1238,7 +1238,7 @@ toc-org generates tables of contents in the org file on save
 
 Install mu4e from the distro's repositories, we just need to make sure the .el files are in emacs's load-path
 
-** Getting emails from the account - mbsync
+** Getting emails - mbsync/isync
 
 #+begin_src conf :tangle ~/.mbsyncrc
 IMAPAccount saucoide-gmail
@@ -1307,7 +1307,6 @@ SyncState *
   ;; US date format is no good
   (setq mu4e-headers-date-format "%Y-%m-%d")
 
-  (add-to-list 'mu4e-view-actions '("View in browser" . mu4e-action-view-in-browser))
 
   ;; Prefer always the plaintext version if it exists
   (with-eval-after-load "mm-decode"
@@ -1373,7 +1372,11 @@ SyncState *
   ;; (setq mu4e-headers-encrypted-mark '("x" . "🔑 "))
   ;; (setq mu4e-headers-signed-mark    '("s" . "🖊 "))
 
-
+  ;; View as html
+  ;; (add-to-list 'mu4e-view-actions
+  ;;              '("xWidget View" . mu4e-action-view-with-xwidget) t)
+  ;; (add-to-list 'mu4e-view-actions
+  ;;              '("View in browser" . mu4e-action-view-in-browser) t)
   
   ;; Shortcuts
   (setq mu4e-maildir-shortcuts

@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Exec=/home/saucoide/scripts/logout-menu
+Name=logout-menu
+Icon=system-log-out
