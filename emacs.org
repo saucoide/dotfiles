@@ -3,6 +3,8 @@
 #+STARTUP: content
 #+PROPERTY: header-args:emacs-lisp :tangle .config/emacs/init.el
 
+TODO - update the key bindings from macflop
+
 * Table of Contents                                          :toc@2:noexport:
 - [[#about][About]]
 - [[#startup][Startup]]

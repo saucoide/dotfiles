@@ -11,7 +11,6 @@
 # # ---------------------------------------------------------------------
 # set VISUAL "emacsclient -c -a ''"
 # set EDITOR "emacsclient -t -a ''"
-# set SSH_ENV "$HOME/.ssh/agent-environment"
 
 # # Aliases
 # # ---------------------------------------------------------------------
@@ -20,8 +19,8 @@ alias ls="lsd --long --color=always --group-dirs=first --date '+%Y-%m-%d %H:%M'"
 alias lsa="lsd --long --almost-all --group-dirs=first --date '+%Y-%m-%d %H:%M'"
 alias lst="lsd --long --tree --depth=2 --color=always --date '+%Y-%m-%d %H:%M'"
 # ## pbcopy pbpaste alias
-# alias pbcopy="xclip -selection clipboard"
-# alias pbpaste="xclip -selection clipboard -o"
+alias pbcopy="xclip -selection clipboard"
+alias pbpaste="xclip -selection clipboard -o"
 # neovim
 alias vim="nvim"
 # ## a better cat
@@ -38,27 +37,20 @@ alias free="free -mt"
 alias wget="wget -c"
 # ## Userlist
 alias userlist="cut -d: -f1 /etc/passwd"
-# ## Aliases for software managment
-# ### Pacman
-# alias pacman='sudo pacman --color auto'
-# alias update='sudo pacman -Syyu'
-# ### Cleanup orphaned packages
-# alias cleanup='sudo pacman -Rns (pacman -Qtdq)'
-# ### Yay as aur helper - updates everything
-# alias yayupdate="yay -Syu"
-# ### Mirror updates
+# ## Aliases for package managment
+alias pacman='sudo pacman --color auto'
+alias autoremove='sudo pacman -Rns (pacman -Qtdq)'
 alias mirrors="sudo reflector --latest 50 --sort rate --save /etc/pacman.d/mirrorlist"
-# ## Calendar show full year
-# alias cal="cal -y -m"
-# # ---------------------------------------------------------------------
 
-# # Functions
-# # ---------------------------------------------------------------------
+# ---------------------------------------------------------------------
+# Functions
+# ---------------------------------------------------------------------
 
-# # Startup greeter
-# function fish_greeting
-#     ""
-# end
+# Startup greeter
+function fish_greeting
+    # set --local disable_list icons theme term de wm packages model shell resolution cols gpu distro
+    neofetch --memory_percent on --cpu_temp on --speed_shorthand on
+end
 
 # # Use vim as default key bindings
 function fish_user_key_bindings
