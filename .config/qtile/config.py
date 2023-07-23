@@ -277,14 +277,13 @@ reconfigure_screens = True
 auto_minimize = True
 
 widget_defaults = dict(
-    font="Ubuntu Mono",
-    fontsize = 12,
-    padding = 2,
+    font="JetBrainsMono Nerd Font",
+    fontsize=12,
+    padding=2,
     background=COLORS["background_0"]
 )
-extension_defaults = widget_defaults.copy()   # ???
+extension_defaults = widget_defaults.copy()
 
-#TODO CHANGE ALL THIS 
 screens = [
     Screen(
         top=bar.Bar(
@@ -295,10 +294,10 @@ screens = [
                     mouse_callbacks = {'Button1': lazy.spawn("rofi -show drun")}
                 ),
                 widget.GroupBox(
-                    font="UbuntuMono Nerd Font",
-                    fontsize=18,
-                    margin_x=5,
-                    padding_x=5,
+                    font="JetBrainsMono Nerd Font",
+                    fontsize=16,
+                    margin_x=4,
+                    padding_x=4,
                     borderwidth=3,
                     block_highlight_text_color=COLORS["white"],
                     active=COLORS["nord_white"],
@@ -313,7 +312,6 @@ screens = [
                 widget.CurrentLayoutIcon(
                     custom_icon_paths=[os.path.expanduser("~/.config/qtile/icons")],
                     background = COLORS["background_0"],
-                    padding = 0,
                     scale=0.6
                 ),
                 widget.Prompt(),
@@ -342,7 +340,8 @@ screens = [
                     fmt=" {} |",
                     update_interval=1,
                 ), 
-                widget.Systray(),
+                widget.Systray(
+                ),
                 widget.Clock(
                     format="%Y-%m-%d %H:%M |",
                     mouse_callbacks={"Button1": lazy.spawn(

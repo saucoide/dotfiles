@@ -1,15 +1,16 @@
 /* Generated from ~/dotfiles/system.org */
 configuration {
   modi: "filebrowser,window,drun,run,ssh";
-  show-icons : true;
-  display-filebrowser : "true";
+  font: "JetBrainsMono\ Nerd\ Font\ 12";
+  show-icons: true;
+  display-filebrowser: "true";
   timeout {
       action: "kb-cancel";
       delay:  0;
   }
   filebrowser {
       directories-first: true;
-      sorting-method:    "name";
+      sorting-method: "name";
   }
 }
     
