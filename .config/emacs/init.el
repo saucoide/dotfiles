@@ -221,15 +221,15 @@
 
 (use-package doom-themes
     :init
-    (load-theme 'doom-one t))
-    ;; (load-theme 'doom-material t))  
-    ;; (load-theme 'doom-palenight t))  
+    (load-theme 'doom-ir-black t))
+    ;; (load-theme 'doom-vibrant t))
+    ;; (load-theme 'doom-monokai-pro t))
     ;; (load-theme 'doom-dracula t))
 
 ;; all the icons is needed for doom-modeline
 ;; run M-x all-the-icons-install-fonts 
-;; in WINDOWS that will only download the fonts, and then you need to install them manually
-;; (use-package all-the-icons)
+(use-package all-the-icons)
+
 (use-package nerd-icons
   :config
   (setq nerd-icons-font-family "JetBrainsMono Nerd Font"))
@@ -460,6 +460,8 @@
   (elm-mode . elm-indent-simple-mode)
   (elm-mode . elm-format-on-save-mode))
 
+(use-package lua-mode)
+
 ;;(use-package flycheck
 ;;  :defer t
 ;;  :hook (eglot-mode . flycheck-mode))
@@ -593,27 +595,28 @@
 (use-package vterm)
 
 (defun my/org-mode-setup()
-    (org-indent-mode)
-    (visual-line-mode 1))
+  (org-indent-mode)
+  (visual-line-mode 1))
 
 (use-package org
-    :defer t
-    :hook (org-mode . my/org-mode-setup)
-    :config
-    (setq org-ellipsis " ..."
-          org-src-tab-acts-natively t
-          org-edit-src-content-indentation 0   ;; src blocks won't get a min indentation automatically
-          org-startup-folder 'content
-          org-directory "~/org/"
-          org-agenda-files (list org-directory)
-		  org-default-notes-file "~/org/notes.org"
-          org-return-follows-link t))
+  :defer t
+  :hook (org-mode . my/org-mode-setup)
+  :config
+  (setq org-ellipsis " ..."
+        org-src-tab-acts-natively t
+        org-src-fontify-natively t
+        org-edit-src-content-indentation 0
+        org-startup-folder 'content
+        org-directory "~/org/"
+        org-agenda-files (list org-directory)
+		org-default-notes-file "~/org/notes.org"
+        org-return-follows-link t))
 
 (use-package evil-org
   :after org
   :hook ((org-mode . evil-org-mode)
          (org-agenda-mode . evil-org-mode)
-		 (evil-org-mode . (lambda ()
+         (evil-org-mode . (lambda ()
                             (evil-org-set-key-theme '(navigation
                                                       todo
                                                       insert
@@ -637,7 +640,7 @@
                           ":CREATED: %U"
                           ":END:"
                           "%?"))
-	         ("Notes" :keys "n"
+	          ("Notes" :keys "n"
 			   :icon ("sticky-note-o" :set "octicon" :color "blue")
                :file (lambda () (concat org-directory "notes.org"))
                :prepend t
@@ -656,7 +659,7 @@
 
 (defun my/org-mode-visual-fill ()
     (setq visual-fill-column-width 100)
-    (visual-fill-column-mode 1))
+    (visual-fill-column-mode 0))
 
 (defun my/org-mode-center-text ()
  "toggle centering text in buffer"
@@ -670,6 +673,7 @@
     'org-babel-load-languages
     '((emacs-lisp . t)
       (python . t)
+      (lua . t)
       (clojure . t)))
 
 (push '("conf-unix" . conf-unix) org-src-lang-modes)

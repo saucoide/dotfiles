@@ -345,10 +345,15 @@ screens = [
                     update_interval=1,
                 ), 
                 widget.Systray(),
-                widget.Clock(format="%Y-%m-%d %H:%M |"),  # TODO: open a calendar, maybe weather?
+                widget.Clock(
+                    format="%Y-%m-%d %H:%M |",
+                    mouse_callbacks={"Button1": lazy.spawn(
+                        cmd="alacritty --hold --title 'terminal-calendar' --command cal --monday --three --columns=3"
+                    )}
+                ),
                 widget.TextBox(
                     fmt="󰐥 ",
-                    mouse_callbacks = {'Button1': lazy.spawn("rofi -show drun")}
+                    mouse_callbacks={'Button1': lazy.spawn("exit-menu")}
                 ),
             ],
             24,

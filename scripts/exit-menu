@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+main() {
+
+    declare -a options=(
+        " Lock screen"
+        " Logout"
+        "󰏦 Suspend"
+        " Reboot"
+        " Shutdown"
+        "󰒲 Hibernate"
+    )
+
+    lock_screen_cmd="light-locker-command -l"
+    logout_cmd="qtile cmd-obj -o cmd -f shutdown"
+    suspend_cmd="systemctl suspend"
+    reboot_cmd="systemctl reboot"
+    shutdown_cmd="systemctl poweroff"
+    hibernate_cmd="systemctl hibernate"
+
+    choice=$(printf '%s\n' "${options[@]}" | rofi -dmenu -i  -p "Quit Menu:")
+
+    case $choice in
+        " Lock screen")
+            ${lock_screen_cmd};;
+        " Logout")
+            cmd=${logout_cmd};;
+        "󰏦 Suspend")
+            cmd=${suspend_cmd};;
+        " Reboot")
+            cmd=${reboot_cmd};;
+        " Shutdown")
+            cmd=${shutdown_cmd};;
+        "󰒲 Hibernate")
+            cmd=${hibernate_cmd};;
+    esac    
+
+    if [[ ${cmd:-} ]]; then
+        confirmation=$(printf '%s\n' "Yes" "No" | rofi -dmenu -i -p "${choice}?")
+        if [[ ${confirmation} == "Yes" ]]; then
+            ${cmd}
+        fi
+    fi
+}
+
+[[ "${BASH_SOURCE[0]}" == "${0}" ]] && main "$@"

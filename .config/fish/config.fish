@@ -22,6 +22,8 @@ alias lst="lsd --long --tree --depth=2 --color=always --date '+%Y-%m-%d %H:%M'"
 # ## pbcopy pbpaste alias
 # alias pbcopy="xclip -selection clipboard"
 # alias pbpaste="xclip -selection clipboard -o"
+# neovim
+alias vim="nvim"
 # ## a better cat
 alias cat="bat"
 # ## I always miss the space

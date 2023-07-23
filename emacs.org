@@ -95,7 +95,7 @@
 
 From doom's early init
 
-#+begin_src emacs-lisp :tangle early-init.el
+#+begin_src emacs-lisp :tangle .config/emacs/early-init.el
   ;; generated from config.org
 
   ;; Defer garbage collection further back in the startup process
@@ -479,9 +479,9 @@ no frame at init
 
 (use-package doom-themes
     :init
-    (load-theme 'doom-one t))
-    ;; (load-theme 'doom-material t))  
-    ;; (load-theme 'doom-palenight t))  
+    (load-theme 'doom-ir-black t))
+    ;; (load-theme 'doom-vibrant t))
+    ;; (load-theme 'doom-monokai-pro t))
     ;; (load-theme 'doom-dracula t))
 
 #+end_src
@@ -491,8 +491,8 @@ no frame at init
 #+begin_src emacs-lisp
 ;; all the icons is needed for doom-modeline
 ;; run M-x all-the-icons-install-fonts 
-;; in WINDOWS that will only download the fonts, and then you need to install them manually
-;; (use-package all-the-icons)
+(use-package all-the-icons)
+
 (use-package nerd-icons
   :config
   (setq nerd-icons-font-family "JetBrainsMono Nerd Font"))
@@ -846,6 +846,14 @@ A sidebar project explorer for quick navigation
   (elm-mode . elm-format-on-save-mode))
 #+end_src
 
+*** Lua
+
+#+begin_src emacs-lisp
+
+(use-package lua-mode)
+
+#+end_src
+
 ** Linting
 
 flycheck does syntax checking as you type
@@ -1083,27 +1091,28 @@ YASnippet is a template system for emaxs, it lets you create custom templates th
 #+begin_src emacs-lisp
 
 (defun my/org-mode-setup()
-    (org-indent-mode)
-    (visual-line-mode 1))
+  (org-indent-mode)
+  (visual-line-mode 1))
 
 (use-package org
-    :defer t
-    :hook (org-mode . my/org-mode-setup)
-    :config
-    (setq org-ellipsis " ..."
-          org-src-tab-acts-natively t
-          org-edit-src-content-indentation 0   ;; src blocks won't get a min indentation automatically
-          org-startup-folder 'content
-          org-directory "~/org/"
-          org-agenda-files (list org-directory)
-		  org-default-notes-file "~/org/notes.org"
-          org-return-follows-link t))
+  :defer t
+  :hook (org-mode . my/org-mode-setup)
+  :config
+  (setq org-ellipsis " ..."
+        org-src-tab-acts-natively t
+        org-src-fontify-natively t
+        org-edit-src-content-indentation 0
+        org-startup-folder 'content
+        org-directory "~/org/"
+        org-agenda-files (list org-directory)
+		org-default-notes-file "~/org/notes.org"
+        org-return-follows-link t))
 
 (use-package evil-org
   :after org
   :hook ((org-mode . evil-org-mode)
          (org-agenda-mode . evil-org-mode)
-		 (evil-org-mode . (lambda ()
+         (evil-org-mode . (lambda ()
                             (evil-org-set-key-theme '(navigation
                                                       todo
                                                       insert
@@ -1133,7 +1142,7 @@ YASnippet is a template system for emaxs, it lets you create custom templates th
                           ":CREATED: %U"
                           ":END:"
                           "%?"))
-	         ("Notes" :keys "n"
+	          ("Notes" :keys "n"
 			   :icon ("sticky-note-o" :set "octicon" :color "blue")
                :file (lambda () (concat org-directory "notes.org"))
                :prepend t
@@ -1168,7 +1177,7 @@ Using =visual-fill-column= to show only the column width, and toggle centering t
 
   (defun my/org-mode-visual-fill ()
       (setq visual-fill-column-width 100)
-      (visual-fill-column-mode 1))
+      (visual-fill-column-mode 0))
 
   (defun my/org-mode-center-text ()
    "toggle centering text in buffer"
@@ -1190,6 +1199,7 @@ Here we enable the list of languages we want code blocks to work with
         'org-babel-load-languages
         '((emacs-lisp . t)
           (python . t)
+          (lua . t)
           (clojure . t)))
 
     (push '("conf-unix" . conf-unix) org-src-lang-modes)
@@ -1855,10 +1865,8 @@ I want to remap swiper-isearch to =C-s=
 drag-stuff with =M-<arrows>=
 
 #+begin_src emacs-lisp
-
-  (use-package drag-stuff)
-  (drag-stuff-global-mode 1)
-
+(use-package drag-stuff)
+(drag-stuff-global-mode 1)
 #+end_src
 
 *** =RET= DWIM in org-mode
@@ -1876,8 +1884,9 @@ In doom emacs, =RET= on org mode can be used for plenty of stuff
 
 * Auto Literate Config
 
-This function automatically tangles =config.org= (into =init.el=) whenever we save it
-It will do it for any =.org= file in our emac's home directory, straight from system crafter's config
+This function automatically tangles =config.org= (into =init.el=) whenever we save it It
+will do it for any =.org= file in our emac's home directory, straight from system
+crafter's config
 
 #+begin_src emacs-lisp
 
