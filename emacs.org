@@ -306,35 +306,14 @@ I have to use windows at work, on a very locked down system, so im going to be u
 
 ** PATH & exec-path
 
-I should find a better way to do this, but for now it works
+Get PATH etc from shell, it runs a non-interactive shell, so all things for ~PATH~ should
+be defined in ~.profile~ and not in the shell config file
 
 #+begin_src emacs-lisp
-
-;; for eshell mostly
-(setenv "PATH"
-	(concat ":~/.cargo/bin"
-            ":~/.poetry/bin"
-            ":~/.config/emacs/bin"
-            ":~/.local/bin"
-            "~/.local/share/coursier/bin"
-            ":/usr/local/bin"
-            ":/usr/bin"
-            ":/bin"
-            ":/usr/local/sbin"
-            ":/usr/lib/jvm/default/bin"))
-
-;; for emacs to find binaries
-(setq exec-path
-	  (append exec-path '("~/.cargo/bin"
-						  "~/.poetry/bin"
-						  "~/.config/emacs/bin"
-						  "~/.local/bin"
-						  "~/.local/share/coursier/bin"
-						  "/usr/local/bin"
-						  "/usr/bin"
-						  "/bin"
-						  "/usr/local/sbin"
-						  "/usr/lib/jvm/default/bin")))
+(use-package exec-path-from-shell
+  :config
+  (setq exec-path-from-shell-arguments nil) ;; non-interactive shell
+  (exec-path-from-shell-initialize))
 #+end_src
 
 ** Evil
@@ -895,19 +874,7 @@ format-all for autoformatting code
 
 ** Git
 
-Magit on windows is pretty slow, setting the executable path helps
-it will still be slow, but without this it will hang forever
-
-#+begin_src emacs-lisp
-
-  (if my/is-windows
-      (progn
-          (setq exec-path (add-to-list 'exec-path "C:\Program Files\Git\bin"))
-          (setenv "PATH" (concat "C:\Program Files\Git\bin;" (getenv "PATH")))))
-
-#+end_src
-
-And then we add magit
+magit!
 
 #+begin_src emacs-lisp
 
@@ -1299,7 +1266,7 @@ SyncState *
   ;; Refresh mail using isync every 10 minutes
   (setq mu4e-update-interval 600)
   (setq mu4e-get-mail-command "mbsync -a")
-  (setq mu4e-maildir "~/mail")
+  (setq mu4e-maildir "~/mail/gmail")
 
   ;; I find it very annoying when the reply to a thread un-archives all other emails
   (setq mu4e-headers-include-related nil)

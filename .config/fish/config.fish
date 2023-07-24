@@ -1,12 +1,3 @@
-# PATH
-# ---------------------------------------------------------------------
-# fish_add_path --prepend "~/.bin"
-# fish_add_path --prepend "~/.local/bin"
-# fish_add_path --prepend "~/.emacs.d/bin"
-# fish_add_path --prepend "~/.poetry/bin"
-# fish_add_path --prepend "~/.local/share/coursier/bin"
-# # ---------------------------------------------------------------------
-
 # # Environment Variables
 # # ---------------------------------------------------------------------
 # set VISUAL "emacsclient -c -a ''"
@@ -146,6 +137,7 @@ set fish_color_autosuggestion "4c566a"
 
 # direnv for my .envrc files
 direnv hook fish | source
+set -g direnv_fish_mode disable_arrow
 
 # PROMPT (starship https://github.com/starship/starship)
 starship init fish | source

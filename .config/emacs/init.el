@@ -111,31 +111,10 @@
 
 (setq my/is-windows (eq system-type 'windows-nt))
 
-;; for eshell mostly
-(setenv "PATH"
-	(concat ":~/.cargo/bin"
-            ":~/.poetry/bin"
-            ":~/.config/emacs/bin"
-            ":~/.local/bin"
-            "~/.local/share/coursier/bin"
-            ":/usr/local/bin"
-            ":/usr/bin"
-            ":/bin"
-            ":/usr/local/sbin"
-            ":/usr/lib/jvm/default/bin"))
-
-;; for emacs to find binaries
-(setq exec-path
-	  (append exec-path '("~/.cargo/bin"
-						  "~/.poetry/bin"
-						  "~/.config/emacs/bin"
-						  "~/.local/bin"
-						  "~/.local/share/coursier/bin"
-						  "/usr/local/bin"
-						  "/usr/bin"
-						  "/bin"
-						  "/usr/local/sbin"
-						  "/usr/lib/jvm/default/bin")))
+(use-package exec-path-from-shell
+  :config
+  (setq exec-path-from-shell-arguments nil) ;; non-interactive shell
+  (exec-path-from-shell-initialize))
 
 (use-package evil
     :init
@@ -475,11 +454,6 @@
 (use-package evil-nerd-commenter
     :bind ("C-/" . evilnc-comment-or-uncomment-lines))
 
-(if my/is-windows
-    (progn
-        (setq exec-path (add-to-list 'exec-path "C:\Program Files\Git\bin"))
-        (setenv "PATH" (concat "C:\Program Files\Git\bin;" (getenv "PATH")))))
-
 (use-package magit
   ;; commands that make magit load
     :defer t
@@ -722,7 +696,7 @@
   ;; Refresh mail using isync every 10 minutes
   (setq mu4e-update-interval 600)
   (setq mu4e-get-mail-command "mbsync -a")
-  (setq mu4e-maildir "~/mail")
+  (setq mu4e-maildir "~/mail/gmail")
 
   ;; I find it very annoying when the reply to a thread un-archives all other emails
   (setq mu4e-headers-include-related nil)
