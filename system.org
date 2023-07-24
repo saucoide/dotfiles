@@ -95,7 +95,7 @@ pacman -Syyu ???
 pacman -Syyu lightdm light-locker lightdm-slick-greeter
 
 # Appearance
-pacman -Syyu lxappearance-gtk3 papirus-icon-theme arc-theme kvantum-qt5
+pacman -Syyu lxappearance-gtk3 papirus-icon-theme arc-theme kvantum-qt5 kvantum
 yay -Syyu xcursor-breeze
 
 # Fonts
@@ -138,6 +138,10 @@ systemctl enable fstrim.timer
 # Guix profile
 GUIX_PROFILE="$HOME/.guix-profile"
 . "$GUIX_PROFILE/etc/profile"
+
+# QT5 Style
+# Manage the style using kvantum
+export QT_STYLE_OVERRIDE=kvantum
 
 # fish as default non-login shell
 export SHELL=/usr/bin/fish
