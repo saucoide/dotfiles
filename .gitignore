@@ -17,3 +17,9 @@ projectile-bookmarks.eld
 .config/fish/config.fish.backup
 /.config/fish/functions/br.fish
 .config/pgcli/history
+/.config/fish/completions/
+/.config/fish/conf.d/
+/scripts/pylocal.sh
+/.config/emacs/tramp
+/.config/emacs/request/
+/.config/emacs/logview-cache.extmap
