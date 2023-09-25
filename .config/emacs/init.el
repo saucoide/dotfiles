@@ -487,6 +487,10 @@
 (reformatter-define terraform-format
   :program "terraform"
   :args '("fmt" "-"))
+;; yaml
+(reformatter-define yaml-format
+  :program "yamlfmt"
+  :args '("-"))
 ;; terraform
 (reformatter-define pg-format
   :program "pg_format"
@@ -500,6 +504,7 @@
   (interactive)
   (pcase major-mode
     ('python-mode (black-format-buffer))
+    ('yaml-mode (yaml-format-buffer))
     ('terraform-mode (terraform-format-buffer))
     ('js-mode (prettier-format-buffer))
     ('sql-mode (pg-format-buffer))
@@ -513,6 +518,7 @@
   (interactive "r")
   (pcase major-mode
     ;; ('python-mode (black-format-buffer))
+    ('yaml-mode (yaml-format-region beg end))
     ;; ('terraform-mode (terraform-format-buffer))
     ('js-mode (prettier-format-region beg end))
     (_ (message "No reformatted configured for `%s`" major-mode))
@@ -790,6 +796,8 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
   (org-roam-completion-everywhere t)
   (org-roam-completion-system 'default)
   :config
+  (setq org-roam-node-display-template
+        "${title:60} ${tags:*}")
   (org-roam-setup))
 
 (use-package general
@@ -946,6 +954,7 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
     "nn" '(org-capture :which-key "Org Capture")
     "ni" '(org-roam-node-insert :which-key "org-roam-node-insert")
     "nf" '(org-roam-node-find :which-key "org-roam-node-find")
+    "nt" '(org-roam-tag-add :which-key "Add a TAG")
     "nl" '(org-roam-buffer-toggle :which-key "org-roam-buffer-toggle"))
 
 (defun my/vterm-toggle()

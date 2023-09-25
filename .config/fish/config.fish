@@ -20,8 +20,8 @@ if [ -f '/Users/saucon/google-cloud-sdk/path.fish.inc' ]; . '/Users/saucon/googl
 
 # Environment Variables
 # ---------------------------------------------------------------------
-set VISUAL "emacsclient -c -a ''"
-set EDITOR "emacsclient -t -a ''"
+# set VISUAL "emacsclient -c -a ''"
+# set EDITOR "emacsclient -t -a ''"
 set SSH_ENV "$HOME/.ssh/agent-environment"
 set JAVA_HOME "/Users/saucon/Library/Caches/Coursier/arc/https/github.com/adoptium/temurin8-binaries/releases/download/jdk8u345-b01/OpenJDK8U-jdk_x64_mac_hotspot_8u345b01.tar.gz/jdk8u345-b01/Contents/Home"
 set USE_GKE_GCLOUD_AUTH_PLUGIN True
@@ -181,32 +181,6 @@ set fish_color_autosuggestion "4c566a"
 # fish_color_cancel
 # fish_color_search_match
 # ---------------------------------------------------------------------
-
-
-# PATH
-# TODO fix this
-# function start_agent {
-#     echo "Initialising new SSH agent..."
-#     /usr/bin/ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
-#     echo succeeded
-#     chmod 600 "${SSH_ENV}"
-#     . "${SSH_ENV}" > /dev/null
-#     /usr/bin/ssh-add;
-# }
-
-# # Source SSH settings, if applicable
-
-# if [ -f "${SSH_ENV}" ]; then
-#     . "${SSH_ENV}" > /dev/null
-#     #ps ${SSH_AGENT_PID} doesn't work under cywgin
-#     ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
-#         start_agent;
-#     }
-# else
-#     start_agent;
-# fi
-
-# PROMPT (starship https://github.com/starship/starship)
 
 # pyenv setup
 set -Ux PYENV_ROOT $HOME/.pyenv

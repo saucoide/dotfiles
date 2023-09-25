@@ -2,7 +2,22 @@
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("system-config"
+(("NOTES"
+ (filename . "~/notes/roam/")
+ (front-context-string . "20220111155623-p")
+ (rear-context-string . "022-07-07 18:14 ")
+ (position . 501))
+("downloads"
+ (filename . "~/Downloads/")
+ (front-context-string . "  -rw-r--r--   1")
+ (rear-context-string . "no_Navarro.xlsx\n")
+ (position . 749))
+("dotfiles"
+ (filename . "~/dotfiles/")
+ (front-context-string . "scripts\n  -rw-r-")
+ (rear-context-string . "023-01-27 00:10 ")
+ (position . 199))
+("system-config"
  (filename . "~/dotfiles/system.org")
  (front-context-string . "#+STARTUP: conte")
  (rear-context-string . "k system config\n")
