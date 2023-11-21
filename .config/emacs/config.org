@@ -6,7 +6,7 @@
 * Table of Contents                                          :toc@2:noexport:
 - [[#about][About]]
 - [[#startup][Startup]]
-  - [[#early-initel][early-init.el]]
+  - [[#wip-early-initel][WIP early-init.el]]
   - [[#dooms-startup-optimizations][doom's startup optimizations]]
 - [[#package-system-setup][Package System Setup]]
 - [[#basic-settings][Basic Settings]]
@@ -17,7 +17,7 @@
   - [[#path--exec-path][PATH & exec-path]]
   - [[#evil][Evil]]
 - [[#basic-gui-theme-etc][Basic GUI, Theme, etc.]]
-  - [[#basic-gui-elements][Basic GUI Elements]]
+  - [[#wip-basic-gui-elements][WIP Basic GUI Elements]]
   - [[#fonts][Fonts]]
   - [[#show-line-numbers-but-not-in-all-modes][Show line numbers, but not in all modes]]
   - [[#highlight-matching-parenthesis-brackets-etc][Highlight matching Parenthesis, Brackets, etc]]
@@ -86,7 +86,7 @@
   in a locked down windows environment where doom was not an option.
 
 * Startup
-** early-init.el
+** WIP early-init.el
 
 From doom's early init
 
@@ -115,7 +115,7 @@ From doom's early init
   (setq frame-inhibit-implied-resize t)
 
   ;; Disable GUI elements
-  (menu-bar-mode -1)
+  (menu-bar-mode t)
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
   (setq inhibit-splash-screen t)
@@ -251,6 +251,7 @@ It can also autoload packages only when needed instead of everything at startup
 (setq-default fill-column 79)
 
 ;; visual-line
+(set-default 'truncate-lines t)
 (global-visual-line-mode -1)
 
 #+end_src
@@ -383,7 +384,7 @@ evil-snipe, search 2 character motions to jump around text with ~s~ and ~S~
 #+end_src
 
 * Basic GUI, Theme, etc.
-** Basic GUI Elements
+** WIP Basic GUI Elements
   
 #+begin_src emacs-lisp
 
@@ -391,7 +392,10 @@ evil-snipe, search 2 character motions to jump around text with ~s~ and ~S~
 (tool-bar-mode -1)		; disable toolbar
 (tooltip-mode -1)		; disable tooltips
 (set-fringe-mode 3) 	; margins
-(menu-bar-mode -1) 		; disable menu bar 
+(menu-bar-mode t) 		; disable menu bar 
+
+(add-to-list 'default-frame-alist '(undecorated . t)) ; disable titlebar
+
 
 #+end_src
  
@@ -734,6 +738,11 @@ helpful is an enhanced version of the builtin emacs help, with more information
 ;;   :hook
 ;;   (python-mode . try/pyvenv-workon))
 
+#+end_src
+*** Nix
+
+#+begin_src emacs-lisp
+(use-package nix-mode)
 #+end_src
 
 *** Clojure
@@ -1153,14 +1162,14 @@ YASnippet is a template system for emaxs, it lets you create custom templates th
 
 #+begin_src emacs-lisp
 
-(use-package vterm
-  :after evil-collection
-  :config
-  (setq vterm-shell "/usr/local/bin/fish")
-  (setq term-prompt-regexp "➜ *")
-  (evil-define-minor-mode-key 'normal 'vterm-mode (kbd "_") 'evil-collection-vterm-first-non-blank)
-  ;; (evil-define-key 'normal 'vterm-mode-map (kbd "cc") 'evil-collection-vterm-change-line)
-  )
+;; (use-package vterm
+;;   :after evil-collection
+;;   :config
+;;   (setq vterm-shell "/usr/local/bin/fish")
+;;   (setq term-prompt-regexp "➜ *")
+;;   (evil-define-minor-mode-key 'normal 'vterm-mode (kbd "_") 'evil-collection-vterm-first-non-blank)
+;;   ;; (evil-define-key 'normal 'vterm-mode-map (kbd "cc") 'evil-collection-vterm-change-line)
+;;   )
 
 #+end_src
 

@@ -649,7 +649,7 @@ colors: *MonokaiPro
 #   - (Linux/BSD) user login shell
 #   - (Windows) powershell
 shell:
-  program: /usr/local/bin/fish
+  program: /Users/saucon/.nix-profile/bin/fish
 #  args:
 #    - --login
 

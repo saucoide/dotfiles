@@ -9,8 +9,9 @@ fish_add_path --prepend "$HOME/.emacs.d/bin"
 fish_add_path --prepend "$HOME/.poetry/bin"
 fish_add_path --prepend "/usr/bin/"
 fish_add_path --prepend "/usr/local/bin"
-fish_add_path --prepend "/Users/saucon/Library/Application Support/Coursier/bin"
 fish_add_path --prepend "$HOME/scripts"
+fish_add_path --prepend "$HOME/.nix-profile/bin"
+
 
 
 # The next line updates PATH for the Google Cloud SDK.

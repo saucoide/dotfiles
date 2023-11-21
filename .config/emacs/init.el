@@ -97,6 +97,7 @@
 (setq-default fill-column 79)
 
 ;; visual-line
+(set-default 'truncate-lines t)
 (global-visual-line-mode -1)
 
 ;; Change the default directory to store backups
@@ -182,7 +183,9 @@
 (tool-bar-mode -1)		; disable toolbar
 (tooltip-mode -1)		; disable tooltips
 (set-fringe-mode 3) 	; margins
-(menu-bar-mode -1) 		; disable menu bar
+(menu-bar-mode t) 		; disable menu bar 
+
+(add-to-list 'default-frame-alist '(undecorated . t)) ; disable titlebar
 
 (set-face-attribute 'default nil
                     :font "JetBrainsMono Nerd Font Mono"
@@ -394,6 +397,8 @@
 ;;   (pyvenv-mode 1)
 ;;   :hook
 ;;   (python-mode . try/pyvenv-workon))
+
+(use-package nix-mode)
 
 (use-package cider
     :mode "\\.clj[sc]?\\'"
@@ -678,14 +683,14 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
   (setq yas-snippet-dirs '("~/.config/emacs/yasnippets"))
   (yas-global-mode 1))
 
-(use-package vterm
-  :after evil-collection
-  :config
-  (setq vterm-shell "/usr/local/bin/fish")
-  (setq term-prompt-regexp "➜ *")
-  (evil-define-minor-mode-key 'normal 'vterm-mode (kbd "_") 'evil-collection-vterm-first-non-blank)
-  ;; (evil-define-key 'normal 'vterm-mode-map (kbd "cc") 'evil-collection-vterm-change-line)
-  )
+;; (use-package vterm
+;;   :after evil-collection
+;;   :config
+;;   (setq vterm-shell "/usr/local/bin/fish")
+;;   (setq term-prompt-regexp "➜ *")
+;;   (evil-define-minor-mode-key 'normal 'vterm-mode (kbd "_") 'evil-collection-vterm-first-non-blank)
+;;   ;; (evil-define-key 'normal 'vterm-mode-map (kbd "cc") 'evil-collection-vterm-change-line)
+;;   )
 
 (use-package eshell-toggle
     :custom
