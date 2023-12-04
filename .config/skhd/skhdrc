@@ -1,12 +1,13 @@
 # -- launchers --
-ctrl + alt - t : /Applications/Alacritty.app/Contents/MacOS/alacritty
+ctrl + alt - t : $HOME/.nix-profile/Applications/Alacritty.app/Contents/MacOS/alacritty
 ctrl + alt - n : /usr/local/bin/emacsclient -c -a ""
-# ctrl + alt - n : /Users/saucon/.nix-profile/bin/emacsclient -c -a ""
+     
 # remap flameshot hardcoded keybinding for screenshots (pre 0.11)
-  
 ctrl + alt - p : skhd -k "cmd + alt + shift - 0x15"
+     
 # kill window
 cmd - k : skhd -k "cmd - q"
+    
 # fixing copy paste
 ctrl - c ["emacsclient" ~
           "Emacs" ~
@@ -114,30 +115,23 @@ shift + cmd - left : yabai -m window --warp prev
     
 ## Window Focus
 ### Navigation
-cmd - h : [[ $(yabai -m query --spaces --space | jq -re '.type') = "bsp" ]]\
+cmd - h : [[ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ]]\
           && yabai -m window --focus prev\
           || yabai -m window --focus stack.prev
-cmd - j : [[ $(yabai -m query --spaces --space | jq -re '.type') = "bsp" ]]\
+cmd - j : [[ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ]]\
           && yabai -m window --focus next\
           || yabai -m window --focus stack.prev
-cmd - k : [[ $(yabai -m query --spaces --space | jq -re '.type') = "bsp" ]]\
+cmd - k : [[ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ]]\
           && yabai -m window --focus prev\
           || yabai -m window --focus stack.next
-cmd - l : [[ $(yabai -m query --spaces --space | jq -re '.type') = "bsp" ]]\
+cmd - l : [[ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ]]\
           && yabai -m window --focus next\
           || yabai -m window --focus stack.next
-cmd - left : [[ $(yabai -m query --spaces --space | jq -re '.type') = "bsp" ]]\
-          && yabai -m window --focus prev\
-          || yabai -m window --focus stack.prev
-cmd - down : [[ $(yabai -m query --spaces --space | jq -re '.type') = "bsp" ]]\
-          && yabai -m window --focus next\
-          || yabai -m window --focus stack.prev
-cmd - up : [[ $(yabai -m query --spaces --space | jq -re '.type') = "bsp" ]]\
-          && yabai -m window --focus prev\
-          || yabai -m window --focus stack.next
-cmd - right : [[ $(yabai -m query --spaces --space | jq -re '.type') = "bsp" ]]\
-          && yabai -m window --focus next\
-          || yabai -m window --focus stack.next
+cmd - left : if [ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ]; yabai -m window --focus prev || yabai -m window --focus stack.prev;end
+cmd - down : if [ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ]; yabai -m window --focus next || yabai -m window --focus stack.prev;end
+cmd - up : if [ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ]; yabai -m window --focus prev || yabai -m window --focus stack.next;end
+cmd - right : if [ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ];yabai -m window --focus next || yabai -m window --focus stack.next;end
+
 
 
 # Float / Unfloat window

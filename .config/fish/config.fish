@@ -184,10 +184,10 @@ set fish_color_autosuggestion "4c566a"
 # ---------------------------------------------------------------------
 
 # pyenv setup
-set -Ux PYENV_ROOT $HOME/.pyenv
-fish_add_path $PYENV_ROOT/bin
-pyenv init - | source
-eval "$(pyenv virtualenv-init -)"
+# set -Ux PYENV_ROOT $HOME/.pyenv
+# fish_add_path $PYENV_ROOT/bin
+# pyenv init - | source
+# eval "$(pyenv virtualenv-init -)"
 
 # direnv setup
 direnv hook fish | source

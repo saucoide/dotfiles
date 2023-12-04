@@ -185,7 +185,7 @@
 (set-fringe-mode 3) 	; margins
 (menu-bar-mode t) 		; disable menu bar 
 
-(add-to-list 'default-frame-alist '(undecorated . t)) ; disable titlebar
+(add-to-list 'default-frame-alist '(undecorated-round  . t)) ; disable titlebar
 
 (set-face-attribute 'default nil
                     :font "JetBrainsMono Nerd Font Mono"
@@ -683,14 +683,14 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
   (setq yas-snippet-dirs '("~/.config/emacs/yasnippets"))
   (yas-global-mode 1))
 
-;; (use-package vterm
-;;   :after evil-collection
-;;   :config
-;;   (setq vterm-shell "/usr/local/bin/fish")
-;;   (setq term-prompt-regexp "➜ *")
-;;   (evil-define-minor-mode-key 'normal 'vterm-mode (kbd "_") 'evil-collection-vterm-first-non-blank)
-;;   ;; (evil-define-key 'normal 'vterm-mode-map (kbd "cc") 'evil-collection-vterm-change-line)
-;;   )
+(use-package vterm
+  :after evil-collection
+  :config
+  (setq vterm-shell "$HOME/.nix-profile/bin/fish")
+  (setq term-prompt-regexp "➜ *")
+  (evil-define-minor-mode-key 'normal 'vterm-mode (kbd "_") 'evil-collection-vterm-first-non-blank)
+  ;; (evil-define-key 'normal 'vterm-mode-map (kbd "cc") 'evil-collection-vterm-change-line)
+  )
 
 (use-package eshell-toggle
     :custom

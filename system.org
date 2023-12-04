@@ -80,14 +80,15 @@ I'm using skhd to handle shortcuts and key remappings
 #+begin_src conf :tangle .config/skhd/skhdrc
 
 # -- launchers --
-ctrl + alt - t : /Applications/Alacritty.app/Contents/MacOS/alacritty
-ctrl + alt - n : /usr/  local/bin/emacsclient -c -a ""
-# ctrl + alt - n : /Users/saucon/.nix-profile/bin/emacsclient -c -a ""
+ctrl + alt - t : $HOME/.nix-profile/Applications/Alacritty.app/Contents/MacOS/alacritty
+ctrl + alt - n : /usr/local/bin/emacsclient -c -a ""
+
 # remap flameshot hardcoded keybinding for screenshots (pre 0.11)
-  
 ctrl + alt - p : skhd -k "cmd + alt + shift - 0x15"
+
 # kill window
 cmd - k : skhd -k "cmd - q"
+
 # fixing copy paste
 ctrl - c ["emacsclient" ~
           "Emacs" ~
@@ -195,30 +196,23 @@ shift + cmd - left : yabai -m window --warp prev
     
 ## Window Focus
 ### Navigation
-cmd - h : [[ $(yabai -m query --spaces --space | jq -re '.type') = "bsp" ]]\
+cmd - h : [[ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ]]\
           && yabai -m window --focus prev\
           || yabai -m window --focus stack.prev
-cmd - j : [[ $(yabai -m query --spaces --space | jq -re '.type') = "bsp" ]]\
+cmd - j : [[ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ]]\
           && yabai -m window --focus next\
           || yabai -m window --focus stack.prev
-cmd - k : [[ $(yabai -m query --spaces --space | jq -re '.type') = "bsp" ]]\
+cmd - k : [[ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ]]\
           && yabai -m window --focus prev\
           || yabai -m window --focus stack.next
-cmd - l : [[ $(yabai -m query --spaces --space | jq -re '.type') = "bsp" ]]\
+cmd - l : [[ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ]]\
           && yabai -m window --focus next\
           || yabai -m window --focus stack.next
-cmd - left : [[ $(yabai -m query --spaces --space | jq -re '.type') = "bsp" ]]\
-          && yabai -m window --focus prev\
-          || yabai -m window --focus stack.prev
-cmd - down : [[ $(yabai -m query --spaces --space | jq -re '.type') = "bsp" ]]\
-          && yabai -m window --focus next\
-          || yabai -m window --focus stack.prev
-cmd - up : [[ $(yabai -m query --spaces --space | jq -re '.type') = "bsp" ]]\
-          && yabai -m window --focus prev\
-          || yabai -m window --focus stack.next
-cmd - right : [[ $(yabai -m query --spaces --space | jq -re '.type') = "bsp" ]]\
-          && yabai -m window --focus next\
-          || yabai -m window --focus stack.next
+cmd - left : if [ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ]; yabai -m window --focus prev || yabai -m window --focus stack.prev;end
+cmd - down : if [ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ]; yabai -m window --focus next || yabai -m window --focus stack.prev;end
+cmd - up : if [ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ]; yabai -m window --focus prev || yabai -m window --focus stack.next;end
+cmd - right : if [ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ];yabai -m window --focus next || yabai -m window --focus stack.next;end
+
 
 
 # Float / Unfloat window
@@ -240,9 +234,6 @@ ctrl + cmd - up : yabai -m window --resize top:0:-75; \
 ctrl + cmd - right : yabai -m window --resize right:75:0; \
                   yabai -m window --resize left:75:0
 
-
-
-     
 #+end_src
 
 ** MacOS defaultkeybidings
@@ -259,7 +250,7 @@ Some macos applications use this file for key bindings, here i'm changing the be
 }
 #+end_src
 
-* Window Manager
+* Window Manager (yabai)
 
 I'm using yabai for now ~yabai &;disown~ if brew services doesnt launch it
 
@@ -294,12 +285,12 @@ yabai -m config window_topmost              off
 yabai -m config window_opacity              off
 yabai -m config window_shadow               float
 
-yabai -m config window_border               on  # turn on when fixed 
-yabai -m config window_border_radius        3
-yabai -m config window_border_width         2
-yabai -m config active_window_border_color  0xff50fa7b
-yabai -m config normal_window_border_color  0xff282a36
-yabai -m config insert_feedback_color       0xff2d74da
+# yabai -m config window_border               on  # turn on when fixed 
+# yabai -m config window_border_radius        3
+# yabai -m config window_border_width         2
+# yabai -m config active_window_border_color  0xff50fa7b
+# yabai -m config normal_window_border_color  0xff282a36
+# yabai -m config insert_feedback_color       0xff2d74da
 
 yabai -m config active_window_opacity       1.0
 yabai -m config normal_window_opacity       0.90
@@ -331,7 +322,7 @@ yabai -m rule --add app="Emacs" manage=on
 # === Top Bar ===
 sketchybar &
 # === Borders ===
-# borders active_color=0xffe1e3e4 inactive_color=0xff494d64 width=5.0 2>/dev/null 1>&2 &
+borders active_color=0xff50fa7b inactive_color=0xff494d64 width=3.0 2>/dev/null 1>&2 &
 #+end_src
 
 * Python
@@ -359,7 +350,6 @@ alias interacti IPython.embed(config=cfg)
 #+begin_src python :tangle .pythonrc.py
 
 from functools import partial
-
 try:
     from rich import inspect, pretty, print
     help = partial(inspect, help=True)
@@ -367,7 +357,6 @@ try:
 except:
     pass
 #+end_src
-
 
 * Postgres
 ** pgcli
@@ -593,8 +582,7 @@ float = ""
 #+begin_src sh :tangle .profile
 
 export PYTHONBREAKPOINT=ipdb.set_trace
-export PYTHONSTARTUP=/Users/saucon/.pythonrc.py
-export CLOUDSDK_PYTHON=/Users/saucon/.pyenv/versions/3.11.2/bin/python
+export PYTHONSTARTUP=$HOME/.pythonrc.py
 export EDITOR="emacsclient -t --alternate-editor=''"
 
 #+end_src
@@ -666,7 +654,7 @@ window:
   # Values for `decorations` (macOS only):
   #     - transparent: Title bar, transparent background and title bar buttons
   #     - buttonless: Title bar, transparent background, but no title bar buttons
-  decorations: None
+  decorations: buttonless
 
   # Startup Mode (changes require restart)
   #
@@ -1782,10 +1770,10 @@ set fish_color_autosuggestion "4c566a"
 # ---------------------------------------------------------------------
 
 # pyenv setup
-set -Ux PYENV_ROOT $HOME/.pyenv
-fish_add_path $PYENV_ROOT/bin
-pyenv init - | source
-eval "$(pyenv virtualenv-init -)"
+# set -Ux PYENV_ROOT $HOME/.pyenv
+# fish_add_path $PYENV_ROOT/bin
+# pyenv init - | source
+# eval "$(pyenv virtualenv-init -)"
 
 # direnv setup
 direnv hook fish | source

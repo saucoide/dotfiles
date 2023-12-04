@@ -14,6 +14,7 @@
       system = "x86_64-darwin";
       pkgs =  import nixpkgs { 
         inherit system;
+        config.allowUnfree = true;
    # Not using the emacs overlays anymore - could not get this
    # to work nicely with yabai
    #     overlays = [
@@ -26,8 +27,16 @@
       packages.${system}.default = pkgs.buildEnv {
         name = "sauco-profile-packages";
         paths = with pkgs; [
+          # Nix
+          nix-direnv
+          cachix
+          # Install devenv separately
+          # https://devenv.sh/getting-started/
+
           # Basics
+          alacritty
           fish
+          starship
           git
           ripgrep
           lsd
@@ -38,33 +47,54 @@
           pass
           parallel
           neofetch
+          trash-cli
+          flameshot
+          # libreoffice
 
           # MacOS
           yabai
           skhd
           sketchybar
 
-          # Nix
-          nix-direnv
-          cachix
-          # Install devenv separately
-          # https://devenv.sh/getting-started/
-
-          # Python tools
-          python311Packages.nox
-          python311Packages.black
-
-          # Node tools
-          nodePackages.prettier
-
           # Editors
           neovim
           # emacs29   # i switched to install this from brew instead
+          # emacsPackages.vterm
+          # libvterm
+          # vscodium-fhs
 
-          # Other tools
-          flameshot
+          # Development Tools
+
+          ## Python
+          python3
+          python311Packages.nox
+          python311Packages.black
+          python311Packages.python-lsp-server
+          python311Packages.python-lsp-ruff
+          python311Packages.ipython
+          python311Packages.ipdb
+          python311Packages.rich
+          ruff
+          ruff-lsp
+          poetry
+          mypy
+          pipx
+
+          ## Databases
+          pgcli
+          litecli
+          sqlite
+
+          ## Other
+          google-cloud-sdk
+          terraform
+          podman
+          podman-compose
           jq
           yamlfmt
+          nodePackages.prettier
+          # llm
+
         ];
       }; 
     };

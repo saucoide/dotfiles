@@ -394,7 +394,7 @@ evil-snipe, search 2 character motions to jump around text with ~s~ and ~S~
 (set-fringe-mode 3) 	; margins
 (menu-bar-mode t) 		; disable menu bar 
 
-(add-to-list 'default-frame-alist '(undecorated . t)) ; disable titlebar
+(add-to-list 'default-frame-alist '(undecorated-round  . t)) ; disable titlebar
 
 
 #+end_src
@@ -1162,14 +1162,14 @@ YASnippet is a template system for emaxs, it lets you create custom templates th
 
 #+begin_src emacs-lisp
 
-;; (use-package vterm
-;;   :after evil-collection
-;;   :config
-;;   (setq vterm-shell "/usr/local/bin/fish")
-;;   (setq term-prompt-regexp "➜ *")
-;;   (evil-define-minor-mode-key 'normal 'vterm-mode (kbd "_") 'evil-collection-vterm-first-non-blank)
-;;   ;; (evil-define-key 'normal 'vterm-mode-map (kbd "cc") 'evil-collection-vterm-change-line)
-;;   )
+ (use-package vterm
+   :after evil-collection
+   :config
+   (setq vterm-shell "$HOME/.nix-profile/bin/fish")
+   (setq term-prompt-regexp "➜ *")
+   (evil-define-minor-mode-key 'normal 'vterm-mode (kbd "_") 'evil-collection-vterm-first-non-blank)
+   ;; (evil-define-key 'normal 'vterm-mode-map (kbd "cc") 'evil-collection-vterm-change-line)
+   )
 
 #+end_src
 

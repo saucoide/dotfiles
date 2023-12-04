@@ -18,7 +18,7 @@ sketchybar --bar height=22        \
                  sticky=off       \
                  padding_left=5  \
                  padding_right=5 \
-                 color=0x88333333
+                 color=0xff333333
 
 ##### Changing Defaults #####
 # We now change some default values that are applied to all further items
