@@ -1,13 +1,13 @@
 # -- launchers --
 ctrl + alt - t : $HOME/.nix-profile/Applications/Alacritty.app/Contents/MacOS/alacritty
 ctrl + alt - n : /usr/local/bin/emacsclient -c -a ""
-     
+
 # remap flameshot hardcoded keybinding for screenshots (pre 0.11)
 ctrl + alt - p : skhd -k "cmd + alt + shift - 0x15"
-     
+
 # kill window
 cmd - k : skhd -k "cmd - q"
-    
+
 # fixing copy paste
 ctrl - c ["emacsclient" ~
           "Emacs" ~
