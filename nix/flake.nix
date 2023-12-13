@@ -15,13 +15,18 @@
       pkgs =  import nixpkgs { 
         inherit system;
         config.allowUnfree = true;
-   # Not using the emacs overlays anymore - could not get this
-   # to work nicely with yabai
-   #     overlays = [
-   #       (import emacs-overlay)
-   #       (import ./overlays/emacs.nix)
-   #     ];
+        # Not using the emacs overlays anymore - could not get this
+        # to work nicely with yabai
+        #     overlays = [
+        #       (import emacs-overlay)
+        #       (import ./overlays/emacs.nix)
+        #     ];
       };
+      gdk = pkgs.google-cloud-sdk.withExtraComponents(
+        with pkgs.google-cloud-sdk.components; [
+            gke-gcloud-auth-plugin
+        ]
+      );
     in 
     {
       packages.${system}.default = pkgs.buildEnv {
@@ -39,6 +44,9 @@
           starship
           git
           ripgrep
+          fd
+          fzf
+          jq
           lsd
           bat
           htop
@@ -49,6 +57,7 @@
           neofetch
           trash-cli
           flameshot
+          nerdfonts
           # libreoffice
 
           # MacOS
@@ -86,11 +95,11 @@
           sqlite
 
           ## Other
-          google-cloud-sdk
+          gdk
+          kubectl
           terraform
           podman
           podman-compose
-          jq
           yamlfmt
           nodePackages.prettier
           # llm

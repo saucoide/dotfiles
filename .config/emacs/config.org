@@ -6,7 +6,7 @@
 * Table of Contents                                          :toc@2:noexport:
 - [[#about][About]]
 - [[#startup][Startup]]
-  - [[#wip-early-initel][WIP early-init.el]]
+  - [[#early-initel][early-init.el]]
   - [[#dooms-startup-optimizations][doom's startup optimizations]]
 - [[#package-system-setup][Package System Setup]]
 - [[#basic-settings][Basic Settings]]
@@ -17,7 +17,7 @@
   - [[#path--exec-path][PATH & exec-path]]
   - [[#evil][Evil]]
 - [[#basic-gui-theme-etc][Basic GUI, Theme, etc.]]
-  - [[#wip-basic-gui-elements][WIP Basic GUI Elements]]
+  - [[#basic-gui-elements][Basic GUI Elements]]
   - [[#fonts][Fonts]]
   - [[#show-line-numbers-but-not-in-all-modes][Show line numbers, but not in all modes]]
   - [[#highlight-matching-parenthesis-brackets-etc][Highlight matching Parenthesis, Brackets, etc]]
@@ -86,7 +86,7 @@
   in a locked down windows environment where doom was not an option.
 
 * Startup
-** WIP early-init.el
+** early-init.el
 
 From doom's early init
 
@@ -384,7 +384,7 @@ evil-snipe, search 2 character motions to jump around text with ~s~ and ~S~
 #+end_src
 
 * Basic GUI, Theme, etc.
-** WIP Basic GUI Elements
+** Basic GUI Elements
   
 #+begin_src emacs-lisp
 

@@ -12,22 +12,12 @@ fish_add_path --prepend "/usr/local/bin"
 fish_add_path --prepend "$HOME/scripts"
 fish_add_path --prepend "$HOME/.nix-profile/bin"
 
-
-
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/saucon/google-cloud-sdk/path.fish.inc' ]; . '/Users/saucon/google-cloud-sdk/path.fish.inc'; end
+if [ -f '$HOME/google-cloud-sdk/path.fish.inc' ]; . '$HOME/google-cloud-sdk/path.fish.inc'; end
 # ---------------------------------------------------------------------
-
 
 # Environment Variables
 # ---------------------------------------------------------------------
-# set VISUAL "emacsclient -c -a ''"
-# set EDITOR "emacsclient -t -a ''"
-set SSH_ENV "$HOME/.ssh/agent-environment"
-set JAVA_HOME "/Users/saucon/Library/Caches/Coursier/arc/https/github.com/adoptium/temurin8-binaries/releases/download/jdk8u345-b01/OpenJDK8U-jdk_x64_mac_hotspot_8u345b01.tar.gz/jdk8u345-b01/Contents/Home"
-set USE_GKE_GCLOUD_AUTH_PLUGIN True
-# set --export PYTHONBREAKPOINT ipdb.set_trace
-
 # Set vim as Manpager
 set --export MANPAGER '/bin/bash -c "vim -MRn -c \"set buftype=nofile showtabline=0 ft=man ts=8 nomod nolist norelativenumber nonu noma\" -c \"normal L\" -c \"nmap q :qa<CR>\"</dev/tty <(col -b)"'
 # ---------------------------------------------------------------------

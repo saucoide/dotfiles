@@ -30,7 +30,6 @@ imperatively.
 In the future i'll try to move this to be truly declarative, for now, i just
 install the list.
 
-
 * Software
 
 software I've installed via homebrew
@@ -250,7 +249,7 @@ Some macos applications use this file for key bindings, here i'm changing the be
 }
 #+end_src
 
-* Window Manager (yabai)
+* Yabai
 
 I'm using yabai for now ~yabai &;disown~ if brew services doesnt launch it
 
@@ -281,16 +280,8 @@ yabai -m config external_bar                all:25:0
 yabai -m config mouse_follows_focus         off
 yabai -m config focus_follows_mouse         off
 
-yabai -m config window_topmost              off
 yabai -m config window_opacity              off
 yabai -m config window_shadow               float
-
-# yabai -m config window_border               on  # turn on when fixed 
-# yabai -m config window_border_radius        3
-# yabai -m config window_border_width         2
-# yabai -m config active_window_border_color  0xff50fa7b
-# yabai -m config normal_window_border_color  0xff282a36
-# yabai -m config insert_feedback_color       0xff2d74da
 
 yabai -m config active_window_opacity       1.0
 yabai -m config normal_window_opacity       0.90
@@ -307,7 +298,7 @@ yabai -m config mouse_action2               resize
 
 # These are misbehaving apps that freeze when managed
 yabai -m rule --add label="System Preferences" app="^System Preferences$" title=".*" manage=off
-yabai -m rule --add label="Flameshot" app="^Flameshot$" title=".*" manage=off
+yabai -m rule --add label="flameshot" app="^Flameshot$" title=".*" manage=off
 yabai -m rule --add label="About This Mac" app="System Information" title="About This Mac" manage=off
 yabai -m rule --add label="Finder" app="^Finder$" manage=off
 yabai -m rule --add label="System Preferences" app="^System Preferences$" title=".*" manage=off
@@ -584,6 +575,8 @@ float = ""
 export PYTHONBREAKPOINT=ipdb.set_trace
 export PYTHONSTARTUP=$HOME/.pythonrc.py
 export EDITOR="emacsclient -t --alternate-editor=''"
+export SSH_ENV="$HOME/.ssh/agent-environment"
+export USE_GKE_GCLOUD_AUTH_PLUGIN=True
 
 #+end_src
 
@@ -1598,22 +1591,12 @@ fish_add_path --prepend "/usr/local/bin"
 fish_add_path --prepend "$HOME/scripts"
 fish_add_path --prepend "$HOME/.nix-profile/bin"
 
-
-
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/saucon/google-cloud-sdk/path.fish.inc' ]; . '/Users/saucon/google-cloud-sdk/path.fish.inc'; end
+if [ -f '$HOME/google-cloud-sdk/path.fish.inc' ]; . '$HOME/google-cloud-sdk/path.fish.inc'; end
 # ---------------------------------------------------------------------
-
 
 # Environment Variables
 # ---------------------------------------------------------------------
-# set VISUAL "emacsclient -c -a ''"
-# set EDITOR "emacsclient -t -a ''"
-set SSH_ENV "$HOME/.ssh/agent-environment"
-set JAVA_HOME "/Users/saucon/Library/Caches/Coursier/arc/https/github.com/adoptium/temurin8-binaries/releases/download/jdk8u345-b01/OpenJDK8U-jdk_x64_mac_hotspot_8u345b01.tar.gz/jdk8u345-b01/Contents/Home"
-set USE_GKE_GCLOUD_AUTH_PLUGIN True
-# set --export PYTHONBREAKPOINT ipdb.set_trace
-
 # Set vim as Manpager
 set --export MANPAGER '/bin/bash -c "vim -MRn -c \"set buftype=nofile showtabline=0 ft=man ts=8 nomod nolist norelativenumber nonu noma\" -c \"normal L\" -c \"nmap q :qa<CR>\"</dev/tty <(col -b)"'
 # ---------------------------------------------------------------------
