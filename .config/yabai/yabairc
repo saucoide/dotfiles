@@ -3,11 +3,11 @@ sudo yabai --load-sa
 yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
 
 # ===== gaps ======
-gaps["top"]="2"
-gaps["bottom"]="2"
-gaps["left"]="2"
-gaps["right"]="2"
-gaps["inner"]="2"
+gaps["top"]="4"
+gaps["bottom"]="4"
+gaps["left"]="4"
+gaps["right"]="4"
+gaps["inner"]="4"
 
 # ===== Tiling setting ======
 
@@ -23,16 +23,8 @@ yabai -m config external_bar                all:25:0
 yabai -m config mouse_follows_focus         off
 yabai -m config focus_follows_mouse         off
 
-# yabai -m config window_topmost              off
 yabai -m config window_opacity              off
 yabai -m config window_shadow               float
-
-# yabai -m config window_border               on  # turn on when fixed 
-# yabai -m config window_border_radius        3
-# yabai -m config window_border_width         2
-# yabai -m config active_window_border_color  0xff50fa7b
-# yabai -m config normal_window_border_color  0xff282a36
-# yabai -m config insert_feedback_color       0xff2d74da
 
 yabai -m config active_window_opacity       1.0
 yabai -m config normal_window_opacity       0.90
@@ -50,7 +42,6 @@ yabai -m config mouse_action2               resize
 # These are misbehaving apps that freeze when managed
 yabai -m rule --add label="System Preferences" app="^System Preferences$" title=".*" manage=off
 yabai -m rule --add label="flameshot" app="^Flameshot$" title=".*" manage=off
-# yabai -m rule --add label="Flameshot" app="^flameshot$" title=".*" manage=off
 yabai -m rule --add label="About This Mac" app="System Information" title="About This Mac" manage=off
 yabai -m rule --add label="Finder" app="^Finder$" manage=off
 yabai -m rule --add label="System Preferences" app="^System Preferences$" title=".*" manage=off

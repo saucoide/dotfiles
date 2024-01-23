@@ -379,6 +379,12 @@
   :config
   (rg-enable-menu))
 
+;; use tree-sitter
+;; Install it first by M-x treesit-install-language-grammar
+(setq major-mode-remap-alist
+      '((python-mode . python-ts-mode)))
+
+
 ;; (use-package lsp-pyright)
 
 ;; (use-package pyvenv
@@ -591,87 +597,115 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
   :config
   (setq magit-todos-keyword-suffix "\\(?:([^)]+)\\)?:?"))
 
-;; TODO
-  ;; (use-package eglot)
+;; (use-package eglot
+;;   :config
+;;   (add-to-list 'eglot-server-programs
+;;                '(python-mode . ("ruff-lsp"))))
+
+
+;; There is a giant list of default associations in eglot-server-programs
+;; to add an extra one:
+;; (with-eval-after-load 'eglot
+;;  (add-to-list 'eglot-server-programs
+;;               '(foo-mode . ("fools" "--stdio"))))
 
 (use-package lsp-mode
-  :init
-  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-  (setq lsp-keymap-prefix "C-l")
-  :config
-  (setq lsp-modeline-diagnostics-enable t)
-  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-         (elm-mode . lsp)
-         (python-mode . lsp)
-         (clojure-mode . lsp)
-         (rustic-mode . lsp)
-         (scala-mode . lsp)
-         ;; if you want which-key integration
-         (lsp-mode . lsp-enable-which-key-integration))
-  :commands (lsp lsp-deferred))
-
-;; optionally
-(use-package lsp-ui :commands lsp-ui-mode)
-;; if you are ivy user
-(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
-(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+   :init
+   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+   (setq lsp-keymap-prefix "C-l")
+   :config
+   (setq lsp-modeline-diagnostics-enable t)
+   :hook (
+          ;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+          (elm-mode . lsp)
+          (python-ts-mode . lsp)
+          (clojure-mode . lsp)
+          (rustic-mode . lsp)
+          (scala-mode . lsp)
+          ;; if you want which-key integration
+          (lsp-mode . lsp-enable-which-key-integration))
+   :commands (lsp lsp-deferred))
+ 
+ ;; optionally
+ ;; (use-package lsp-ui :commands lsp-ui-mode)
+ ;; if you are ivy user
+ ;; (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+ ;; (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
 
 ;; optionally if you want to use debugger
 ;; (use-package dap-mode)
 ;; (use-package dap-python)
 ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
 
-(use-package company
-    :init
-    (add-hook 'after-init-hook 'global-company-mode)
-    :bind (:map company-active-map
-           ("<tab>" . company-complete-common-or-cycle)) ; tab completes the selection instead next
-    :custom
-    (company-minimum-prefix-lenght 1)
-    (company-idle-delay 0.1)
-    (company-show-numbers nil))
-
-;; a little bit better interface
-(use-package company-box
-  :hook (company-mode . company-box-mode)
+(use-package corfu
+  ;; Optional customizations
+  ;; :custom
+  ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+  ;; (corfu-auto t)                 ;; Enable auto completion
+  ;; (corfu-separator ?\s)          ;; Orderless field separator
+  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+  ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
+  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
+  :init
+  (global-corfu-mode)
   :config
-    (setq company-box-show-single-candidate t
-          company-box-backends-colors nil
-          company-box-max-candidates 50
-          company-box-icons-alist 'company-box-icons-all-the-icons
-          company-box-icons-all-the-icons
-          (let ((all-the-icons-scale-factor 0.8))
-            `((Unknown       . ,(all-the-icons-material "find_in_page"             :face 'all-the-icons-purple))
-              (Text          . ,(all-the-icons-material "text_fields"              :face 'all-the-icons-green))
-              (Method        . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-              (Function      . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-              (Constructor   . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-              (Field         . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-              (Variable      . ,(all-the-icons-material "adjust"                   :face 'all-the-icons-blue))
-              (Class         . ,(all-the-icons-material "class"                    :face 'all-the-icons-red))
-              (Interface     . ,(all-the-icons-material "settings_input_component" :face 'all-the-icons-red))
-              (Module        . ,(all-the-icons-material "view_module"              :face 'all-the-icons-red))
-              (Property      . ,(all-the-icons-material "settings"                 :face 'all-the-icons-red))
-              (Unit          . ,(all-the-icons-material "straighten"               :face 'all-the-icons-red))
-              (Value         . ,(all-the-icons-material "filter_1"                 :face 'all-the-icons-red))
-              (Enum          . ,(all-the-icons-material "plus_one"                 :face 'all-the-icons-red))
-              (Keyword       . ,(all-the-icons-material "filter_center_focus"      :face 'all-the-icons-red))
-              (Snippet       . ,(all-the-icons-material "short_text"               :face 'all-the-icons-red))
-              (Color         . ,(all-the-icons-material "color_lens"               :face 'all-the-icons-red))
-              (File          . ,(all-the-icons-material "insert_drive_file"        :face 'all-the-icons-red))
-              (Reference     . ,(all-the-icons-material "collections_bookmark"     :face 'all-the-icons-red))
-              (Folder        . ,(all-the-icons-material "folder"                   :face 'all-the-icons-red))
-              (EnumMember    . ,(all-the-icons-material "people"                   :face 'all-the-icons-red))
-              (Constant      . ,(all-the-icons-material "pause_circle_filled"      :face 'all-the-icons-red))
-              (Struct        . ,(all-the-icons-material "streetview"               :face 'all-the-icons-red))
-              (Event         . ,(all-the-icons-material "event"                    :face 'all-the-icons-red))
-              (Operator      . ,(all-the-icons-material "control_point"            :face 'all-the-icons-red))
-              (TypeParameter . ,(all-the-icons-material "class"                    :face 'all-the-icons-red))
-              (Template      . ,(all-the-icons-material "short_text"               :face 'all-the-icons-green))
-              (ElispFunction . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-              (ElispVariable . ,(all-the-icons-material "check_circle"             :face 'all-the-icons-blue))
-              (ElispFeature  . ,(all-the-icons-material "stars"                    :face 'all-the-icons-orange))
-              (ElispFace     . ,(all-the-icons-material "format_paint"             :face 'all-the-icons-pink))))))
+  (setq completion-cycle-threshold 4)
+  (setq tab-always-indent 'complete))
+
+;;  (use-package company
+;;      :init
+;;      (add-hook 'after-init-hook 'global-company-mode)
+;;      :bind (:map company-active-map
+;;             ("<tab>" . company-complete-common-or-cycle)) ; tab completes the selection instead next
+;;      :custom
+;;      (company-minimum-prefix-lenght 1)
+;;      (company-idle-delay 0.1)
+;;      (company-show-numbers nil))
+;;    
+;;  ;; a little bit better interface
+;;  (use-package company-box
+;;    :hook (company-mode . company-box-mode)
+;;    :config
+;;      (setq company-box-show-single-candidate t
+;;            company-box-backends-colors nil
+;;            company-box-max-candidates 50
+;;            company-box-icons-alist 'company-box-icons-all-the-icons
+;;            company-box-icons-all-the-icons
+;;            (let ((all-the-icons-scale-factor 0.8))
+;;              `((Unknown       . ,(all-the-icons-material "find_in_page"             :face 'all-the-icons-purple))
+;;                (Text          . ,(all-the-icons-material "text_fields"              :face 'all-the-icons-green))
+;;                (Method        . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
+;;                (Function      . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
+;;                (Constructor   . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
+;;                (Field         . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
+;;                (Variable      . ,(all-the-icons-material "adjust"                   :face 'all-the-icons-blue))
+;;                (Class         . ,(all-the-icons-material "class"                    :face 'all-the-icons-red))
+;;                (Interface     . ,(all-the-icons-material "settings_input_component" :face 'all-the-icons-red))
+;;                (Module        . ,(all-the-icons-material "view_module"              :face 'all-the-icons-red))
+;;                (Property      . ,(all-the-icons-material "settings"                 :face 'all-the-icons-red))
+;;                (Unit          . ,(all-the-icons-material "straighten"               :face 'all-the-icons-red))
+;;                (Value         . ,(all-the-icons-material "filter_1"                 :face 'all-the-icons-red))
+;;                (Enum          . ,(all-the-icons-material "plus_one"                 :face 'all-the-icons-red))
+;;                (Keyword       . ,(all-the-icons-material "filter_center_focus"      :face 'all-the-icons-red))
+;;                (Snippet       . ,(all-the-icons-material "short_text"               :face 'all-the-icons-red))
+;;                (Color         . ,(all-the-icons-material "color_lens"               :face 'all-the-icons-red))
+;;                (File          . ,(all-the-icons-material "insert_drive_file"        :face 'all-the-icons-red))
+;;                (Reference     . ,(all-the-icons-material "collections_bookmark"     :face 'all-the-icons-red))
+;;                (Folder        . ,(all-the-icons-material "folder"                   :face 'all-the-icons-red))
+;;                (EnumMember    . ,(all-the-icons-material "people"                   :face 'all-the-icons-red))
+;;                (Constant      . ,(all-the-icons-material "pause_circle_filled"      :face 'all-the-icons-red))
+;;                (Struct        . ,(all-the-icons-material "streetview"               :face 'all-the-icons-red))
+;;                (Event         . ,(all-the-icons-material "event"                    :face 'all-the-icons-red))
+;;                (Operator      . ,(all-the-icons-material "control_point"            :face 'all-the-icons-red))
+;;                (TypeParameter . ,(all-the-icons-material "class"                    :face 'all-the-icons-red))
+;;                (Template      . ,(all-the-icons-material "short_text"               :face 'all-the-icons-green))
+;;                (ElispFunction . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
+;;                (ElispVariable . ,(all-the-icons-material "check_circle"             :face 'all-the-icons-blue))
+;;                (ElispFeature  . ,(all-the-icons-material "stars"                    :face 'all-the-icons-orange))
+;;                (ElispFace     . ,(all-the-icons-material "format_paint"             :face 'all-the-icons-pink))))))
 
 (use-package smartparens
   :config 

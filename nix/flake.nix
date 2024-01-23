@@ -27,6 +27,13 @@
             gke-gcloud-auth-plugin
         ]
       );
+
+      # Add mypy plugin to the same venv
+      pylsp = pkgs.python3.withPackages(
+        p: with p; [
+          python-lsp-server
+          pylsp-mypy
+      ]);
     in 
     {
       packages.${system}.default = pkgs.buildEnv {
@@ -67,26 +74,20 @@
 
           # Editors
           neovim
-          # emacs29   # i switched to install this from brew instead
-          # emacsPackages.vterm
-          # libvterm
           # vscodium-fhs
 
           # Development Tools
 
           ## Python
-          python3
           python311Packages.nox
           python311Packages.black
-          python311Packages.python-lsp-server
-          python311Packages.python-lsp-ruff
           python311Packages.ipython
           python311Packages.ipdb
           python311Packages.rich
+          pylsp
           ruff
           ruff-lsp
           poetry
-          mypy
           pipx
 
           ## Databases
@@ -98,6 +99,8 @@
           gdk
           kubectl
           terraform
+          vault
+          nmap
           podman
           podman-compose
           yamlfmt
