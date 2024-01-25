@@ -25,9 +25,10 @@
 (setq user-emacs-directory (file-truename (file-name-directory load-file-name)))
 
 (require 'package)
-(setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                         ("org" . "https://orgmode.org/elpa/")
-                         ("elpa" . "https://elpa.gnu.org/packages/")))
+(setq package-archives '(
+          ("melpa" . "https://melpa.org/packages/")
+          ("org" . "https://orgmode.org/elpa/")
+          ("elpa" . "https://elpa.gnu.org/packages/")))
 
 (package-initialize)
 (unless package-archive-contents
@@ -57,6 +58,9 @@
 
 ;; Change how much data emacs can read in one chunk
 (setq read-process-output-max (* 1024 1024))
+
+;; save minibuffer history between sessions
+(savehist-mode 1)
 
 ;; Answer with y/n instead of yes/no
 (defalias 'yes-or-no-p 'y-or-n-p)    
@@ -94,10 +98,10 @@
 (setq-default tab-width 4)                  ; 4 spaces is the right tab width
 
 ;; Line length
-(setq-default fill-column 79)
+(setq-default fill-column 88)
 
 ;; visual-line
-(set-default 'truncate-lines t)
+(set-default 'truncate-lines 't)
 (global-visual-line-mode -1)
 
 ;; Change the default directory to store backups
@@ -120,31 +124,6 @@
   :init
   (setq exec-path-from-shell-shell-name "fish")
   (exec-path-from-shell-initialize))
-;; ;; for eshell mostly
-;; (setenv "PATH"
-;;         (concat ":~/.cargo/bin"
-;;                 ":~/.poetry/bin"
-;;                 ":~/.config/emacs/bin"
-;;                 ":~/.local/bin"
-;;                 ":/usr/local/bin"
-;;                 ":/usr/bin"
-;;                 ":/bin"
-;;                 ":/usr/local/sbin"
-;;                 ":/usr/lib/jvm/default/bin"
-;;                 ":$HOME/google-cloud-sdk/bin"))
-
-;; ;; for emacs to find binaries
-;; (setq exec-path
-;;       (append exec-path '("~/.cargo/bin"
-;;                           "~/.poetry/bin"
-;;                           "~/.config/emacs/bin"
-;;                           "~/.local/bin"
-;;                           "/usr/local/bin"
-;;                           "/usr/bin"
-;;                           "/bin"
-;;                           "/usr/local/sbin"
-;;                           "/usr/lib/jvm/default/bin"
-;;                           "$HOME/google-cloud-sdk/bin")))
 
 (use-package evil
     :init
@@ -223,8 +202,6 @@
 
 ;; all the icons is needed for doom-modeline
 ;; run M-x all-the-icons-install-fonts 
-;; in WINDOWS that will only download the fonts, and then you need to install
-;; them manually
 
 (use-package all-the-icons)
 
@@ -255,19 +232,11 @@
     ;; (setq dashboard-footer-icon nil)
     (setq dashboard-items '((recents  . 5)
                             (bookmarks . 5)
-                            (projects . 5)
+                            ;; (projects . 5)
                             (agenda . 10))))
 
 ;; Set dashboard to be the initial buffer that opens when using emacsclient
 (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
-
-(setq frame-title-format
-      '(""
-        (:eval "%b")
-        (:eval
-         (let ((project-name (projectile-project-name)))
-           (unless (string= "-" project-name)
-             (format (if (buffer-modified-p)  " * %s" " - %s") project-name))))))
 
 ;; show icons on dired
 (use-package all-the-icons-dired
@@ -293,14 +262,12 @@
     (kbd "h") 'dired-single-up-directory
     (kbd "<left>") 'dired-single-up-directory))
 
-
 (use-package dired-single)
 
-;; TODO
 (use-package transient
-  :init
-   (with-eval-after-load 'transient
-    (transient-bind-q-to-quit)))
+  :config
+  (define-key transient-map (kbd "<escape>") 'transient-quit-one)
+  (transient-bind-q-to-quit))
 
 (use-package which-key
   :init (which-key-mode)
@@ -308,36 +275,68 @@
   :config
   (setq which-key-idle-delay 0.3))
 
-(use-package ivy
-  :diminish
-  :bind (("C-s" . swiper)
-         :map ivy-minibuffer-map
-         ("TAB" . ivy-alt-done)
-         ("C-l" . ivy-alt-done)
-         ("C-j" . ivy-next-line)
-         ("C-k" . ivy-previous-line)
-         :map ivy-switch-buffer-map
-         ("C-k" . ivy-previous-line)
-         ("C-l" . ivy-done)
-         ("C-d" . ivy-switch-buffer-kill)
-         :map ivy-reverse-i-search-map
-         ("C-k" . ivy-previous-line)
-         ("C-d" . ivy-reverse-i-search-kill))
-  :config
-  (ivy-mode 1))
+(use-package vertico
+  :custom
+  (vertico-cycle t)
+  :init
+  (vertico-mode))
 
-(use-package ivy-rich
-    :init
-    (ivy-rich-mode 1))
+(use-package marginalia
+  :after vertico
+  :custom
+  (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
+  :init
+  (marginalia-mode))
 
-(use-package counsel
-  :bind (("M-x" . counsel-M-x)
-         ("C-x b" . counsel-ibuffer)
-         ("C-x X-f" . counsel-find-file)
+(use-package consult
+  :bind (("C-s" . consult-line)
          :map minibuffer-local-map
-         ("C-r" . 'counsel-minibuffer-history))
+         ("C-r" . consult-history))
+  :custom
+  (completion-in-region-function #'consult-completion-in-region)
+  (consult-fd-args "fd --hidden")
+  (consult-async-min-input 1)
+  (consult-preview-key 'any))  ;'(:debounce 0.5 any)))  ;; delay previews
+
+(use-package embark
+  :bind (("C-S-a" . embark-act)
+         :map minibuffer-local-map
+         ("C-d" . embark-act))
   :config
-  (setq ivy-initial-inputs-alist nil))
+  ;; Show Embark actions via which-key
+  (setq embark-action-indicator
+        (lambda (map)
+          (which-key--show-keymap "Embark" map nil nil 'no-paging)
+          #'which-key--hide-popup-ignore-command)
+        embark-become-indicator embark-action-indicator))
+
+(use-package embark-consult
+  :hook
+  (embark-collect-mode . conult-preview-at-point-mode))
+
+(use-package corfu
+  ;; Optional customizations
+  :custom
+  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+  ;; (corfu-auto t)                 ;; Enable auto completion
+  ;; (corfu-separator ?\s)          ;; Orderless field separator
+  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+  ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
+  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
+  :init
+  (global-corfu-mode)
+  :config
+  (setq completion-cycle-threshold 4)
+  (setq tab-always-indent 'complete))
+
+(use-package orderless
+  :init
+  (setq completion-styles '(orderless)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles . (partial-completion))))))
 
 (use-package smex
   :config (smex-initialize))
@@ -346,63 +345,20 @@
   :after evil
   :init
   (setq evil-lookup-func #'helpful-at-point)
-  :custom
-  (counsel-describe-function-function #'helpful-callable)
-  (counsel-describe-variable-function #'helpful-variable)
   :bind
-  ([remap describe-function] . counsel-describe-function)
+  ([remap describe-function] . helpful-function)
   ([remap describe-command] . helpful-command)
-  ([remap describe-variable] . counsel-describe-variable)
+  ([remap describe-variable] . helpful-variable)
   ([remap describe-key] . helpful-key))
-
-(use-package projectile
-  :diminish projectile-mode
-  :config (projectile-mode)
-  (add-to-list 'projectile-globally-ignored-directories "*venv")
-  (add-to-list 'projectile-globally-ignored-directories "venv")
-  (add-to-list 'projectile-globally-ignored-directories "*.venv")
-  (add-to-list 'projectile-globally-ignored-directories ".venv")
-  (add-to-list 'projectile-globally-ignored-file-suffixes "*.pyc")
-  :bind-keymap
-  ("C-c p" . projectile-command-map)
-  ;; ("SPC P" . projectile-command-map))
-  :init
-  (when (file-directory-p "~/projects")
-    (setq projectile-project-search-path '("~/projects")))
-  ;; action that triggers on switching projects (eg open dired)
-  (setq projectile-switch-project-action #'projectile-dired))
-
-(use-package counsel-projectile
-  :config (counsel-projectile-mode))
 
 (use-package rg
   :config
   (rg-enable-menu))
 
-;; use tree-sitter
-;; Install it first by M-x treesit-install-language-grammar
+; use tree-sitter
+; Install it first by M-x treesit-install-language-grammar
 (setq major-mode-remap-alist
       '((python-mode . python-ts-mode)))
-
-
-;; (use-package lsp-pyright)
-
-;; (use-package pyvenv
-;;   :init
-;;   (setenv "WORKON_HOME" "~/.pyenv/versions")
-;;     (defun try/pyvenv-workon ()
-;;     (when (buffer-file-name)
-;;       (let* ((python-version ".python-version")
-;;              (project-dir (locate-dominating-file (buffer-file-name) python-version)))
-;;         (when project-dir
-;;           (pyvenv-workon
-;;             (with-temp-buffer
-;;               (insert-file-contents (expand-file-name python-version project-dir))
-;;              (car (split-string (buffer-string)))))))))
-;;   :config
-;;   (pyvenv-mode 1)
-;;   :hook
-;;   (python-mode . try/pyvenv-workon))
 
 (use-package nix-mode)
 
@@ -413,15 +369,6 @@
 
 (use-package scala-mode
   :interpreter ("scala" . scala-mode))
-
-;; (use-package lsp-metals
-;;   :ensure t
-;;   :custom
-;;   ;; Metals claims to support range formatting by default but it supports range
-;;   ;; formatting of multiline strings only. You might want to disable it so that
-;;   ;; emacs can use indentation provided by scala-mode.
-;;   (lsp-metals-server-args '("-J-Dmetals.allow-multiline-string-formatting=off"))
-;;   :hook (scala-mode . lsp))
 
 (use-package rustic
   :config
@@ -439,7 +386,8 @@
 
 (use-package yaml-mode
   :config
-  (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode)))
+  (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+  (add-to-list 'auto-mode-alist '("\\.yaml\\'" . yaml-mode)))
 
 (use-package eval-in-repl
   :config
@@ -470,18 +418,20 @@
                  (local-set-key (kbd "C-<return>") 'eir-eval-in-shell)))
   )
 
-;; (add-to-list 'load-path "~/dotfiles/.config/emacs/local-packages/kubectl")
-;; (require 'kubectl)
+(use-package kubel
+  :defer t
+  :after (vterm)
+  :config (kubel-vterm-setup))
 
-(use-package kubernetes)
-(use-package kubernetes-evil
-  :ensure t
-  :after kubernetes)
+;; https://github.com/abrochard/kubel/pull/127
+(use-package kubel-evil
+  :defer t
+  :after (kubel)
+  :config 
+  (kubel-evil-mode))
 
 (use-package flycheck
   :init (global-flycheck-mode))
-    ;; :defer t
-    ;; :hook (lsp-mode . flycheck-mode))
 
 ;; Reformatter
 (use-package reformatter)
@@ -491,6 +441,9 @@
 (reformatter-define black-format
   :program "black"
   :args '("-"))
+(reformatter-define ruff-format
+  :program "ruff"
+  :args '("format" "-"))
 (reformatter-define prettier-format
   :program "prettier"
   :args '("--parser" "json"))
@@ -514,7 +467,8 @@
  a reformatter configured for the active major mode."
   (interactive)
   (pcase major-mode
-    ('python-mode (black-format-buffer))
+    ('python-mode (ruff-format-buffer))
+    ('python-ts-mode (ruff-format-buffer))
     ('yaml-mode (yaml-format-buffer))
     ('terraform-mode (terraform-format-buffer))
     ('js-mode (prettier-format-buffer))
@@ -586,7 +540,6 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
                                    (when smerge-mode
                                      (unpackaged/smerge-hydra/body)))))
 
-;; TODO doesnt work well with org mode buffers for me
 (use-package git-gutter
   :defer t
   :hook ((text-mode . git-gutter-mode)
@@ -596,18 +549,6 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
   :hook (magit-mode . magit-todos-mode)
   :config
   (setq magit-todos-keyword-suffix "\\(?:([^)]+)\\)?:?"))
-
-;; (use-package eglot
-;;   :config
-;;   (add-to-list 'eglot-server-programs
-;;                '(python-mode . ("ruff-lsp"))))
-
-
-;; There is a giant list of default associations in eglot-server-programs
-;; to add an extra one:
-;; (with-eval-after-load 'eglot
-;;  (add-to-list 'eglot-server-programs
-;;               '(foo-mode . ("fools" "--stdio"))))
 
 (use-package lsp-mode
    :init
@@ -628,8 +569,6 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
  
  ;; optionally
  ;; (use-package lsp-ui :commands lsp-ui-mode)
- ;; if you are ivy user
- ;; (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
  ;; (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
 
 ;; optionally if you want to use debugger
@@ -637,80 +576,7 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 ;; (use-package dap-python)
 ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
 
-(use-package corfu
-  ;; Optional customizations
-  ;; :custom
-  ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  ;; (corfu-auto t)                 ;; Enable auto completion
-  ;; (corfu-separator ?\s)          ;; Orderless field separator
-  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
-  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
-  ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
-  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
-  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
-  :init
-  (global-corfu-mode)
-  :config
-  (setq completion-cycle-threshold 4)
-  (setq tab-always-indent 'complete))
-
-;;  (use-package company
-;;      :init
-;;      (add-hook 'after-init-hook 'global-company-mode)
-;;      :bind (:map company-active-map
-;;             ("<tab>" . company-complete-common-or-cycle)) ; tab completes the selection instead next
-;;      :custom
-;;      (company-minimum-prefix-lenght 1)
-;;      (company-idle-delay 0.1)
-;;      (company-show-numbers nil))
-;;    
-;;  ;; a little bit better interface
-;;  (use-package company-box
-;;    :hook (company-mode . company-box-mode)
-;;    :config
-;;      (setq company-box-show-single-candidate t
-;;            company-box-backends-colors nil
-;;            company-box-max-candidates 50
-;;            company-box-icons-alist 'company-box-icons-all-the-icons
-;;            company-box-icons-all-the-icons
-;;            (let ((all-the-icons-scale-factor 0.8))
-;;              `((Unknown       . ,(all-the-icons-material "find_in_page"             :face 'all-the-icons-purple))
-;;                (Text          . ,(all-the-icons-material "text_fields"              :face 'all-the-icons-green))
-;;                (Method        . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-;;                (Function      . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-;;                (Constructor   . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-;;                (Field         . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-;;                (Variable      . ,(all-the-icons-material "adjust"                   :face 'all-the-icons-blue))
-;;                (Class         . ,(all-the-icons-material "class"                    :face 'all-the-icons-red))
-;;                (Interface     . ,(all-the-icons-material "settings_input_component" :face 'all-the-icons-red))
-;;                (Module        . ,(all-the-icons-material "view_module"              :face 'all-the-icons-red))
-;;                (Property      . ,(all-the-icons-material "settings"                 :face 'all-the-icons-red))
-;;                (Unit          . ,(all-the-icons-material "straighten"               :face 'all-the-icons-red))
-;;                (Value         . ,(all-the-icons-material "filter_1"                 :face 'all-the-icons-red))
-;;                (Enum          . ,(all-the-icons-material "plus_one"                 :face 'all-the-icons-red))
-;;                (Keyword       . ,(all-the-icons-material "filter_center_focus"      :face 'all-the-icons-red))
-;;                (Snippet       . ,(all-the-icons-material "short_text"               :face 'all-the-icons-red))
-;;                (Color         . ,(all-the-icons-material "color_lens"               :face 'all-the-icons-red))
-;;                (File          . ,(all-the-icons-material "insert_drive_file"        :face 'all-the-icons-red))
-;;                (Reference     . ,(all-the-icons-material "collections_bookmark"     :face 'all-the-icons-red))
-;;                (Folder        . ,(all-the-icons-material "folder"                   :face 'all-the-icons-red))
-;;                (EnumMember    . ,(all-the-icons-material "people"                   :face 'all-the-icons-red))
-;;                (Constant      . ,(all-the-icons-material "pause_circle_filled"      :face 'all-the-icons-red))
-;;                (Struct        . ,(all-the-icons-material "streetview"               :face 'all-the-icons-red))
-;;                (Event         . ,(all-the-icons-material "event"                    :face 'all-the-icons-red))
-;;                (Operator      . ,(all-the-icons-material "control_point"            :face 'all-the-icons-red))
-;;                (TypeParameter . ,(all-the-icons-material "class"                    :face 'all-the-icons-red))
-;;                (Template      . ,(all-the-icons-material "short_text"               :face 'all-the-icons-green))
-;;                (ElispFunction . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-;;                (ElispVariable . ,(all-the-icons-material "check_circle"             :face 'all-the-icons-blue))
-;;                (ElispFeature  . ,(all-the-icons-material "stars"                    :face 'all-the-icons-orange))
-;;                (ElispFace     . ,(all-the-icons-material "format_paint"             :face 'all-the-icons-pink))))))
-
-(use-package smartparens
-  :config 
-  (smartparens-global-mode t)
-  (require 'smartparens-config))
+(electric-pair-mode 1)
 
 (use-package yasnippet
   :config
@@ -725,12 +591,6 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
   (evil-define-minor-mode-key 'normal 'vterm-mode (kbd "_") 'evil-collection-vterm-first-non-blank)
   ;; (evil-define-key 'normal 'vterm-mode-map (kbd "cc") 'evil-collection-vterm-change-line)
   )
-
-(use-package eshell-toggle
-    :custom
-    (eshell-toggle-size-fraction 3)
-    (eshell-toggle-use-projectile-root t)
-    (eshell-toggle-run-command nil))
 
 (defun my/org-mode-setup()
     (org-indent-mode)
@@ -801,18 +661,6 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
   :custom
   (org-bullets-bullet-list '("◐" "○" "●" "✖" "✚")))
 
-;; (defun my/org-mode-visual-fill ()
-;;     (setq visual-fill-column-width 79)
-;;     (visual-fill-column-mode 1))
-
-;; (defun my/org-mode-center-text ()
-;;  "toggle centering text in buffer"
-;;     (interactive)
-;;     (setq visual-fill-column-center-text (not visual-fill-column-center-text)))
-
-;; (use-package visual-fill-column 
-;;     :hook (org-mode . my/org-mode-visual-fill))
-
 (org-babel-do-load-languages
     'org-babel-load-languages
     '((emacs-lisp . t)
@@ -849,23 +697,26 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
         :global-prefix "C-SPC"))
 
 (defun my/find-file()
+  "Use project specific find if in project"
   (interactive)
-  (if (projectile-project-p)
-      (counsel-projectile-find-file)
-    (counsel-find-file)))
+  (if (project-current)
+      (project-find-file)
+    (consult-fd)))
+
+(defun my/popup-scratch-buffer nil
+  "Popup a scratch buffer."
+  (interactive)
+  (evil-window-split 20)
+  (switch-to-buffer (get-buffer-create "*scratch*"))
+  (lisp-interaction-mode))
 
 (my/leader-key-def
   ;; actions
   "DEL" '(evil-switch-to-windows-last-buffer :which-key "Last buffer")
-  "RET" '(counsel-bookmark :which-key "Bookmarks")
+  "RET" '(consult-bookmark :which-key "Bookmarks")
   "SPC" '(my/find-file :which-key "Find file")
   "<home>" '(dashboard-refresh-buffer :which-key "Switch to Dashboard")
-  "'" '(ivy-resume :which-key "Resume last search")
-  "," '(projectile-switch-to-buffer :which-key "Switch project buffer")
-  "." '(counsel-M-x :which-key "M-x")
-  ":" '(counsel-find-file :which-key "Find file")
   ";" '(eval-expression :which-key "Eval expression")
-  "<" '(counsel-switch-buffer :which-key "Switch buffer (all)")
   "x" '(my/popup-scratch-buffer :which-key "Pop scratch buffer")
   "X" '(org-capture :which-key "Org Capture"))
 
@@ -876,36 +727,52 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
     "am" '(org-tags-view :which-key "Tags view")
     "av" '(org-search-view :which-key "Search view"))
 
+(defun my/consult-switch-buffer()
+  "Use project specific switcher if in project"
+  (interactive)
+  (if (project-current)
+      (consult-project-buffer)
+      (consult-buffer)))
+
+(defun my/kill-matching-buffers-no-confirm (regexp)
+ "Kill all buffers matching REGEXP without confirmation."
+  (interactive)
+  (cl-letf (((symbol-function 'kill-buffer-ask) #'kill-buffer))
+    (kill-matching-buffers regexp)))
+
+(defun my/close-all-buffers ()
+  "Closes all buffers."
+  (interactive)
+  ;; (kill-matching-buffers ".*"))
+  (cl-loop for buf in (buffer-list)
+	if (not (or (string-match "^*dashboard" (buffer-name buf))
+				(string-match "^*Messages" (buffer-name buf))
+				(string-match "^*scratch" (buffer-name buf))
+				(string-match "^ " (buffer-name buf))))
+	do (kill-buffer buf))
+  (dashboard-refresh-buffer))
+
 (my/leader-key-def
   "b"  '(:ignore t :which-key "buffer")
   "bn" '(next-buffer :which-key "Next buffer")
-  "bp" '(next-buffer :which-key "Previous buffer")
-  "b>" '(next-buffer :which-key "Next buffer")
-  "b<" '(previous-buffer :which-key "Previous buffer")
-  "bb" '(projectile-switch-to-buffer :which-key "Switch project buffer")
+  "bp" '(previous-buffer :which-key "Previous buffer")
+  "bb" '(my/consult-switch-buffer :which-key "Switch buffer")
   "bi" '(ibuffer :which-key "ibuffer")
-  "bc" '(kill-current-buffer :which-key "Kill buffer")
-  "bd" '(kill-current-buffer :which-key "Kill buffer")
   "bk" '(kill-current-buffer :which-key "Kill buffer")
   "bl" '(evil-switch-to-windows-last-buffer :which-key "Switch to last buffer")
-  "bm" '(bookmark-set :which-key "Mark as bookmark")
   "bs" '(basic-save-buffer :which-key "Save buffer")
-  ;; "u" '(:which-key "Save as root")
   "bz" '(bury-buffer :which-key "Bury buffer")
   "bm" '(bookmark-set :which-key "Mark as bookmark")
   "bM" '(bookmark-delete :which-key "Delete bookmark")
   "bR" '(revert-buffer :which-key "Revert buffer")
-  "bB" '(counsel-switch-buffer :which-key "Switch buffer")
-  "bT" '(ivy-switch-buffer :which-key "Switch buffer")
+  "bB" '(consult-buffer :which-key "consult buffer")
   "bK" '(my/close-all-buffers :which-key "Kill all buffers")
   "bN" '(evil-buffer-new :which-key "New buffer"))
-
-;; TODO bK use doom's better function
 
 (my/leader-key-def
     "c"  '(:ignore t :which-key "code")
     "c <return>" '(lsp-execute-code-action :which-key "Code Actions")
-    "cc" '(counsel-compile :which-key "Compile")
+    "cc" '(project-compile :which-key "Compile")
     "cd" '(lsp-find-definition :which-key "Jump to definition")
     "cr" '(lsp-find-references :which-key "Jump to references")
     "cf" '(my/reformat-buffer :which-key "Format buffer")
@@ -920,49 +787,37 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
     "el" '(eval-last-sexp :which-key "Evaluate last sexpression")
     "er" '(eval-region :which-key "Evaluate region"))
 
-;; from system crafters's config
-(eval-when-compile (require 'cl))
-(defun my/dired-in (path)
-  (lexical-let ((target path))
-    (lambda () (interactive) (dired target))))
-
 (my/leader-key-def
-  "d"  '(counsel-find-file :which-key "Here"))
-  ;; "dh"  `(,(my/dired-in "~") :which-key "Home")
-  ;; "do"  `(,(my/dired-in "~/org") :which-key "Org")
-  ;; "dD"  `(,(my/dired-in "~/downloads") :which-key "Downloads")
-  ;; "dv"  `(,(my/dired-in "~/videos") :which-key "Videos")
-  ;; "d."  `(,(my/dired-in "~/dotfiles") :which-key "dotfiles")
-  ;; "dp"  `(,(my/dired-in "~/projects") :which-key "projects")
-  ;; "de"  `(,(my/dired-in "~/.config/emacs") :which-key "emacs"))
+  "d"  '(find-file :which-key "Here"))
 
 (my/leader-key-def
     "f"  '(:ignore t :which-key "files")
-    "fd" '(projectile-dired :which-key "Find directory")
-    "ff" '(counsel-find-file :which-key "Find file")
-    "fl" '(counsel-locate :which-key "Locate file")
-    "fr" '(counsel-recentf :which-key "Recent files")
+    "ff" '(find-file :which-key "Find file")
+    "fl" '(consult-locate :which-key "Locate file")
+    "fr" '(consult-recent-file :which-key "Recent files")
     "fs" '(save-buffer :which-key "Save file")
     "fy" '(my/copy-filename-to-clipboard :which-key "Yank filename")
     "fC" '(copy-file :which-key "Copy this file")
     "fD" '(delete-file :which-key "Delete this file")
-    ;; "E" '(a :which-key "Browse emacs.d")
-    ;; "F" '(a :which-key "Find file from here")
     "fR" '(rename-file :which-key "Rename/Move file")
-    "fS" '(write-file :which-key "Save file as...")
-    ;; "U" '(a :which-key "Sudo this file")
-)
+    "fS" '(write-file :which-key "Save file as..."))
+
+(defun my/kill-magit-buffers()
+  "Kills all magit buffers"
+  (interactive)
+  (my/kill-matching-buffers-no-confirm "^magit.*"))
 
 (my/leader-key-def
-    "g"  '(:ignore t :which-key "git")
-    "gg" '(magit-status :which-key "Magit status")
-    "g/" '(magit-dispatch :which-key "Magit dispatch")
-    "gb" '(magit-branch-checkout :which-key "Magit switch branch")
-    "gC" '(magit-clone :which-key "Magit clone")
-    "gD" '(magit-file-delete :which-key "Magit file delete")
-    "gR" '(vc-revert :which-key "Revert file")
-    "gS" '(magit-stage-file :which-key "Magit stage file")
-    "gU" '(magit-unstage-file :which-key "Magit unstage file"))
+  "g"  '(:ignore t :which-key "git")
+  "gg" '(magit-status :which-key "Magit status")
+  "g/" '(magit-dispatch :which-key "Magit dispatch")
+  "gb" '(magit-branch-checkout :which-key "Magit switch branch")
+  "gC" '(magit-clone :which-key "Magit clone")
+  "gD" '(magit-file-delete :which-key "Magit file delete")
+  "gR" '(vc-revert :which-key "Revert file")
+  "gS" '(magit-stage-file :which-key "Magit stage file")
+  "gK" '(my/kill-magit-buffers :which-key "Kill all magit buffers")
+  "gU" '(magit-unstage-file :which-key "Magit unstage file"))
 
 (my/leader-key-def
     "h"  '(:ignore t :which-key "help")
@@ -973,20 +828,36 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
     "ha" '(apropos :which-key "Apropos")
     "hc" '(describe-key-briefly :which-key "Describe key briefly")
     "he" '(view-echo-area-messages :which-key "View echo messages")
-    "hf" '(counsel-describe-function :which-key "Describe function")
+    "hf" '(describe-function :which-key "Describe function")
     "hi" '(info :which-key "Info")
     "hk" '(describe-key :which-key "Describe key")
     "hl" '(view-lossage :which-key "View lossage")
     "hm" '(describe-mode :which-key "Describe mode")
-    "hs" '(counsel-describe-symbol :which-key "Describe symbol")
+    "hs" '(describe-symbol :which-key "Describe symbol")
     "hq" '(help-quit :which-key "Help quit")
-    "hv" '(counsel-describe-variable :which-key "Describe variable")
+    "hv" '(describe-variable :which-key "Describe variable")
     "hw" '(where-is :which-key "Where is")
     "hA" '(apropos-documentation :which-key "Apropos docs")
     "hC" '(describe-coding-system :which-key "Describe coding system")
-    "hF" '(counsel-describe-face :which-key "Describe face")
+    "hF" '(describe-face :which-key "Describe face")
     "hV" '(set-variable :which-key "Set variable")
     "hH" '(help-for-help :which-key "Help for help"))
+
+;; (defun my/k8s-pods()
+;;     (kubel-open ))
+
+(defun my/kill-kubel-buffers()
+    "Kill all kubel buffers"
+    (interactive)
+    (my/kill-matching-buffers-no-confirm "^\\*kubel.*\\*"))
+
+(my/leader-key-def
+    "k"  '(:ignore t :which-key "Kubernetes")
+    "kk" '(kubel :which-key "k8s")
+    "kK" '(my/kill-kubel-buffers :which-key "Kill kubel buffers"))
+    ;; "kl" '(kubel-open :which-key "k8s Logs"))
+
+;; TODO add note filtering functions here
 
 (my/leader-key-def
     "n"  '(:ignore t :which-key "notes")
@@ -998,8 +869,9 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 
 (defun my/vterm-toggle()
   (interactive)
-  (if (projectile-project-p)
-      (projectile-run-vterm-other-window)
+  (if (project-current)
+      (let ((default-directory (project-root (project-current))))
+        (vterm-other-window))
     (vterm-other-window)))
 
 (defun my/vterm-here()
@@ -1020,24 +892,21 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
     )
 
 (defun my/switch-project-dired()
-  (interactive)
-    (counsel-projectile-switch-project 'counsel-projectile-switch-project-action-dired))
+ "Switch to a project and open dired in the project root."
+ (interactive)
+ (let ((project (project-prompt-project-dir)))
+    (when project
+      (dired (expand-file-name project)))))
 
 (my/leader-key-def
     "p"  '(:ignore t :which-key "projects")
-    "p!" '(projectile-run-shell-command-in-root :which-key "Run cmd in project root")
-    "p." '(projectile-recentf :which-key "Recent files in project")
-    "pa" '(projectile-add-known-project :which-key "Add project")
-    "pb" '(counsel-projectile-switch-to-buffer :which-key "Switch to project buffer")
-    "pd" '(projectile-dired :which-key "dired in project")
-    "pf" '(counsel-projectile-find-file :which-key "Find file in project")
-    "pk" '(projectile-kill-buffers :which-key "Kill project buffers")
+    "pb" '(consult-project-buffer :which-key "Switch project buffer")
+    "pd" '(project-dired :which-key "dired in project")
+    "pf" '(consult-fd :which-key "Find file in project")
+    "pk" '(project-kill-buffers :which-key "Kill project buffers")
     "pp" '(my/switch-project-dired :which-key "Switch project") 
-    "pr" '(projectile-recentf :which-key "Recent files in project")
-    "ps" '(projectile-ripgrep :which-key "ripgrep on project")
     "pt" '(magit-todos-list :which-key "Project TODOs")
-    "pD" '(projectile-remove-known-project :which-key "Delete project")
-    "pR" '(projectile-run-project :which-key "Run project"))
+    "pD" '(project-forget-project :which-key "Forget project"))
 
 (my/leader-key-def
     "q"  '(:ignore t :which-key "quit")
@@ -1045,11 +914,12 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 
 (my/leader-key-def
     "s"  '(:ignore t :which-key "search")
-    "ss" '(rg-menu :which-key "ripgrep-menu")
-    "sp" '(projectile-ripgrep :which-key "projectile -ipgrep")
-    "sr" '(rg--transient :which-key "ripgrep-regex"))
-
- ;; TODO add bindings to search in project, etc
+    "ss" '(rg-dwim :which-key "ripgrep simple")
+    "sS" '(rg-menu :which-key "ripgrep menu")
+    "sp" '(rg-project :which-key "ripgrep project")
+    "sl" '(rg-literal :which-key "ripgrep literal anywhere")
+    "sr" '(rg--transient :which-key "ripgrep regex anywhere")
+    "s/" '(consult-ripgrep :which-key "ripgrep dwim"))
 
 (my/leader-key-def
     "t"  '(:ignore t :which-key "toggle")
@@ -1115,11 +985,11 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 
 (general-define-key
  :states '(normal insert visual)
- "C-s" 'swiper-isearch)
+ "C-s" 'consult-line)
 
 (general-define-key
  :states '(normal visual)
- "/" 'swiper-isearch)
+ "/" 'consult-line)
 
 (use-package drag-stuff)
 (drag-stuff-global-mode 1)
