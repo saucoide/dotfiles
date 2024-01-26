@@ -173,3 +173,52 @@ See `display-line-numbers' for what these values mean."
   (setq indent-tabs-mode (not indent-tabs-mode))
   (message "Indent style changed to %s" (if indent-tabs-mode "tabs" "spaces")))
 
+
+(defun my/org-roam-filter-by-tag (tag)
+  "Filters all roam-notes by TAG."
+  (lambda (node)
+    (member tag (org-roam-node-tags node))))
+
+(defun my/org-roam-list-notes-by-tag (tag)
+  "Return a list with all roam notes matching TAG."
+ (mapcar #'org-roam-node-file
+         (seq-filter
+           (my/org-roam-filter-by-tag tag)
+           (org-roam-node-list))))
+
+(defun my/refresh-roam-gitignore()
+  "Create a new .gitignore file at the org-roam directory excluding the notes matching
+the criteria."
+  (interactive)
+  (let (
+     (notes (mapcar
+             (lambda (filepath)
+               (file-relative-name filepath org-roam-directory))
+             (my/org-roam-list-notes-by-tag "work")))
+     )
+    (when notes
+      (my/save-lines-to-file
+       (expand-file-name ".gitignore" org-roam-directory)
+       (cons ".gitignore" notes)))))
+
+(defun my/org-roam-node-is-untagged(node)
+  "Check if a single NODE is untagged."
+  (lambda (node))
+  (null (org-roam-node-tags node)))
+
+(defun my/org-roam-get-untagged()
+  "Get all untagged notes"
+  (interactive)
+  (org-roam-node-find nil nil 'my/org-roam-node-is-untagged))
+
+(defun my/save-lines-to-file (filename lines)
+ "Insert LINES into FILENAME, each on a new line."
+ (with-temp-file filename
+   (dolist (line lines)
+     (insert line "\n"))))
+
+(defun my/insert-lines-to-buffer-end(lines)
+ (save-excursion
+   (goto-char (point-max))
+   (dolist (match lines)
+     (insert "\n" match))))

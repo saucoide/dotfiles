@@ -67,6 +67,7 @@
   - [[#quit-spc-q][Quit =SPC q=]]
   - [[#search-spc-s][Search =SPC s=]]
   - [[#toggle-spc-t][Toggle =SPC t=]]
+  - [[#embark-action-spc-l][Embark Action =SPC l=]]
   - [[#window-management-spc-w][Window Management =SPC w=]]
   - [[#other-keybindings][Other KeyBindings]]
 - [[#envrc][envrc]]
@@ -576,20 +577,25 @@ The emacs file manager
 
 *** TODO Embark
 
+https://karthinks.com/software/fifteen-ways-to-use-embark/
+
 #+begin_src emacs-lisp
 (use-package embark
-  :bind (("C-S-a" . embark-act)
+  :bind (("C-l" . embark-act)
          :map minibuffer-local-map
-         ("C-d" . embark-act))
+         ("C-l" . embark-act))
   :config
   ;; Show Embark actions via which-key
   (setq embark-action-indicator
         (lambda (map)
           (which-key--show-keymap "Embark" map nil nil 'no-paging)
           #'which-key--hide-popup-ignore-command)
-        embark-become-indicator embark-action-indicator))
-
+        embark-become-indicator embark-action-indicator)
+  (setopt embark-verbose-indicator-display-action
+          '(display-buffer-at-bottom)))
+  
 (use-package embark-consult
+  :after (embark consult)
   :hook
   (embark-collect-mode . conult-preview-at-point-mode))
 
@@ -1296,23 +1302,21 @@ My leader key is =SPC=, these is what's directly bound to it
 
 #+begin_src emacs-lisp
 
-  (my/leader-key-def
-      "e"  '(:ignore t :which-key "eval")
-      "eb" '(eval-buffer :which-key "Evaluate buffer")
-      "ed" '(eval-defun :which-key "Evaluate defun")
-      "ee" '(eval-expression :which-key "Evaluate expression")
-      "el" '(eval-last-sexp :which-key "Evaluate last sexpression")
-      "er" '(eval-region :which-key "Evaluate region"))
+(my/leader-key-def
+    "e"  '(:ignore t :which-key "eval")
+    "eb" '(eval-buffer :which-key "Evaluate buffer")
+    "ed" '(eval-defun :which-key "Evaluate defun")
+    "ee" '(eval-expression :which-key "Evaluate expression")
+    "el" '(eval-last-sexp :which-key "Evaluate last sexpression")
+    "er" '(eval-region :which-key "Evaluate region"))
 
 #+end_src
 
 ** Dired =SPC d=
 
 #+begin_src emacs-lisp
-
 (my/leader-key-def
-  "d"  '(find-file :which-key "Here"))
-
+  "d"  '(find-file :which-key "here"))
 #+end_src
 
 ** Files =SPC f=
@@ -1512,6 +1516,13 @@ TODO: Might be worth adding keybinds to the logs popup, etc
     "tI" '(doom/toggle-indent-style :which-key "Indentation"))
 
 #+end_src
+
+** Embark Action =SPC l=
+
+#+begin_src emacs-lisp
+(my/leader-key-def
+    "l" '(embark-act :which-key "Embark Act"))
+#+end_src>
 
 ** Window Management =SPC w=
     

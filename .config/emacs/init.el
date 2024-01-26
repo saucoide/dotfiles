@@ -299,18 +299,21 @@
   (consult-preview-key 'any))  ;'(:debounce 0.5 any)))  ;; delay previews
 
 (use-package embark
-  :bind (("C-S-a" . embark-act)
+  :bind (("C-l" . embark-act)
          :map minibuffer-local-map
-         ("C-d" . embark-act))
+         ("C-l" . embark-act))
   :config
   ;; Show Embark actions via which-key
   (setq embark-action-indicator
         (lambda (map)
           (which-key--show-keymap "Embark" map nil nil 'no-paging)
           #'which-key--hide-popup-ignore-command)
-        embark-become-indicator embark-action-indicator))
-
+        embark-become-indicator embark-action-indicator)
+  (setopt embark-verbose-indicator-display-action
+          '(display-buffer-at-bottom)))
+  
 (use-package embark-consult
+  :after (embark consult)
   :hook
   (embark-collect-mode . conult-preview-at-point-mode))
 
@@ -788,7 +791,7 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
     "er" '(eval-region :which-key "Evaluate region"))
 
 (my/leader-key-def
-  "d"  '(find-file :which-key "Here"))
+  "d"  '(find-file :which-key "here"))
 
 (my/leader-key-def
     "f"  '(:ignore t :which-key "files")
