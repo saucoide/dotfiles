@@ -173,11 +173,26 @@ See `display-line-numbers' for what these values mean."
   (setq indent-tabs-mode (not indent-tabs-mode))
   (message "Indent style changed to %s" (if indent-tabs-mode "tabs" "spaces")))
 
+(defun my/org-roam-insert-node-link(node)
+  (save-excursion
+    (goto-char (point-max))
+      (insert
+        "\n"
+        (org-link-make-string
+          (concat "id:" (org-roam-node-id node))
+          (org-roam-node-formatted node)))))
+
 
 (defun my/org-roam-filter-by-tag (tag)
   "Filters all roam-notes by TAG."
   (lambda (node)
     (member tag (org-roam-node-tags node))))
+
+
+(defun my/org-roam-get-nodes-by-tag(tag)
+  (seq-filter
+    (lambda (node) (member tag (org-roam-node-tags node)))
+    (org-roam-node-list)))
 
 (defun my/org-roam-list-notes-by-tag (tag)
   "Return a list with all roam notes matching TAG."
@@ -222,3 +237,25 @@ the criteria."
    (goto-char (point-max))
    (dolist (match lines)
      (insert "\n" match))))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(magit-todos-insert-after '(bottom) nil nil "Changed by setter of obsolete option `magit-todos-insert-at'")
+ '(package-selected-packages
+   '(all-the-icons-dired cider consult-dash corfu dash-docs dashboard dired-hide-dotfiles
+                         dired-single diredfl doct doom-modeline doom-themes drag-stuff
+                         elm-mode embark-consult envrc eval-in-repl evil-collection
+                         evil-nerd-commenter evil-org evil-snipe exec-path-from-shell
+                         flycheck gcmh general git-gutter helpful hydra kotlin-mode
+                         kotlin-ts-mode kubel-evil lsp-mode magit-todos marginalia
+                         nix-mode orderless org-bullets org-roam rainbow-delimiters rg
+                         rotate rustic scala-mode smex terraform-mode toc-org undo-fu
+                         vertico vterm which-key yasnippet)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )

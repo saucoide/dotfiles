@@ -702,6 +702,15 @@ helpful is an enhanced version of the builtin emacs help, with more information
   :interpreter ("scala" . scala-mode))
 #+end_src
 
+*** Kotlin
+
+#+begin_src emacs-lisp
+(use-package kotlin-mode)
+(use-package kotlin-ts-mode
+  :config
+  (add-to-list 'auto-mode-alist '("\\.kt\\'" . kotlin-ts-mode))
+)
+#+end_src>
 *** Rust
 
 #+begin_src emacs-lisp
