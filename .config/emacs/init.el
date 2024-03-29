@@ -133,7 +133,9 @@
     (setq evil-want-C-i-jump nil)
     :config
     (evil-mode 1)
-    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state))
+    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+    ;; remap :W -> :w)
+    (evil-ex-define-cmd "W" 'evil-write))
 
 (use-package evil-collection
   :after evil
@@ -562,7 +564,8 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
    :hook (
           ;; replace XXX-mode with concrete major-mode(e. g. python-mode)
           (elm-mode . lsp)
-          (python-ts-mode . lsp)
+          (python-ts-mode . lsp-deferred)
+          (python-mode . lsp-deferred)
           (clojure-mode . lsp)
           (rustic-mode . lsp)
           (scala-mode . lsp)
@@ -870,16 +873,22 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
     "nt" '(org-roam-tag-add :which-key "Add a TAG")
     "nl" '(org-roam-buffer-toggle :which-key "org-roam-buffer-toggle"))
 
-(defun my/vterm-toggle()
+(defun my/vterm-switch-or-new()
   (interactive)
-  (if (project-current)
-      (let ((default-directory (project-root (project-current))))
-        (vterm-other-window))
-    (vterm-other-window)))
+  (let ((vterm-target-name (my/vterm-buffer-name)))
+    (if (buffer-live-p (get-buffer vterm-target-name))
+        (switch-to-buffer-other-window vterm-target-name)
+      (vterm-other-window vterm-target-name))))
 
-(defun my/vterm-here()
+(defun my/vterm-new()
   (interactive)
-  (vterm-other-window vterm-buffer-name))
+  (vterm-other-window (my/vterm-buffer-name)))
+
+(defun my/vterm-buffer-name()
+  (let ((default-directory (if (project-current)
+                               (project-root (project-current))
+                             default-directory)))
+    (format "%s @ %s" vterm-buffer-name default-directory)))
 
 (my/leader-key-def
     "o"  '(:ignore t :which-key "open")
@@ -890,9 +899,8 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
     "om" '(mu4e :which-key "Mu4e")
     ;o; "r" '(org :which-key "REPL")
     "oe" '(eshell-toggle :which-key "eshell")
-    "ot" '(my/vterm-toggle :which-key "toggle-vterm")
-    "oT" '(my/vterm-here :which-key "vterm-here")
-    )
+    "ot" '(my/vterm-switch-or-new :which-key "vterm-switch")
+    "oT" '(my/vterm-new :which-key "vterm-new"))
 
 (defun my/switch-project-dired()
  "Switch to a project and open dired in the project root."
@@ -913,7 +921,7 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 
 (my/leader-key-def
     "q"  '(:ignore t :which-key "quit")
-    "qq" '(save-buffers-kill-terminal :which-key "Quit"))
+    "qq" '(delete-frame :which-key "quit frame"))
 
 (my/leader-key-def
     "s"  '(:ignore t :which-key "search")

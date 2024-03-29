@@ -53,6 +53,12 @@ alias startyabai="brew services start yabai"
 ## docker/podman
 alias docker="podman"
 alias docker-compose="podman-compose"
+alias podman-into-bash='podman run --tty --interactive --entrypoint="/bin/bash"'
+alias podman-into-shell='podman run --tty --interactive --entrypoint="/bin/sh"'
+## kubectl
+alias k="kubectl"
+alias kn="kube_namespace"
+alias kc="kube_context"
 # ---------------------------------------------------------------------
 
 
@@ -76,6 +82,27 @@ end
 # result: copies file as file.txt.bak
 function backup --argument filename
     cp $filename $filename.bak
+end
+
+# Kubernetes utility functions
+function kube_namespace --wraps "kubectl get namespaces"
+  if test (count $argv) -gt 0
+    set namespace $argv[1]
+    set -e argv[1]
+    kubectl config set-context --current --namespace=$namespace $argv
+  else
+    kubectl get namespaces
+  end
+end
+
+function kube_context --wraps "kubectl config use-context"
+  if test (count $argv) -gt 0
+    set context $argv[1]
+    set -e argv[1]
+    kubectl config use-context $context $argv
+  else
+    kubectl config get-contexts
+  end
 end
 
 # Function to extract a variety of archives

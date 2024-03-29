@@ -12,3 +12,7 @@ symbol = " "
 # Disable the package module, hiding it from the prompt completely
 [package]
 disabled = true
+
+[kubernetes]
+disabled = false
+style = "#0189f8 bold"

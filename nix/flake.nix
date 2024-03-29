@@ -55,6 +55,7 @@
           fzf
           jq
           lsd
+          watch
           bat
           htop
           stow

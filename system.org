@@ -322,30 +322,85 @@ i like to also used ipdb as default breakpoint
 ~export PYTHONBREAKPOINT=ipdb.set_trace~
 
 ** .pdbrc
-#+begin_src python :tangle .pdbrc
-# Install IPython: python3 -m pip install ipython
+#+begin_src python :tangle .pdbrc.py
 
-import IPython
-from traitlets.config import get_config
+# pdb++
+import pdb
 
-cfg = get_config()
-cfg.InteractiveShellEmbed.colors = "Linux"  # syntax highlighting
-cfg.InteractiveShellEmbed.confirm_exit = False
+class Config(pdb.DefaultConfig):
+    sticky_by_default = True
 
-alias interacti IPython.embed(config=cfg)
+# ipdb
+# import IPython
+# from traitlets.config import get_config
+
+# cfg = get_config()
+# cfg.InteractiveShellEmbed.colors = "Linux"  # syntax highlighting
+# cfg.InteractieShellEmbed.confirm_exit = False
+
+# alias interacti IPython.embed(config=cfg)
 
 #+end_src
 
 ** .pythonrc.py
 
 #+begin_src python :tangle .pythonrc.py
-
+from importlib import util
 from functools import partial
+
+
 try:
-    from rich import inspect, pretty, print
-    help = partial(inspect, help=True)
-    pretty.install()
-except:
+    # make ipython pretty
+    if __IPYTHON__ and util.find_spec("rich"):
+        from rich import inspect, pretty, print, traceback
+        from IPython import get_ipython
+        from IPython.core.magic import (
+            Magics,
+            line_magic,
+            magics_class,
+        )
+
+        # rich pretty printers
+        help = partial(inspect, help=True)
+        pretty.install()
+        traceback.install()
+
+        @magics_class
+        class CustomMagics(Magics):
+            def _get_var_ref(self, line):
+                var_name = line.strip()
+                if var_name in self.shell.user_ns:
+                    return self.shell.user_ns[var_name]
+
+            @line_magic
+            def pinfo(self, line):
+                """Overwrite ipython's pinfo (= ?)"""
+                var_ref = self._get_var_ref(line)
+                if var_ref:
+                    return inspect(var_ref, help=True)
+                else:
+                    return f"Object '{line.strip()}' not found."
+
+            @line_magic
+            def pinfo2(self, line):
+                """Overwrite ipython's pinfo2 (= ??)"""
+                var_ref = self._get_var_ref(line)
+                if var_ref:
+                    return inspect(var_ref, help=True, methods=True, docs=True)
+                else:
+                    return f"Object '{line.strip()}' not found."
+
+            @line_magic
+            def h(self, line):
+                """add a %h magic to print ALL"""
+                var_ref = self._get_var_ref(line)
+                if var_ref:
+                    return inspect(var_ref, all=True, sort=False)
+                else:
+                    return f"Object '{line.strip()}' not found."
+
+        get_ipython().register_magics(CustomMagics)
+except NameError:
     pass
 #+end_src
 
@@ -572,9 +627,9 @@ float = ""
 
 #+begin_src sh :tangle .profile
 
-export PYTHONBREAKPOINT=ipdb.set_trace
+export PYTHONBREAKPOINT=pdb.set_trace
 export PYTHONSTARTUP=$HOME/.pythonrc.py
-export EDITOR="emacsclient -t --alternate-editor=''"
+export EDITOR="emacsclient -t --alternate-editor='nvim'"
 export SSH_ENV="$HOME/.ssh/agent-environment"
 export USE_GKE_GCLOUD_AUTH_PLUGIN=True
 
@@ -920,6 +975,12 @@ alias startyabai="brew services start yabai"
 ## docker/podman
 alias docker="podman"
 alias docker-compose="podman-compose"
+alias podman-into-bash='podman run --tty --interactive --entrypoint="/bin/bash"'
+alias podman-into-shell='podman run --tty --interactive --entrypoint="/bin/sh"'
+## kubectl
+alias k="kubectl"
+alias kn="kube_namespace"
+alias kc="kube_context"
 # ---------------------------------------------------------------------
 
 
@@ -943,6 +1004,27 @@ end
 # result: copies file as file.txt.bak
 function backup --argument filename
     cp $filename $filename.bak
+end
+
+# Kubernetes utility functions
+function kube_namespace --wraps "kubectl get namespaces"
+  if test (count $argv) -gt 0
+    set namespace $argv[1]
+    set -e argv[1]
+    kubectl config set-context --current --namespace=$namespace $argv
+  else
+    kubectl get namespaces
+  end
+end
+
+function kube_context --wraps "kubectl config use-context"
+  if test (count $argv) -gt 0
+    set context $argv[1]
+    set -e argv[1]
+    kubectl config use-context $context $argv
+  else
+    kubectl config get-contexts
+  end
 end
 
 # Function to extract a variety of archives
@@ -1074,6 +1156,11 @@ symbol = " "
 # Disable the package module, hiding it from the prompt completely
 [package]
 disabled = true
+
+[kubernetes]
+disabled = false
+style = "#0189f8 bold"
+         
 #+end_src
 
 * Neovim
