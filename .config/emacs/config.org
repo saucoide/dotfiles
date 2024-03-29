@@ -1035,14 +1035,23 @@ YASnippet is a template system for emaxs, it lets you create custom templates th
 
 #+begin_src emacs-lisp
 
- (use-package vterm
-   :after evil-collection
-   :config
-   (setq vterm-shell "$HOME/.nix-profile/bin/fish")
-   (setq term-prompt-regexp "➜ *")
-   (evil-define-minor-mode-key 'normal 'vterm-mode (kbd "_") 'evil-collection-vterm-first-non-blank)
-   ;; (evil-define-key 'normal 'vterm-mode-map (kbd "cc") 'evil-collection-vterm-change-line)
-   )
+(use-package vterm
+  :after evil-collection
+  :config
+  (setq vterm-shell "$HOME/.nix-profile/bin/fish")
+  (setq term-prompt-regexp "➜ *")
+  (evil-define-minor-mode-key 'normal 'vterm-mode (kbd "_") 'evil-collection-vterm-first-non-blank)
+  ;; (evil-define-key 'normal 'vterm-mode-map (kbd "cc") 'evil-collection-vterm-change-line)
+  )
+
+(defun my/vterm-buffer-p (buffer)
+ "Return non-nil if BUFFER is a vterm buffer."
+ (with-current-buffer buffer
+    (or (eq major-mode 'vterm-mode)
+        (eq major-mode 'vterm-copy-mode))))
+
+;; make sure project-kill-buffers kills vterm buffers
+(add-to-list 'project-kill-buffer-conditions 'my/vterm-buffer-p)
 
 #+end_src
 

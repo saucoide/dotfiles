@@ -598,6 +598,15 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
   ;; (evil-define-key 'normal 'vterm-mode-map (kbd "cc") 'evil-collection-vterm-change-line)
   )
 
+(defun my/vterm-buffer-p (buffer)
+ "Return non-nil if BUFFER is a vterm buffer."
+ (with-current-buffer buffer
+    (or (eq major-mode 'vterm-mode)
+        (eq major-mode 'vterm-copy-mode))))
+
+;; make sure project-kill-buffers kills vterm buffers
+(add-to-list 'project-kill-buffer-conditions 'my/vterm-buffer-p)
+
 (defun my/org-mode-setup()
     (org-indent-mode)
     ;;(visual-line-mode 1)
