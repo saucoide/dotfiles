@@ -884,19 +884,23 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 
 (defun my/vterm-switch-or-new()
   (interactive)
-  (let ((vterm-target-name (my/vterm-buffer-name)))
+  (let ((vterm-target-name (my/vterm-buffer-name))
+        (default-directory (my/vterm-project-default-dir)))
     (if (buffer-live-p (get-buffer vterm-target-name))
         (switch-to-buffer-other-window vterm-target-name)
-      (vterm-other-window vterm-target-name))))
+        (vterm-other-window vterm-target-name))))
 
 (defun my/vterm-new()
   (interactive)
   (vterm-other-window (my/vterm-buffer-name)))
 
+(defun my/vterm-project-default-dir()
+  (if (project-current)
+      (project-root (project-current))
+    default-directory))
+
 (defun my/vterm-buffer-name()
-  (let ((default-directory (if (project-current)
-                               (project-root (project-current))
-                             default-directory)))
+  (let ((default-directory (my/vterm-project-default-dir)))
     (format "%s @ %s" vterm-buffer-name default-directory)))
 
 (my/leader-key-def
@@ -918,13 +922,23 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
     (when project
       (dired (expand-file-name project)))))
 
+
+(defun my/goto-project-flake()
+  (interactive)
+  (if (project-current)
+      (let* ((project (project-name (project-current)))
+            (flake-project (expand-file-name project "~/projects/flakes")))
+        (find-file (expand-file-name "flake.nix" flake-project)))
+    (message "Not in a project.")))
+
 (my/leader-key-def
     "p"  '(:ignore t :which-key "projects")
     "pb" '(consult-project-buffer :which-key "Switch project buffer")
     "pd" '(project-dired :which-key "dired in project")
-    "pf" '(consult-fd :which-key "Find file in project")
     "pk" '(project-kill-buffers :which-key "Kill project buffers")
     "pp" '(my/switch-project-dired :which-key "Switch project") 
+    "pf" '(my/goto-project-flake :which-key "Go to Flake")
+    "ps" '(consult-fd :which-key "consult find")
     "pt" '(magit-todos-list :which-key "Project TODOs")
     "pD" '(project-forget-project :which-key "Forget project"))
 
