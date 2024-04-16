@@ -6,7 +6,7 @@ ctrl + alt - n : /usr/local/bin/emacsclient -c -a ""
 ctrl + alt - p : skhd -k "cmd + alt + shift - 0x15"
 
 # kill window
-cmd - k : skhd -k "cmd - q"
+cmd + shift - k : skhd -k "cmd - q"
 
 # fixing copy paste
 ctrl - c ["emacsclient" ~
@@ -115,22 +115,14 @@ shift + cmd - left : yabai -m window --warp prev
     
 ## Window Focus
 ### Navigation
-cmd - h : [[ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ]]\
-          && yabai -m window --focus prev\
-          || yabai -m window --focus stack.prev
-cmd - j : [[ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ]]\
-          && yabai -m window --focus next\
-          || yabai -m window --focus stack.prev
-cmd - k : [[ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ]]\
-          && yabai -m window --focus prev\
-          || yabai -m window --focus stack.next
-cmd - l : [[ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ]]\
-          && yabai -m window --focus next\
-          || yabai -m window --focus stack.next
-cmd - left : if [ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ]; yabai -m window --focus prev || yabai -m window --focus stack.prev;end
-cmd - down : if [ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ]; yabai -m window --focus next || yabai -m window --focus stack.prev;end
-cmd - up : if [ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ]; yabai -m window --focus prev || yabai -m window --focus stack.next;end
-cmd - right : if [ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ];yabai -m window --focus next || yabai -m window --focus stack.next;end
+cmd - h : if [ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ]; yabai -m window --focus prev; else; yabai -m window --focus stack.prev;end
+cmd - j : if [ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ]; yabai -m window --focus next; else; yabai -m window --focus stack.prev;end
+cmd - k : if [ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ]; yabai -m window --focus prev; else; yabai -m window --focus stack.next;end
+cmd - l : if [ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ];yabai -m window --focus next; else; yabai -m window --focus stack.next;end
+cmd - left : if [ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ]; yabai -m window --focus prev; else; yabai -m window --focus stack.prev;end
+cmd - down : if [ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ]; yabai -m window --focus next; else; yabai -m window --focus stack.prev;end
+cmd - up : if [ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ]; yabai -m window --focus prev; else; yabai -m window --focus stack.next;end
+cmd - right : if [ (yabai -m query --spaces --space | jq -re '.type') = "bsp" ];yabai -m window --focus next; else; yabai -m window --focus stack.next;end
 
 
 

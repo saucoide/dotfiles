@@ -166,6 +166,11 @@
 (set-fringe-mode 3) 	; margins
 (menu-bar-mode t) 		; disable menu bar 
 
+(setq scroll-margin 10) ; minimum screen lines to keep above & below cursor
+(setq scroll-conservatively 101)  ; scroll line-by-line instead of jumping to the center
+(global-display-line-numbers-mode t)
+(global-hl-line-mode 1)  ; highlight the current line globally (we disable it in specific modes later)
+
 (add-to-list 'default-frame-alist '(undecorated-round  . t)) ; disable titlebar
 
 (set-face-attribute 'default nil
@@ -177,16 +182,6 @@
 (set-face-attribute 'variable-pitch nil
                     :font "JetBrainsMono Nerd Font Mono"
                     :height 125)
-
-(global-display-line-numbers-mode t)
-(setq display-line-numbers-type t)
-
-;; modes to skip
-(dolist (mode '(term-mode-hook
-                eshell-mode-hook
-                vterm-mode-hook))
-        (add-hook mode (lambda ()
-                         (display-line-numbers-mode 0))))
 
 (use-package rainbow-delimiters
     :hook
@@ -596,7 +591,8 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
   (setq term-prompt-regexp "➜ *")
   (evil-define-minor-mode-key 'normal 'vterm-mode (kbd "_") 'evil-collection-vterm-first-non-blank)
   ;; (evil-define-key 'normal 'vterm-mode-map (kbd "cc") 'evil-collection-vterm-change-line)
-  )
+  :hook ((vterm-mode . (lambda () (setq-local global-hl-line-mode nil)))
+         (vterm-mode . (lambda () (global-display-line-numbers-mode -1)))))
 
 (defun my/vterm-buffer-p (buffer)
  "Return non-nil if BUFFER is a vterm buffer."
@@ -682,6 +678,7 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
       (python . t)
       (clojure . t)
       (shell . t)
+      (http . t)
       (sql . t)))
 
 (push '("conf-unix" . conf-unix) org-src-lang-modes)
@@ -718,21 +715,32 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
       (project-find-file)
     (consult-fd)))
 
-(defun my/popup-scratch-buffer nil
-  "Popup a scratch buffer."
+(defun my/toggle-scratch-buffer ()
+  "Toggle the scratch buffer. If it's currently displayed, close the window; otherwise, open it."
   (interactive)
-  (evil-window-split 20)
-  (switch-to-buffer (get-buffer-create "*scratch*"))
-  (lisp-interaction-mode))
+  (let ((scratch-buffer (get-buffer "*scratch*")))
+    (if scratch-buffer
+        (let ((window (get-buffer-window scratch-buffer)))
+          (if window
+              (delete-window window)
+            (progn
+              (evil-window-split 20)
+              (switch-to-buffer scratch-buffer))))
+      (progn
+        (evil-window-split 20)
+        (switch-to-buffer (get-buffer-create "*scratch*"))))))
 
 (my/leader-key-def
-  ;; actions
   "DEL" '(evil-switch-to-windows-last-buffer :which-key "Last buffer")
   "RET" '(consult-bookmark :which-key "Bookmarks")
   "SPC" '(my/find-file :which-key "Find file")
   "<home>" '(dashboard-refresh-buffer :which-key "Switch to Dashboard")
+  "<up>" '(evil-window-up :which-key "cursor up")
+  "<down>" '(evil-window-down :which-key "cursor down")
+  "<left>" '(evil-window-left :which-key "cursor left")
+  "<right>" '(evil-window-right :which-key "cursor right")
   ";" '(eval-expression :which-key "Eval expression")
-  "x" '(my/popup-scratch-buffer :which-key "Pop scratch buffer")
+  "x" '(my/toggle-scratch-buffer :which-key "Toggle scratch buffer")
   "X" '(org-capture :which-key "Org Capture"))
 
 (my/leader-key-def
@@ -989,16 +997,12 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
     "ww"  '(evil-window-next :which-key "next")
     "w|"  '(evil-window-set-width :which-key "set width")
     "wp"  '(evil-window-prev :which-key "prev")
-    "wSPC" '(rotate-layout :which-key "rotate layout")
+    "w SPC" '(rotate-layout :which-key "rotate layout") 
     "wr" '(rotate-window :which-key "rotate windows")
-    "w <up>" '(evil-window-up :which-key "cursor up")
-    "w <down>" '(evil-window-down :which-key "cursor down")
-    "w <left>" '(evil-window-left :which-key "cursor left")
-    "w <right>" '(evil-window-right :which-key "cursor right")
-    "w C-<up>" '(windmove-swap-states-up :which-key "move window up")
-    "w C-<down>" '(windmove-swap-states-down :which-key "move window down")
-    "w C-<left>" '(windmove-swap-states-left :which-key "move window left")
-    "w C-<right>" '(windmove-swap-states-right :which-key "move window right"))
+    "w <up>" '(windmove-swap-states-up :which-key "move window up")
+    "w <down>" '(windmove-swap-states-down :which-key "move window down")
+    "w <left>" '(windmove-swap-states-left :which-key "move window left")
+    "w <right>" '(windmove-swap-states-right :which-key "move window right"))
 
 (use-package winner
     :after evil
