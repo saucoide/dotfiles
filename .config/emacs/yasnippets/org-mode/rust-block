@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
 # name: rust-block
-# key: <rs
+# key: >rs
 # --
 
 #+begin_src rust

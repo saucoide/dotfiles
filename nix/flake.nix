@@ -29,7 +29,7 @@
       );
 
       # Add mypy plugin to the same venv
-      pylsp = pkgs.python3.withPackages(
+      pylsp = pkgs.python311.withPackages(
         p: with p; [
           python-lsp-server
           pylsp-mypy

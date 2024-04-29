@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
 # name: clojure-block
-# key: <cl
+# key: >cl
 # --
 
 #+begin_src clojure

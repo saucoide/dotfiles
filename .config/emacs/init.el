@@ -134,6 +134,9 @@
     :config
     (evil-mode 1)
     (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+    ;; highlight on yank
+    (setq pulse-flag t)
+    (advice-add 'evil-yank :around 'my/evil-yank-advice)
     ;; remap :W -> :w)
     (evil-ex-define-cmd "W" 'evil-write))
 
@@ -1007,10 +1010,10 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 (use-package winner
     :after evil
     :config
-    (winner-mode)
-    (my/leader-key-def
-        "<left>" '(winner-undo :which-key "winner undo")
-        "<right>" '(winner-redo :which-key "winner redo")))
+    (winner-mode))
+    ;; (my/leader-key-def
+    ;;     "<left>" '(winner-undo :which-key "winner undo")
+    ;;     "<right>" '(winner-redo :which-key "winner redo")))
 
 (general-define-key    
     :states 'insert

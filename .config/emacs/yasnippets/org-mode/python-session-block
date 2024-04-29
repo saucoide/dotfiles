@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
 # name: python-session-block 
-# key: <pys
+# key: >pys
 # --
 
 #+begin_src python :session

@@ -106,6 +106,12 @@ the criteria."
      (insert "\n" match))))
 
 
+;; An "advice" function in emacs is like a python decorator, a wrapper.
+;; this one is to highlight on yank
+(defun my/evil-yank-advice (orig-fn beg end &rest args)
+  (pulse-momentary-highlight-region beg end)
+  (apply orig-fn beg end args))
+
 
 
 

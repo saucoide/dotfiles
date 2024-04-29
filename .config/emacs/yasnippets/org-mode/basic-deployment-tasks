@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
 # name: basic-deployment-tasks
-# key: <tasks
+# key: >tasks
 # --
 
 - [ ] Merged into acceptance

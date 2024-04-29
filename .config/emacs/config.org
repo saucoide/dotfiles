@@ -316,6 +316,9 @@ Evil, evil collection & undo-fu
     :config
     (evil-mode 1)
     (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+    ;; highlight on yank
+    (setq pulse-flag t)
+    (advice-add 'evil-yank :around 'my/evil-yank-advice)
     ;; remap :W -> :w)
     (evil-ex-define-cmd "W" 'evil-write))
 
@@ -356,20 +359,6 @@ evil-snipe, search 2 character motions to jump around text with ~s~ and ~S~
 
 #+end_src
 
-Highlight on Yank
-
-#+begin_src emacs-lisp
-
-;; An "advice" function in emacs is like a python decorator, a wrapper.
-(defun my/evil-yank-advice (orig-fn beg end &rest args)
-  (pulse-momentary-highlight-region beg end)
-  (apply orig-fn beg end args))
-
-(setq pulse-flag t)
-
-(advice-add 'evil-yank :around 'my/evil-yank-advice)
-  
-#+end_src>
 
 * Basic GUI, Theme, etc.
 ** Basic GUI Elements
@@ -1647,13 +1636,13 @@ Enabling winner-mode by default, it lets you switch between window configuration
    
 #+begin_src emacs-lisp
 
-  (use-package winner
-      :after evil
-      :config
-      (winner-mode)
-      (my/leader-key-def
-          "<left>" '(winner-undo :which-key "winner undo")
-          "<right>" '(winner-redo :which-key "winner redo")))
+(use-package winner
+    :after evil
+    :config
+    (winner-mode))
+    ;; (my/leader-key-def
+    ;;     "<left>" '(winner-undo :which-key "winner undo")
+    ;;     "<right>" '(winner-redo :which-key "winner redo")))
 
 #+end_src
    
