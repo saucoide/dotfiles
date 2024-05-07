@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
 # name: yaml-block
-# key: <yaml
+# key: >yaml
 # --
 
 #+begin_src yaml

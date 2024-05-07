@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
 # name: shell-block
-# key: <sh
+# key: >sh
 # --
 
 #+begin_src shell
