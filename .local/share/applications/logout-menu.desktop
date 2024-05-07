@@ -3,5 +3,5 @@ Type=Application
 Version=1.0
 Exec=/home/saucoide/scripts/logout-menu
 Name=Exit Menu
-Categories=shutdown;reboot;restart;hibernate;logout;lock
+Categories=shutdown;reboot;restart;hibernate;logout;lock;suspend
 Icon=system-log-out

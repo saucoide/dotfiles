@@ -275,8 +275,9 @@
 ;; show icons on dired
 (use-package nerd-icons-dired
     :hook (dired-mode . nerd-icons-dired-mode))
-;; dired-single forces a single dired buffer instead of a new one everytime
-(use-package dired-single)
+;; Make dired kill the current buffer when opening a new one
+(setf dired-kill-when-opening-new-dired-buffer t)
+
 (use-package dired-hide-dotfiles)
 
 (defun my/open-externally ()
@@ -287,7 +288,7 @@
                       "text/markdown")))
      (if (or (file-directory-p filename)
              (member (mailcap-file-name-to-mime-type filename) text-types))
-        (dired-single-buffer)
+        (dired-find-file)
         (dwim-shell-commands-open-externally))))
 
 
@@ -300,20 +301,23 @@
     (all-the-icons-dired-mode 1)
     (dired-hide-dotfiles-mode 1)
     (evil-define-key 'normal dired-mode-map
-    (kbd "H") 'dired-hide-dotfiles-mode
-    ;; (kbd "RET") 'dwim-shell-commands-open-externally
-    (kbd "RET") 'my/open-externally
-    (kbd "l") 'dired-single-buffer
-    (kbd "<right>") 'dired-single-buffer
-    (kbd "h") 'dired-single-up-directory
-    (kbd "<left>") 'dired-single-up-directory)
+      (kbd "H") 'dired-hide-dotfiles-mode
+      ;; (kbd "RET") 'dwim-shell-commands-open-externally
+      (kbd "RET") 'my/open-externally
+      (kbd "l") 'dired-find-file
+      (kbd "<right>") 'dired-find-file
+      (kbd "h") 'dired-up-directory
+      (kbd "<left>") 'dired-up-directory)
     )
 
 (defun my/dired-customizations()
   "Custom behaviours for `dired-mode'."
   (setq truncate-lines t))
-
 (add-hook 'dired-mode-hook #'my/dired-customizations)
+
+;; make dired refresh after actions
+;; (add-hook 'dired-mode-hook 'auto-revert-mode)
+;; (setq dired-do-revert-buffer t)
 
 ;; Add some colors to the output
 (use-package diredfl
@@ -685,12 +689,12 @@
   ;; I want to refile to also mark the emails as read
   (setq mu4e-view-auto-mark-as-read nil)
   (add-to-list 'mu4e-marks
-    '(refile
-        :char ("r" . "▶")
-        :prompt "refile"
-        :dyn-target (lambda (target msg) (mu4e-get-refile-folder msg))
-        :action (lambda (docid msg target)
-                    (mu4e--server-move docid (mu4e--mark-check-target target) "+S-u-N"))))
+               '(refile
+                 :char ("r" . "▶")
+                 :prompt "refile"
+                 :dyn-target (lambda (target msg) (mu4e-get-refile-folder msg))
+                 :action (lambda (docid msg target)
+                           (mu4e--server-move docid (mu4e--mark-check-target target) "+S-u-N"))))
 
 
   ;; Refresh mail using isync every 10 minutes
@@ -707,8 +711,8 @@
 
   ;; Prefer always the plaintext version if it exists
   (with-eval-after-load "mm-decode"
-  (add-to-list 'mm-discouraged-alternatives "text/html")
-  (add-to-list 'mm-discouraged-alternatives "text/richtext"))
+    (add-to-list 'mm-discouraged-alternatives "text/html")
+    (add-to-list 'mm-discouraged-alternatives "text/richtext"))
   
   ;; When html emails are very large compared to the text one, mu4e blocks
   ;; toggling between plaintext and html which is annoying
@@ -739,36 +743,27 @@
         mu4e-view-show-images t
         mu4e-view-image-max-width 800
         mu4e-headers-fields
-          '((:from . 25)
-            (:human-date . 12)
-            (:flags . 4)
-            (:subject)))
+        '((:from . 25)
+          (:human-date . 12)
+          (:flags . 4)
+          (:subject)))
 
   ;; Use fancy icons
   (setq mu4e-use-fancy-chars t
-          mu4e-headers-draft-mark '("D" . "")
-          mu4e-headers-flagged-mark '("F" . "")
-          mu4e-headers-new-mark '("N" . "!")
-          mu4e-headers-passed-mark '("P" . "")
-          mu4e-headers-replied-mark '("R" . "")
-          mu4e-headers-seen-mark '("S" . ".")
-          mu4e-headers-trashed-mark '("T" . "")
-          mu4e-headers-encrypted-mark '("x" . "")
-          mu4e-headers-signed-mark '("s" . "")
-          mu4e-headers-unread-mark '("u" . "✉")
-          mu4e-headers-attach-mark '("a" . ""))
-  ;; (setq mu4e-headers-unread-mark    '("u" . "📩 "))
-  ;; (setq mu4e-headers-draft-mark     '("D" . "🚧 "))
-  ;; (setq mu4e-headers-flagged-mark   '("F" . "🚩 "))
-  ;; (setq mu4e-headers-new-mark       '("N" . "✨ "))
-  ;; (setq mu4e-headers-passed-mark    '("P" . "↪ "))
-  ;; (setq mu4e-headers-replied-mark   '("R" . "↩ "))
-  ;; (setq mu4e-headers-seen-mark      '("S" . " "))
-  ;; (setq mu4e-headers-trashed-mark   '("T" . "🗑️"))
-  ;; (setq mu4e-headers-attach-mark    '("a" . "📎 "))
-  ;; (setq mu4e-headers-encrypted-mark '("x" . "🔑 "))
-  ;; (setq mu4e-headers-signed-mark    '("s" . "🖊 "))
-
+        mu4e-headers-draft-mark '("D" . " ")
+        mu4e-headers-flagged-mark '("F" . " ")
+        mu4e-headers-new-mark '("N" . " ")
+        mu4e-headers-passed-mark '("P" . " ")
+        mu4e-headers-replied-mark '("R" . " ")
+        mu4e-headers-seen-mark '("S" . "󰗯 ")
+        mu4e-headers-trashed-mark '("T" . " ")
+        mu4e-headers-attach-mark '("a" . "󰁦 ")
+        mu4e-headers-encrypted-mark '("x" . "")
+        mu4e-headers-signed-mark '("s" . " ")
+        mu4e-headers-unread-mark '("u" . "󰇮 ")
+        mu4e-headers-list-mark      '("l" . "󰕾 ")
+        mu4e-headers-personal-mark  '("p" . "")
+        mu4e-headers-calendar-mark  '("c" . " "))
   ;; View as html
   ;; (add-to-list 'mu4e-view-actions
   ;;              '("xWidget View" . mu4e-action-view-with-xwidget) t)
@@ -777,23 +772,23 @@
   
   ;; Shortcuts
   (setq mu4e-maildir-shortcuts
-    '((:maildir "/Inbox"    :key ?i)
-      (:maildir "/[Gmail]/Sent Mail" :key ?s)
-      (:maildir "/[Gmail]/Bin"     :key ?t)
-      (:maildir "/[Gmail]/Drafts"    :key ?d)))
+        '((:maildir "/Inbox"    :key ?i)
+          (:maildir "/[Gmail]/Sent Mail" :key ?s)
+          (:maildir "/[Gmail]/Bin"     :key ?t)
+          (:maildir "/[Gmail]/Drafts"    :key ?d)))
 
   ;; Bookmarks
   (setq mu4e-bookmarks
-    '(
-     ;; (:name "Unread messages" :query "flag:unread AND NOT flag:trashed" :key ?i)
-     ;; (:name "Today's messages" :query "date:today..now AND NOT flag:trashed" :key ?t)
-      (:name "Inbox" :query "maildir:/Inbox" :key ?b)
-      (:name "ReadInbox" :query "maildir:/ReadInbox" :key ?r)
-     ;; (:name "Sent" :query "maildir:/Sent Mail" :key ?s)
-     ;; (:name "All" :query "maildir:/All Mail" :key ?a)
-     ;; (:name "with Attachments" :query "flag:attach" :key ?a)
-     ;; (:name "Last 7 days" :query "date:7d..now AND NOT flag:trashed" :key ?w)
-      )))
+        '(
+          ;; (:name "Unread messages" :query "flag:unread AND NOT flag:trashed" :key ?i)
+          ;; (:name "Today's messages" :query "date:today..now AND NOT flag:trashed" :key ?t)
+          (:name "Inbox" :query "maildir:/Inbox" :key ?b)
+          (:name "ReadInbox" :query "maildir:/ReadInbox" :key ?r)
+          ;; (:name "Sent" :query "maildir:/Sent Mail" :key ?s)
+          ;; (:name "All" :query "maildir:/All Mail" :key ?a)
+          ;; (:name "with Attachments" :query "flag:attach" :key ?a)
+          ;; (:name "Last 7 days" :query "date:7d..now AND NOT flag:trashed" :key ?w)
+          )))
 
 ;; don't keep message buffers around
 (setq message-kill-buffer-on-exit t)
@@ -885,24 +880,17 @@
   (lexical-let ((target path))
     (lambda () (interactive) (dired target))))
 
-(if my/is-windows
-    (my/leader-key-def
-         "d"   '(:ignore t :which-key "dired")
-         "dd"  '(dired :which-key "Here")
-         "dh"  `(,(my/dired-in "~") :which-key "Home")
-         "do"  `(,(my/dired-in "P:\\org") :which-key "Org")
-         "dD"  `(,(my/dired-in "%USERPROFILE%'\\Downloads") :which-key "Downloads")
-         "dp"  `(,(my/dired-in "P:\\SAUCO_PROJECTS\\") :which-key "projects")
-         "de"  `(,(my/dired-in "~/.config/emacs") :which-key ".config/emacs"))
-   (my/leader-key-def
-         "d"   '(:ignore t :which-key "dired")
-         "dd"  '(dired :which-key "Here")
-         "dh"  `(,(my/dired-in "~") :which-key "Home")
-         "do"  `(,(my/dired-in "~/org") :which-key "Org")
-         "dD"  `(,(my/dired-in "~/downloads") :which-key "Downloads")
-         "dv"  `(,(my/dired-in "~/videos") :which-key "Videos")
-         "d."  `(,(my/dired-in "~/dotfiles") :which-key "dotfiles")
-         "de"  `(,(my/dired-in "~/.config/emacs") :which-key ".config/emacs")))
+(my/leader-key-def
+  "d"  '(dired :which-key "dired"))
+  ;; (my/leader-key-def
+  ;;   "d"   '(:ignore t :which-key "dired")
+  ;;   "dd"  '(dired :which-key "Here")
+  ;;   "dh"  `(,(my/dired-in "~") :which-key "Home")
+  ;;   "do"  `(,(my/dired-in "~/org") :which-key "Org")
+  ;;   "dD"  `(,(my/dired-in "~/downloads") :which-key "Downloads")
+  ;;   "dv"  `(,(my/dired-in "~/videos") :which-key "Videos")
+  ;;   "d."  `(,(my/dired-in "~/dotfiles") :which-key "dotfiles")
+  ;;   "de"  `(,(my/dired-in "~/.config/emacs") :which-key ".config/emacs")))
 
 (my/leader-key-def
     "f"  '(:ignore t :which-key "files")

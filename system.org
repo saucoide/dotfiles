@@ -20,12 +20,13 @@ write the code blocks, and GNU Stow to symlink them into the home directory
 stow .
 #+END_SRC
 
-Emacs configuration is in a separate [[emacs_config.org][]] file.
+Emacs configuration is in a separate [[./emacs.org][emacs.org]] file.
 
 * Instructions
 
 1. Install Archlinux
-2. Install the base packages with pacman
+2. ~bash~ is the default login-shell, but fish it set up as $SHELL in .profile
+3. Install the base packages with pacman
 
 #+begin_src bash
 
@@ -147,10 +148,11 @@ export QT_STYLE_OVERRIDE=kvantum
 export SHELL=/usr/bin/fish
 
 # Add a few places to $PATH
-export PATH=$HOME/scripts:$PATH
+export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$HOME/scripts:$PATH
 
 # Python debugging
 export PYTHONBREAKPOINT=ipdb.set_trace
+export PYTHONSTARTUP=$HOME/.pythonrc.py
 
 #+end_src
 
@@ -1114,6 +1116,9 @@ alias userlist="cut -d: -f1 /etc/passwd"
 alias pacman='sudo pacman --color auto'
 alias autoremove='sudo pacman -Rns (pacman -Qtdq)'
 alias mirrors="sudo reflector --latest 50 --sort rate --save /etc/pacman.d/mirrorlist"
+# ## yt-dlp
+alias yt="yt-dlp"
+alias yt-audio="yt-dlp -x -f bestaudio"
 
 # ---------------------------------------------------------------------
 # Functions
@@ -1217,9 +1222,15 @@ set fish_color_autosuggestion "4c566a"
 # # fish_color_search_match
 # # ---------------------------------------------------------------------
 
+# pyenv setup
+set -Ux PYENV_ROOT $HOME/.pyenv
+fish_add_path $PYENV_ROOT/bin
+pyenv init - | source
+eval "$(pyenv virtualenv-init -)"
+
 # direnv for my .envrc files
 direnv hook fish | source
-set -g direnv_fish_mode disable_arrow
+# set -g direnv_fish_mode disable_arrow
 
 # PROMPT (starship https://github.com/starship/starship)
 starship init fish | source
@@ -2168,6 +2179,57 @@ font:
 
   # Highlight window damage information.
   #highlight_damage: false
+#+end_src
+
+* Programming
+** Python
+*** pyenv
+
+Using ~pyenv~ to handle python installations & virtualenvs
+
+https://github.com/pyenv/pyenv#installation
+
+#+begin_src
+curl https://pyenv.run | bash
+#+end_src`
+
+*** .pdbrc
+
+#+begin_src python :tangle .pythonrc.py
+
+import IPython
+from traitlets.config import get_config
+
+cfg = get_config()
+cfg.InteractiveShellEmbed.colors = "Linux"  # syntax highlighting
+cfg.InteractiveShellEmbed.confirm_exit = False
+
+alias interacti IPython.embed(config=cfg)
+
+#+end_src
+
+*** .pythonrc.py
+
+To run on startup when opening a python console:w
+
+#+begin_src python :tangle .pdbrc
+from functools import partial
+
+try:
+    from rich import inspect, pretty, print
+    help = partial(inspect, help=True)
+    pretty.install()
+except:
+    pass
+#+end_src
+
+** Postgres
+*** pgcli
+
+config for pgcli
+
+#+begin_src conf :tangle .config/pgcli/config
+
 #+end_src
 
 * Lightdm
@@ -3416,9 +3478,10 @@ run light-locker &
 # xinput set-prop {device} {property} {value}
 # Touchpad settings
 xinput -set-prop "Elan Touchpad" "libinput Tapping Enabled" 1
+xinput set-prop "Elan Touchpad" "libinput Accel Speed" +0.2
 
 # Trackpoint settings
-xinput set-prop "Elan TrackPoint" "libinput Accel Speed" -0.4
+xinput set-prop "Elan TrackPoint" "libinput Accel Speed" -0.3
 
 
 #+END_SRC
@@ -3943,15 +4006,15 @@ if __name__ == "__main__":
 
 #+END_SRC
 
-* GPG
+* TODO GPG
 
 configuring gpg-agent to cache passphrase for a day
 https://wiki.archlinux.org/title/GnuPG#gpg-agent
 
 #+begin_src conf :tangle .gnupg/gpg-agent.conf
 # Generated from ~/dotfiles/system.org
-max-cache-ttl 86000
-default-cache-ttl 86000
+max-cache-ttl 432000
+default-cache-ttl 432000
 allow-preset-passphrase
 pinentry-program /home/saucoide/.guix-profile/bin/pinentry
 #+end_src

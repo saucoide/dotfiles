@@ -14,7 +14,8 @@ export QT_STYLE_OVERRIDE=kvantum
 export SHELL=/usr/bin/fish
 
 # Add a few places to $PATH
-export PATH=$HOME/scripts:$PATH
+export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$HOME/scripts:$PATH
 
 # Python debugging
 export PYTHONBREAKPOINT=ipdb.set_trace
+export PYTHONSTARTUP=$HOME/.pythonrc.py

@@ -32,6 +32,9 @@ alias userlist="cut -d: -f1 /etc/passwd"
 alias pacman='sudo pacman --color auto'
 alias autoremove='sudo pacman -Rns (pacman -Qtdq)'
 alias mirrors="sudo reflector --latest 50 --sort rate --save /etc/pacman.d/mirrorlist"
+# ## yt-dlp
+alias yt="yt-dlp"
+alias yt-audio="yt-dlp -x -f bestaudio"
 
 # ---------------------------------------------------------------------
 # Functions
@@ -135,9 +138,15 @@ set fish_color_autosuggestion "4c566a"
 # # fish_color_search_match
 # # ---------------------------------------------------------------------
 
+# pyenv setup
+set -Ux PYENV_ROOT $HOME/.pyenv
+fish_add_path $PYENV_ROOT/bin
+pyenv init - | source
+eval "$(pyenv virtualenv-init -)"
+
 # direnv for my .envrc files
 direnv hook fish | source
-set -g direnv_fish_mode disable_arrow
+# set -g direnv_fish_mode disable_arrow
 
 # PROMPT (starship https://github.com/starship/starship)
 starship init fish | source
