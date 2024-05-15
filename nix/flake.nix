@@ -72,6 +72,7 @@
           yabai
           skhd
           sketchybar
+          raycast
 
           # Editors
           neovim
