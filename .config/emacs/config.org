@@ -1043,8 +1043,8 @@ YASnippet is a template system for emaxs, it lets you create custom templates th
   (setq term-prompt-regexp "➜ *")
   (evil-define-minor-mode-key 'normal 'vterm-mode (kbd "_") 'evil-collection-vterm-first-non-blank)
   ;; (evil-define-key 'normal 'vterm-mode-map (kbd "cc") 'evil-collection-vterm-change-line)
-  :hook ((vterm-mode . (lambda () (setq-local global-hl-line-mode nil)))
-         (vterm-mode . (lambda () (global-display-line-numbers-mode -1)))))
+  :hook ((vterm-mode . (lambda () (setq-local hl-line-mode nil)))
+         (vterm-mode . (lambda () (display-line-numbers-mode -1)))))
 
 (defun my/vterm-buffer-p (buffer)
  "Return non-nil if BUFFER is a vterm buffer."

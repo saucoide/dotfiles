@@ -51,6 +51,7 @@
           starship
           git
           ripgrep
+          just
           fd
           fzf
           jq
