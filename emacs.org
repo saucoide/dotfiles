@@ -74,8 +74,10 @@ TODO - WIP bringing stuff from macflop
   - [[#quit-spc-q][Quit =SPC q=]]
   - [[#search-spc-s][Search =SPC s=]]
   - [[#toggle-spc-t][Toggle =SPC t=]]
+  - [[#embark-action-spc-l][Embark Action =SPC l=]]
   - [[#window-management-spc-w][Window Management =SPC w=]]
   - [[#other-keybindings][Other KeyBindings]]
+- [[#envrc][envrc]]
 - [[#auto-literate-config][Auto Literate Config]]
 
 * Startup
@@ -550,10 +552,10 @@ The emacs file manager
 (use-package nerd-icons-dired
     :hook (dired-mode . nerd-icons-dired-mode))
 
-;; Make dired kill the current buffer when opening a new one
-(setf dired-kill-when-opening-new-dired-buffer t)
-
 (use-package dired-hide-dotfiles)
+
+(use-package diredfl
+  :hook (dired-mode . diredfl-mode))
 
 (defun my/open-externally ()
   (interactive)
@@ -567,6 +569,7 @@ The emacs file manager
         (dwim-shell-commands-open-externally))))
 
 
+;; TODO fix this
 (use-package dired
     :ensure nil
     ;; :commands (dired dired-jump)
@@ -574,31 +577,24 @@ The emacs file manager
     ;; TODO check in the mac what GLS does
     ;; (setq insert-director-program "/usr/local/bin/")
     (setq dired-listing-switches "-algho --group-directories-first --time-style \"+%Y-%m-%d %H:%M\"")
-    (setq dired-dwim-target t)
-    (all-the-icons-dired-mode 1)
+    ;; (setq dired-dwim-target t)
+    ;; (all-the-icons-dired-mode 1)
     (dired-hide-dotfiles-mode 1)
     (evil-define-key 'normal dired-mode-map
-      (kbd "H") 'dired-hide-dotfiles-mode
-      ;; (kbd "RET") 'dwim-shell-commands-open-externally
       (kbd "RET") 'my/open-externally
-      (kbd "l") 'dired-find-file
-      (kbd "<right>") 'dired-find-file
-      (kbd "h") 'dired-up-directory
-      (kbd "<left>") 'dired-up-directory))
+      (kbd "H") 'dired-hide-dotfiles-mode
+      (kbd "l") 'dired-single-buffer
+      (kbd "<right>") 'dired-single-buffer
+      (kbd "h") 'dired-single-up-directory
+      (kbd "<left>") 'dired-single-up-directory))
 
-(defun my/dired-customizations()
-  "Custom behaviours for `dired-mode'."
-  (setq truncate-lines t))
+(use-package dired-single)
 
-(add-hook 'dired-mode-hook #'my/dired-customizations)
+;; (defun my/dired-customizations()
+;;   "Custom behaviours for `dired-mode'."
+;;   (setq truncate-lines t))
 
-;; TODO dired might need to be copied in fll
-
-;; Add some colors to the output
-(use-package diredfl
-  :hook (dired-mode . diredfl-mode))
-
-
+;; (add-hook 'dired-mode-hook #'my/dired-customizations)
 #+end_src
 
 ** Command Completion
@@ -1170,7 +1166,6 @@ Here we enable the list of languages we want code blocks to work with
       (python . t)
       (clojure . t)
       (shell . t)
-      (http . t)
       (sql . t)))
 
 (push '("conf-unix" . conf-unix) org-src-lang-modes)
@@ -1527,147 +1522,140 @@ My leader key is =SPC=, these is what's directly bound to it
 #+end_src
 
 ** Code =SPC c=
-TODO: CONTINUE HERE
 
 #+begin_src emacs-lisp
-
-  (my/leader-key-def
-      "c"  '(:ignore t :which-key "code")
-      "cc" '(counsel-compile :which-key "Compile")
-      "cd" '(evil-goto-definition :which-key "Jump to definition")
-      "cf" '(format-all-buffer :which-key "Format buffer/region")
-      "cx" '(flycheck-list-errors :which-key "List errors")
-      "cn" '(flycheck-next-error :which-key "Next error")
-      "cw" '(delete-trailing-whitespace :which-key "Delete trailing whitespace")
-      "cW" '(my/delete-trailing-newlines :which-key "Delete trailing newlines"))
-
+(my/leader-key-def
+    "c"  '(:ignore t :which-key "code")
+    "c <return>" '(lsp-execute-code-action :which-key "Code Actions")
+    "cc" '(project-compile :which-key "Compile")
+    "cd" '(lsp-find-definition :which-key "Jump to definition")
+    "cr" '(lsp-find-references :which-key "Jump to references")
+    "cf" '(my/reformat-buffer :which-key "Format buffer")
+    "cl" '(flycheck-list-errors :which-key "List errors")
+    "cn" '(flycheck-next-error :which-key "Next error"))
 #+end_src
 
 ** Eval =SPC e=
 
 #+begin_src emacs-lisp
-
-  (my/leader-key-def
-      "e"  '(:ignore t :which-key "eval")
-      "eb" '(eval-buffer :which-key "Evaluate buffer")
-      "ed" '(eval-defun :which-key "Evaluate defun")
-      "ee" '(eval-expression :which-key "Evaluate expression")
-      "el" '(eval-last-sexp :which-key "Evaluate last sexpression")
-      "er" '(eval-region :which-key "Evaluate region"))
-
+(my/leader-key-def
+    "e"  '(:ignore t :which-key "eval")
+    "eb" '(eval-buffer :which-key "Evaluate buffer")
+    "ed" '(eval-defun :which-key "Evaluate defun")
+    "ee" '(eval-expression :which-key "Evaluate expression")
+    "el" '(eval-last-sexp :which-key "Evaluate last sexpression")
+    "er" '(eval-region :which-key "Evaluate region"))
 #+end_src
 
 ** Dired =SPC d=
 
 #+begin_src emacs-lisp
-
-;; from system crafters's config
-(eval-when-compile (require 'cl))
-(defun my/dired-in (path)
-  (lexical-let ((target path))
-    (lambda () (interactive) (dired target))))
-
 (my/leader-key-def
-  "d"  '(dired :which-key "dired"))
-  ;; (my/leader-key-def
-  ;;   "d"   '(:ignore t :which-key "dired")
-  ;;   "dd"  '(dired :which-key "Here")
-  ;;   "dh"  `(,(my/dired-in "~") :which-key "Home")
-  ;;   "do"  `(,(my/dired-in "~/org") :which-key "Org")
-  ;;   "dD"  `(,(my/dired-in "~/downloads") :which-key "Downloads")
-  ;;   "dv"  `(,(my/dired-in "~/videos") :which-key "Videos")
-  ;;   "d."  `(,(my/dired-in "~/dotfiles") :which-key "dotfiles")
-  ;;   "de"  `(,(my/dired-in "~/.config/emacs") :which-key ".config/emacs")))
+  "d"  '(find-file :which-key "here"))
 #+end_src
 
 ** Files =SPC f=
 
 #+begin_src emacs-lisp
-
-  (my/leader-key-def
-      "f"  '(:ignore t :which-key "files")
-      "fd" '(projectile-dired :which-key "Find directory")
-      "ff" '(counsel-find-file :which-key "Find file")
-      "fl" '(counsel-locate :which-key "Locate file")
-      "fr" '(counsel-recentf :which-key "Recent files")
-      "fs" '(save-buffer :which-key "Save file")
-      "fy" '(my/copy-filename-to-clipboard :which-key "Yank filename")
-      "fC" '(copy-file :which-key "Copy this file")
-      "fD" '(delete-file :which-key "Delete this file")
-      ;; "E" '(a :which-key "Browse emacs.d")
-      ;; "F" '(a :which-key "Find file from here")
-      "fR" '(rename-file :which-key "Rename/Move file")
-      "fS" '(write-file :which-key "Save file as...")
-      ;; "U" '(a :which-key "Sudo this file")
-  )
-
+(my/leader-key-def
+    "f"  '(:ignore t :which-key "files")
+    "ff" '(find-file :which-key "Find file")
+    "fl" '(consult-locate :which-key "Locate file")
+    "fr" '(consult-recent-file :which-key "Recent files")
+    "fs" '(save-buffer :which-key "Save file")
+    "fy" '(my/copy-filename-to-clipboard :which-key "Yank filename")
+    "fC" '(copy-file :which-key "Copy this file")
+    "fD" '(delete-file :which-key "Delete this file")
+    "fR" '(rename-file :which-key "Rename/Move file")
+    "fS" '(write-file :which-key "Save file as..."))
 #+end_src
 
 ** Git =SPC g=
 
 #+begin_src emacs-lisp
+(defun my/kill-magit-buffers()
+  "Kills all magit buffers"
+  (interactive)
+  (my/kill-matching-buffers-no-confirm "^magit.*"))
 
-  (my/leader-key-def
-      "g"  '(:ignore t :which-key "git")
-      "gg" '(magit-status :which-key "Magit status")
-      "g/" '(magit-dispatch :which-key "Magit dispatch")
-      "gb" '(magit-branch-checkout :which-key "Magit switch branch")
-      "gC" '(magit-clone :which-key "Magit clone")
-      "gD" '(magit-file-delete :which-key "Magit file delete")
-      "gR" '(vc-revert :which-key "Revert file")
-      "gS" '(magit-stage-file :which-key "Magit stage file")
-      "gU" '(magit-unstage-file :which-key "Magit unstage file"))
-
+(my/leader-key-def
+  "g"  '(:ignore t :which-key "git")
+  "gg" '(magit-status :which-key "Magit status")
+  "g/" '(magit-dispatch :which-key "Magit dispatch")
+  "gb" '(magit-branch-checkout :which-key "Magit switch branch")
+  "gC" '(magit-clone :which-key "Magit clone")
+  "gD" '(magit-file-delete :which-key "Magit file delete")
+  "gR" '(vc-revert :which-key "Revert file")
+  "gS" '(magit-stage-file :which-key "Magit stage file")
+  "gK" '(my/kill-magit-buffers :which-key "Kill all magit buffers")
+  "gU" '(magit-unstage-file :which-key "Magit unstage file"))
 #+end_src
 
 ** Help =SPC h=
 
 #+begin_src emacs-lisp
-
-  (my/leader-key-def
-      "h"  '(:ignore t :which-key "help")
-      "hRET" '(info-emacs-manual :which-key "Emacs manual")
-      "h'" '(describe-char :which-key "Describe char")
-      "h." '(display-local-help :which-key "Local-help")
-      "h?" '(help-for-help :which-key "Help for help")
-      "ha" '(apropos :which-key "Apropos")
-      "hc" '(describe-key-briefly :which-key "Describe key briefly")
-      "he" '(view-echo-area-messages :which-key "View echo messages")
-      "hf" '(counsel-describe-function :which-key "Describe function")
-      "hi" '(info :which-key "Info")
-      "hk" '(describe-key :which-key "Describe key")
-      "hl" '(view-lossage :which-key "View lossage")
-      "hm" '(describe-mode :which-key "Describe mode")
-      "hs" '(counsel-describe-symbol :which-key "Describe symbol")
-      "hq" '(help-quit :which-key "Help quit")
-      "hv" '(counsel-describe-variable :which-key "Describe variable")
-      "hw" '(where-is :which-key "Where is")
-      "hA" '(apropos-documentation :which-key "Apropos docs")
-      "hC" '(describe-coding-system :which-key "Describe coding system")
-      "hF" '(counsel-describe-face :which-key "Describe face")
-      "hV" '(set-variable :which-key "Set variable")
-      "hH" '(help-for-help :which-key "Help for help"))
-
+(my/leader-key-def
+    "h"  '(:ignore t :which-key "help")
+    "h <return>" '(info-emacs-manual :which-key "Emacs manual")
+    "h'" '(describe-char :which-key "Describe char")
+    "h." '(display-local-help :which-key "Local-help")
+    "h?" '(help-for-help :which-key "Help for help")
+    "ha" '(apropos :which-key "Apropos")
+    "hc" '(describe-key-briefly :which-key "Describe key briefly")
+    "he" '(view-echo-area-messages :which-key "View echo messages")
+    "hf" '(describe-function :which-key "Describe function")
+    "hi" '(info :which-key "Info")
+    "hk" '(describe-key :which-key "Describe key")
+    "hl" '(view-lossage :which-key "View lossage")
+    "hm" '(describe-mode :which-key "Describe mode")
+    "hs" '(describe-symbol :which-key "Describe symbol")
+    "hq" '(help-quit :which-key "Help quit")
+    "hv" '(describe-variable :which-key "Describe variable")
+    "hw" '(where-is :which-key "Where is")
+    "hA" '(apropos-documentation :which-key "Apropos docs")
+    "hC" '(describe-coding-system :which-key "Describe coding system")
+    "hF" '(describe-face :which-key "Describe face")
+    "hV" '(set-variable :which-key "Set variable")
+    "hH" '(help-for-help :which-key "Help for help"))
 #+end_src
 
 ** Notes =SPC n=
    
-TODO change these to org-roam bindings
-
 #+begin_src emacs-lisp
 
+;; TODO add note filtering functions here
 (my/leader-key-def
     "n"  '(:ignore t :which-key "notes")
     "nn" '(org-capture :which-key "Org Capture")
     "ni" '(org-roam-node-insert :which-key "org-roam-node-insert")
     "nf" '(org-roam-node-find :which-key "org-roam-node-find")
+    "nt" '(org-roam-tag-add :which-key "Add a TAG")
     "nl" '(org-roam-buffer-toggle :which-key "org-roam-buffer-toggle"))
-
 #+end_src
 
 ** Open =SPC o=
 
 #+begin_src emacs-lisp
+(defun my/vterm-switch-or-new()
+  (interactive)
+  (let ((vterm-target-name (my/vterm-buffer-name))
+        (default-directory (my/vterm-project-default-dir)))
+    (if (buffer-live-p (get-buffer vterm-target-name))
+        (switch-to-buffer-other-window vterm-target-name)
+        (vterm-other-window vterm-target-name))))
+
+(defun my/vterm-new()
+  (interactive)
+  (vterm-other-window (my/vterm-buffer-name)))
+
+(defun my/vterm-project-default-dir()
+  (if (project-current)
+      (project-root (project-current))
+    default-directory))
+
+(defun my/vterm-buffer-name()
+  (let ((default-directory (my/vterm-project-default-dir)))
+    (format "%s @ %s" vterm-buffer-name default-directory)))
 
 (my/leader-key-def
     "o"  '(:ignore t :which-key "open")
@@ -1676,144 +1664,140 @@ TODO change these to org-roam bindings
     ;o; "d" '(org :which-key "debugger")
     "of" '(make-frame :which-key "New frame")
     "om" '(mu4e :which-key "Mu4e")
-    "op" '(neotree-toggle :which-key "Project sidebar")
     ;o; "r" '(org :which-key "REPL")
-    "oe" '(eshell-toggle :which-key "eshell"))
-    ;o; "t" '(org :which-key "Terminal")
-
+    "oe" '(eshell-toggle :which-key "eshell")
+    "ot" '(my/vterm-switch-or-new :which-key "vterm-switch")
+    "oT" '(my/vterm-new :which-key "vterm-new"))
 #+end_src
 
 ** Projects =SPC p=
    
 #+begin_src emacs-lisp
+(defun my/switch-project-dired()
+ "Switch to a project and open dired in the project root."
+ (interactive)
+ (let ((project (project-prompt-project-dir)))
+    (when project
+      (dired (expand-file-name project)))))
 
-  (my/leader-key-def
-      "p"  '(:ignore t :which-key "projects")
-      "p!" '(projectile-run-shell-command-in-root :which-key "Run cmd in project root")
-      "p." '(projectile-recentf :which-key "Recent files in project")
-      "pa" '(projectile-add-known-project :which-key "Add project")
-      "pb" '(counsel-projectile-switch-to-buffer :which-key "Switch to project buffer")
-      "pd" '(projectile-dired :which-key "dired in project")
-      "pf" '(counsel-projectile-find-file :which-key "Find file in project")
-      "pk" '(projectile-kill-buffers :which-key "Kill project buffers")
-      "pp" '(counsel-projectile-switch-project :which-key "Switch project") 
-      "pr" '(projectile-recentf :which-key "Recent files in project")
-      "ps" '(projectile-save-project-buffers :which-key "Save project files")
-      "pt" '(magit-todos-list :which-key "Project TODOs")
-      "pD" '(projectile-remove-known-project :which-key "Delete project")
-      "pR" '(projectile-run-project :which-key "Run project"))
 
+(defun my/goto-project-flake()
+  (interactive)
+  (if (project-current)
+      (let* ((project (project-name (project-current)))
+            (flake-project (expand-file-name project "~/projects/flakes")))
+        (find-file (expand-file-name "flake.nix" flake-project)))
+    (message "Not in a project.")))
+
+(my/leader-key-def
+    "p"  '(:ignore t :which-key "projects")
+    "pb" '(consult-project-buffer :which-key "Switch project buffer")
+    "pd" '(project-dired :which-key "dired in project")
+    "pk" '(project-kill-buffers :which-key "Kill project buffers")
+    "pp" '(my/switch-project-dired :which-key "Switch project") 
+    "pf" '(my/goto-project-flake :which-key "Go to Flake")
+    "ps" '(consult-fd :which-key "consult find")
+    "pt" '(magit-todos-list :which-key "Project TODOs")
+    "pD" '(project-forget-project :which-key "Forget project"))
 #+end_src
 
 ** Quit =SPC q=
 
 #+begin_src emacs-lisp
-
-  (my/leader-key-def
-      "q"  '(:ignore t :which-key "quit")
-      "qq" '(save-buffers-kill-terminal :which-key "Quit"))
-
+(my/leader-key-def
+    "q"  '(:ignore t :which-key "quit")
+    "qq" '(delete-frame :which-key "quit frame"))
 #+end_src
 
 ** Search =SPC s=
 
 #+begin_src emacs-lisp
-
-  (my/leader-key-def
-      "s"  '(:ignore t :which-key "search")
-      "ss" '(swiper :which-key "Swiper")
-      ;; "sr" '(swiper :which-key "ripgrep")
-
-      )
-
-   ;; TODO add bindings to search in project, etc
-
+(my/leader-key-def
+    "s"  '(:ignore t :which-key "search")
+    "ss" '(rg-dwim :which-key "ripgrep simple")
+    "sS" '(rg-menu :which-key "ripgrep menu")
+    "sp" '(rg-project :which-key "ripgrep project")
+    "sl" '(rg-literal :which-key "ripgrep literal anywhere")
+    "sr" '(rg--transient :which-key "ripgrep regex anywhere")
+    "s/" '(consult-ripgrep :which-key "ripgrep dwim"))
 #+end_src
 
 ** Toggle =SPC t=
    
 #+begin_src emacs-lisp
-
-  (my/leader-key-def
-      "t"  '(:ignore t :which-key "toggle")
-      "tf" '(flycheck-mode :which-key "Flycheck")
-      "tl" '(doom/toggle-line-numbers :which-key "Line numbers")
-      "tn" '(neotree-toggle :which-key "Neotree")
-      "tt" '(toggle-truncate-lines :which-key "Truncate lines")
-      "tI" '(doom/toggle-indent-style :which-key "Indentation"))
-
+(my/leader-key-def
+    "t"  '(:ignore t :which-key "toggle")
+    "tf" '(flycheck-mode :which-key "Flycheck")
+    "tl" '(doom/toggle-line-numbers :which-key "Line numbers")
+    "tt" '(toggle-truncate-lines :which-key "Truncate lines")
+    "tI" '(doom/toggle-indent-style :which-key "Indentation"))
 #+end_src
+
+** Embark Action =SPC l=
+
+#+begin_src emacs-lisp
+(my/leader-key-def
+    "l" '(embark-act :which-key "Embark Act"))
+#+end_src>
 
 ** Window Management =SPC w=
     
 Using =rotate= to move windows around
 
 #+begin_src emacs-lisp
-
-  (use-package rotate)
-
+(use-package rotate)
 #+end_src
    
 I prefer the focus to go into the newly split buffers
 
 #+begin_src emacs-lisp
-
-  (setq evil-vsplit-window-right t
-        evil-split-window-below t)
-
+(setq evil-vsplit-window-right t
+      evil-split-window-below t)
 #+end_src
 
 Window management keybindings, =SPC w=:
 
 #+begin_src emacs-lisp
-
-  (my/leader-key-def
-      "w"  '(:ignore t :which-key "window")
-      "w+"  '(evil-window-increase-height :which-key "increase height")
-      "w-"  '(evil-window-decrease-height :which-key "decrease height")
-      "w>"  '(evil-window-increase-width :which-key "increase width")
-      "w<"  '(evil-window-decrease-width :which-key "decrease width")
-      "ww"  '(evil-window-next :which-key "next")
-      "wW"  '(evil-window-prev :which-key "prev")
-      "w_"  '(evil-window-set-height :which-key "set height")
-      "wc"  '(evil-window-delete :which-key "delete")
-      "wh"  '(evil-window-left :which-key "cursor left")
-      "wj"  '(evil-window-down :which-key "cursor down")
-      "wk"  '(evil-window-up :which-key "cursor up")
-      "wl"  '(evil-window-right :which-key "cursor right")
-      "wn"  '(evil-window-new :which-key "new")
-      "wo"  '(delete-other-windows :which-key "delete others")
-      "wq"  '(evil-quit- :which-key "quit")
-      "ws"  '(evil-window-split :which-key "horizontal split")
-      "wv"  '(evil-window-vsplit :which-key "vertical split")
-      "ww"  '(evil-window-next :which-key "next")
-      "w|"  '(evil-window-set-width :which-key "set width")
-      "wp"  '(evil-window-prev :which-key "prev")
-      "wSPC" '(rotate-layout :which-key "rotate layout")
-      "wr" '(rotate-window :which-key "rotate windows")
-      "w <up>" '(evil-window-up :which-key "cursor up")
-      "w <down>" '(evil-window-down :which-key "cursor down")
-      "w <left>" '(evil-window-left :which-key "cursor left")
-      "w <right>" '(evil-window-right :which-key "cursor right")
-      "w C-<up>" '(windmove-swap-states-up :which-key "move window up")
-      "w C-<down>" '(windmove-swap-states-down :which-key "move window down")
-      "w C-<left>" '(windmove-swap-states-left :which-key "move window left")
-      "w C-<right>" '(windmove-swap-states-right :which-key "move window right"))
-
+(my/leader-key-def
+    "w"  '(:ignore t :which-key "window")
+    "w+"  '(evil-window-increase-height :which-key "increase height")
+    "w-"  '(evil-window-decrease-height :which-key "decrease height")
+    "w>"  '(evil-window-increase-width :which-key "increase width")
+    "w<"  '(evil-window-decrease-width :which-key "decrease width")
+    "ww"  '(evil-window-next :which-key "next")
+    "wW"  '(evil-window-prev :which-key "prev")
+    "w_"  '(evil-window-set-height :which-key "set height")
+    "wc"  '(evil-window-delete :which-key "delete")
+    "wh"  '(evil-window-left :which-key "cursor left")
+    "wj"  '(evil-window-down :which-key "cursor down")
+    "wk"  '(evil-window-up :which-key "cursor up")
+    "wl"  '(evil-window-right :which-key "cursor right")
+    "wn"  '(evil-window-new :which-key "new")
+    "wo"  '(delete-other-windows :which-key "delete others")
+    "wq"  '(evil-quit- :which-key "quit")
+    "ws"  '(evil-window-split :which-key "horizontal split")
+    "wv"  '(evil-window-vsplit :which-key "vertical split")
+    "ww"  '(evil-window-next :which-key "next")
+    "w|"  '(evil-window-set-width :which-key "set width")
+    "wp"  '(evil-window-prev :which-key "prev")
+    "w SPC" '(rotate-layout :which-key "rotate layout") 
+    "wr" '(rotate-window :which-key "rotate windows")
+    "w <up>" '(windmove-swap-states-up :which-key "move window up")
+    "w <down>" '(windmove-swap-states-down :which-key "move window down")
+    "w <left>" '(windmove-swap-states-left :which-key "move window left")
+    "w <right>" '(windmove-swap-states-right :which-key "move window right"))
 #+end_src
 
 Enabling winner-mode by default, it lets you switch between window configurations. I map them to =SPC arrow= keys
    
 #+begin_src emacs-lisp
-
-  (use-package winner
-      :after evil
-      :config
-      (winner-mode)
-      (my/leader-key-def
-          "<left>" '(winner-undo :which-key "winner undo")
-          "<right>" '(winner-redo :which-key "winner redo")))
-
+(use-package winner
+    :after evil
+    :config
+    (winner-mode))
+    ;; (my/leader-key-def
+    ;;     "<left>" '(winner-undo :which-key "winner undo")
+    ;;     "<right>" '(winner-redo :which-key "winner redo")))
 #+end_src
    
 ** Other KeyBindings
@@ -1823,27 +1807,21 @@ Other keybindings not strictly related to =SPC=
 *** KeyBinding Help with =?= 
 
 #+begin_src emacs-lisp
-
 (general-define-key    
     :states 'normal
     "?" 'which-key-show-major-mode)
-
 #+end_src
 
-*** Swiper Isearch
-
-I want to remap swiper-isearch to =C-s=
+*** Line Search
 
 #+begin_src emacs-lisp
+(general-define-key
+ :states '(normal insert visual)
+ "C-s" 'consult-line)
 
 (general-define-key
-    :states '(normal insert visual)
-    "C-s" 'swiper-isearch)
-
-(general-define-key
-    :states '(normal visual)
-    "/" 'swiper-isearch)
-
+ :states '(normal visual)
+ "/" 'consult-line)
 #+end_src
 
 *** Drag stuff
@@ -1860,12 +1838,22 @@ drag-stuff with =M-<arrows>=
 In doom emacs, =RET= on org mode can be used for plenty of stuff
 
 #+begin_src emacs-lisp
+(general-define-key
+    :states 'normal
+    :keymaps 'org-mode-map
+    "RET" '+org/dwim-at-point)
+#+end_src
 
-  (general-define-key
-      :states 'normal
-      :keymaps 'org-mode-map
-      "RET" '+org/dwim-at-point)
+* envrc
 
+Envrc to enable direnv goodness per buffer
+
+Doing this late in the init as recommended [[https://github.com/purcell/envrc][here]]
+
+#+begin_src emacs-lisp
+(use-package envrc
+  :config
+  (envrc-global-mode))
 #+end_src
 
 * Auto Literate Config
@@ -1875,17 +1863,14 @@ will do it for any =.org= file in our emac's home directory, straight from syste
 crafter's config
 
 #+begin_src emacs-lisp
+(defun my/org-babel-tangle-config ()
+    (when (string-equal (file-name-directory (buffer-file-name))
+              (expand-file-name user-emacs-directory))
+          ;; Dynamic scoping to the rescue
+          (let ((org-confirm-babel-evaluate nil))
+    (org-babel-tangle))))
 
-
-  (defun my/org-babel-tangle-config ()
-      (when (string-equal (file-name-directory (buffer-file-name))
-                (expand-file-name user-emacs-directory))
-            ;; Dynamic scoping to the rescue
-            (let ((org-confirm-babel-evaluate nil))
-      (org-babel-tangle))))
-
-  (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'my/org-babel-tangle-config)))
-
+(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'my/org-babel-tangle-config)))
 #+end_src
 
 

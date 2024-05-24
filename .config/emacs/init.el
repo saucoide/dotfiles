@@ -31,7 +31,7 @@
 
 (package-initialize)
 (unless package-archive-contents
-    (package-refresh-contents))
+  (package-refresh-contents))
 
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
@@ -39,69 +39,78 @@
 (require 'use-package)
 (setq use-package-always-ensure t)
 
-(use-package emacs
-    :init
-    (setq inhibit-startup-screen t
-          initial-scratch-message nil
-          sentence-end-double-space nil
-          ring-bell-function 'ignore
-          frame-resize-pixelwise t)
+;; Basic UI settings
+(setq inhibit-startup-screen t
+      initial-scratch-message nil
+      sentence-end-double-space nil
+      ring-bell-function 'ignore
+      frame-resize-pixelwise t)
 
-    ;; personal information
-    (setq user-full-name "saucoide"
-          user-mail-address "saucoide@gmail.com")
+;; save minibuffer history between sessions
+(savehist-mode 1)
 
-	;; Auth sources, this us used for authentication
-	;; including mu4e, etc.
-    (setq auth-sources '(password-store))
-    (auth-source-pass-enable)
+;; personal information
+(setq user-full-name "saucoide"
+      user-mail-address "saucoide@gmail.com")
 
-    (setq read-process-output-max (* 1024 1024))
+;; Auth sources, this us used for authentication
+;; including mu4e, etc.
+(setq auth-sources '(password-store))
+(auth-source-pass-enable)
 
-    (defalias 'yes-or-no-p 'y-or-n-p)    ; Answer with y/n instead of yes/no
+(setq read-process-output-max (* 1024 1024))
 
-    ;; default to utf-8 for all the things
-    (set-charset-priority 'unicode)
-    (setq locale-coding-system 'utf-8
-          coding-system-for-read 'utf-8
-          coding-system-for-write 'utf-8)
-    (set-terminal-coding-system 'utf-8)
-    (set-keyboard-coding-system 'utf-8)
-    (set-selection-coding-system 'utf-8)
-    (prefer-coding-system 'utf-8)
-    (setq default-process-coding-system '(utf-8-unix . utf-8-unix))
-    (set-language-environment "UTF-8")     ; I like utf-8 as my default
+(defalias 'yes-or-no-p 'y-or-n-p)    ; Answer with y/n instead of yes/no
 
-    ;; write over selected text on input... like all modern editors do
-    (delete-selection-mode t)
+;; default to utf-8 for all the things
+(set-charset-priority 'unicode)
+(setq locale-coding-system 'utf-8
+      coding-system-for-read 'utf-8
+      coding-system-for-write 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-selection-coding-system 'utf-8)
+(prefer-coding-system 'utf-8)
+(setq default-process-coding-system '(utf-8-unix . utf-8-unix))
+(set-language-environment "UTF-8")     ; I like utf-8 as my default
 
-    ;; don't want ESC as a modifier
-    (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+;; write over selected text on input... like all modern editors do
+(delete-selection-mode t)
 
-    (setq-default delete-by-moving-to-trash t          ; Delete to trash
-                  major-mode 'org-mode)                ; Org mode by default on new buffers
+;; don't want ESC as a modifier
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
-    (setq undo-limit 60000000              ; Raise undo limit to 60mb
-          evil-want-fine-undo t)           ; A more granular undo
+;; Delete to trash
+(setq-default delete-by-moving-to-trash t)
 
-    (setq-default indent-tabs-mode nil)      ; use spaces
-    (setq-default tab-width 4)             ; 4 spaces is the right tab width
-    (setq-default fill-column  90))        ; line length
+;; Org mode by default on new buffers
+(setq-default major-mode 'org-mode)
 
-(use-package emacs
-    :init
-    (setq backup-directory-alist '(("." . "~/.config/emacs/backups")))
-    ;; or to stop emacs from making them altogether
-    (setq make-backup-files nil
-          auto-save-default nil
-          create-lockfiles nil))
+(setq undo-limit 60000000              ; Raise undo limit to 60mb
+      evil-want-fine-undo t)           ; A more granular undo
+
+(setq-default indent-tabs-mode nil)      ; use spaces
+(setq-default tab-width 4)             ; 4 spaces is the right tab width
+(setq-default fill-column  88)         ; line length
+
+;; visual-line
+(set-default 'truncate-lines 't)
+(global-visual-line-mode -1)
+
+;; Change the default directory to store backups
+(setq backup-directory-alist '(("." . "~/.local/emacs/backups")))
+
+;; or to stop emacs from making them altogether
+(setq make-backup-files nil
+      auto-save-default nil
+      create-lockfiles nil)
 
 ;; emacs custom-file to save customizations
 (setq custom-file "~/.config/emacs/custom.el")
 (load custom-file t)
 
 ;; custom modules with convenience functions i use
-(with-eval-after-load (load-file "~/.config/emacs/custom/general_functions.el"))
+(with-eval-after-load (load-file "~/.config/emacs/custom/functions.el"))
 (with-eval-after-load 'mu4e (load-file "~/.config/emacs/custom/mu4e_functions.el"))
 
 (use-package gcmh
@@ -109,11 +118,10 @@
     :config
     (gcmh-mode 1))
 
-(setq my/is-windows (eq system-type 'windows-nt))
-
 (use-package exec-path-from-shell
   :config
-  (setq exec-path-from-shell-arguments nil) ;; non-interactive shell
+  ;; (setq exec-path-from-shell-arguments nil) ;; non-interactive shell
+  (setq exec-path-from-shell-shell-name "fish")
   (exec-path-from-shell-initialize))
 
 (use-package evil
@@ -124,7 +132,12 @@
     (setq evil-want-C-i-jump nil)
     :config
     (evil-mode 1)
-    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state))
+    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+    ;; highlight on yank
+    (setq pulse-flag t)
+    (advice-add 'evil-yank :around 'my/evil-yank-advice)
+    ;; remap :W -> :w)
+    (evil-ex-define-cmd "W" 'evil-write))
 
 (use-package evil-collection
     :after evil
@@ -134,6 +147,7 @@
  ;; using undo-fu to get redo functionality
 (use-package undo-fu
     :config
+    (setq evil-undo-system "undo-fu")
     (define-key evil-normal-state-map "u" 'undo-fu-only-undo)
     (define-key evil-normal-state-map "\C-r" 'undo-fu-only-redo))
 
@@ -155,13 +169,16 @@
 ;;     (kbd "h") 'dired-up-directory
 ;;     (kbd "<left>") 'dired-up-directory)
 
-(use-package emacs
-    :init
-    (scroll-bar-mode -1)		; disable visible scrollbar
-    (tool-bar-mode -1)		; disable toolbar
-    (tooltip-mode -1)	        ; disable tooltips
-    (set-fringe-mode 3) 		; margins
-    (menu-bar-mode -1)) 		; disable menu bar
+(scroll-bar-mode -1)		; disable visible scrollbar
+(tool-bar-mode -1)		; disable toolbar
+(tooltip-mode -1)	        ; disable tooltips
+(set-fringe-mode 3) 		; margins
+(menu-bar-mode -1) 		; disable menu bar 
+
+(setq scroll-margin 10) ; minimum screen lines to keep above & below cursor
+(setq scroll-conservatively 101)  ; scroll line-by-line instead of jumping to the center
+
+(add-to-list 'default-frame-alist '(undecorated-round  . t)) ; disable titlebar
 
 (defun set-fonts-after-frame (frame)
   (if (display-graphic-p frame)
@@ -184,15 +201,14 @@
 (add-hook 'after-make-frame-functions 'set-fonts-after-frame)
 
 (global-display-line-numbers-mode t)
-(setq display-line-numbers-type 't)
-(setq truncate-lines nil)            ; truncate lines
+(global-hl-line-mode 1)  ; highlight the current line globally (we disable it in specific modes later)
 
 ;; modes to skip
 (dolist (mode '(term-mode-hook
                 eshell-mode-hook
                 image-mode-hook
                 pdf-view-mode-hook))
-(add-hook mode (lambda () (display-line-numbers-mode 0))))
+  (add-hook mode (lambda () (display-line-numbers-mode -1))))
 
 (use-package rainbow-delimiters
     :hook
@@ -200,9 +216,9 @@
 
 (use-package doom-themes
     :init
-    (load-theme 'doom-ir-black t))
+    (load-theme 'doom-monokai-pro t))
+    ;; (load-theme 'doom-ir-black t))
     ;; (load-theme 'doom-vibrant t))
-    ;; (load-theme 'doom-monokai-pro t))
     ;; (load-theme 'doom-dracula t))
 
 ;; all the icons is needed for doom-modeline
@@ -221,10 +237,8 @@
 ;; doom-modeline to replace the standard modeline
 (use-package doom-modeline
     :config
-    (if my/is-windows
-      (setq doom-modeline-icon nil)
-      (setq doom-modeline-unicode-fallback t)
-            doom-modeline-icon t)
+    (setq doom-modeline-unicode-fallback t
+          doom-modeline-icon t)
     :init
     (column-number-mode)
     (doom-modeline-mode 1))
@@ -236,7 +250,7 @@
   :config
   (setq dashboard-startup-banner "~/.config/emacs/logo.png")
   ;; (setq dashboard-startup-banner "~/.config/emacs/logo.txt")
-  (setq dashboard-center-content nil)
+  ;; (setq dashboard-center-content nil)
   (setq dashboard-set-navigator t)
   (setq dashboard-agenda-time-string-format "%Y-%m-%d %a")
   (setq dashboard-match-agenda-entry "CATEGORY={TODO}")
@@ -275,10 +289,11 @@
 ;; show icons on dired
 (use-package nerd-icons-dired
     :hook (dired-mode . nerd-icons-dired-mode))
-;; Make dired kill the current buffer when opening a new one
-(setf dired-kill-when-opening-new-dired-buffer t)
 
 (use-package dired-hide-dotfiles)
+
+(use-package diredfl
+  :hook (dired-mode . diredfl-mode))
 
 (defun my/open-externally ()
   (interactive)
@@ -292,42 +307,37 @@
         (dwim-shell-commands-open-externally))))
 
 
+;; TODO fix this
 (use-package dired
     :ensure nil
     ;; :commands (dired dired-jump)
     :config
+    ;; TODO check in the mac what GLS does
+    ;; (setq insert-director-program "/usr/local/bin/")
     (setq dired-listing-switches "-algho --group-directories-first --time-style \"+%Y-%m-%d %H:%M\"")
-    (setq dired-dwim-target t)
-    (all-the-icons-dired-mode 1)
+    ;; (setq dired-dwim-target t)
+    ;; (all-the-icons-dired-mode 1)
     (dired-hide-dotfiles-mode 1)
     (evil-define-key 'normal dired-mode-map
-      (kbd "H") 'dired-hide-dotfiles-mode
-      ;; (kbd "RET") 'dwim-shell-commands-open-externally
       (kbd "RET") 'my/open-externally
-      (kbd "l") 'dired-find-file
-      (kbd "<right>") 'dired-find-file
-      (kbd "h") 'dired-up-directory
-      (kbd "<left>") 'dired-up-directory)
-    )
+      (kbd "H") 'dired-hide-dotfiles-mode
+      (kbd "l") 'dired-single-buffer
+      (kbd "<right>") 'dired-single-buffer
+      (kbd "h") 'dired-single-up-directory
+      (kbd "<left>") 'dired-single-up-directory))
 
-(defun my/dired-customizations()
-  "Custom behaviours for `dired-mode'."
-  (setq truncate-lines t))
-(add-hook 'dired-mode-hook #'my/dired-customizations)
+(use-package dired-single)
 
-;; make dired refresh after actions
-;; (add-hook 'dired-mode-hook 'auto-revert-mode)
-;; (setq dired-do-revert-buffer t)
+;; (defun my/dired-customizations()
+;;   "Custom behaviours for `dired-mode'."
+;;   (setq truncate-lines t))
 
-;; Add some colors to the output
-(use-package diredfl
-  :hook (dired-mode . diredfl-mode))
+;; (add-hook 'dired-mode-hook #'my/dired-customizations)
 
-;; TODO
 (use-package transient
-  :init
-   (with-eval-after-load 'transient
-    (transient-bind-q-to-quit)))
+  :config
+  (define-key transient-map (kbd "<escape>") 'transient-quit-one)
+  (transient-bind-q-to-quit))
 
 (use-package which-key
     :init (which-key-mode)
@@ -335,36 +345,71 @@
     :config
     (setq which-key-idle-delay 0.3))
 
-(use-package counsel
-    :bind (("M-x" . counsel-M-x)
-           ("C-x b" . counsel-ibuffer)
-           ("C-x X-f" . counsel-find-file)
-           :map minibuffer-local-map
-                ("C-r" . 'counsel-minibuffer-history))
-    :config
-    (setq ivy-initial-inputs-alist nil))
+(use-package vertico
+  :custom
+  (vertico-cycle t)
+  :init
+  (vertico-mode))
 
-(use-package ivy
-    :diminish
-    :bind (("C-s" . swiper)
-        :map ivy-minibuffer-map
-        ("TAB" . ivy-alt-done)
-        ("C-l" . ivy-alt-done)
-        ("C-j" . ivy-next-line)
-        ("C-k" . ivy-previous-line)
-        :map ivy-switch-buffer-map
-        ("C-k" . ivy-previous-line)
-        ("C-l" . ivy-done)
-        ("C-d" . ivy-switch-buffer-kill)
-        :map ivy-reverse-i-search-map
-        ("C-k" . ivy-previous-line)
-        ("C-d" . ivy-reverse-i-search-kill))
-    :config
-    (ivy-mode 1))
+(use-package marginalia
+  :after vertico
+  :custom
+  (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
+  :init
+  (marginalia-mode))
 
-(use-package ivy-rich
-    :init
-    (ivy-rich-mode 1))
+(use-package consult
+  :bind (("C-s" . consult-line)
+         :map minibuffer-local-map
+         ("C-r" . consult-history))
+  :custom
+  (completion-in-region-function #'consult-completion-in-region)
+  (consult-fd-args "fd --hidden")
+  (consult-async-min-input 1)
+  (consult-preview-key 'any))  ;'(:debounce 0.5 any)))  ;; delay previews
+
+(use-package embark
+  :bind (("C-l" . embark-act)
+         :map minibuffer-local-map
+         ("C-l" . embark-act))
+  :config
+  ;; Show Embark actions via which-key
+  (setq embark-action-indicator
+        (lambda (map)
+          (which-key--show-keymap "Embark" map nil nil 'no-paging)
+          #'which-key--hide-popup-ignore-command)
+        embark-become-indicator embark-action-indicator)
+  (setopt embark-verbose-indicator-display-action
+          '(display-buffer-at-bottom)))
+  
+(use-package embark-consult
+  :after (embark consult)
+  :hook
+  (embark-collect-mode . conult-preview-at-point-mode))
+
+(use-package corfu
+  ;; Optional customizations
+  :custom
+  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+  ;; (corfu-auto t)                 ;; Enable auto completion
+  ;; (corfu-separator ?\s)          ;; Orderless field separator
+  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+  ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
+  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
+  :init
+  (global-corfu-mode)
+  :config
+  (setq completion-cycle-threshold 4)
+  (setq tab-always-indent 'complete))
+
+(use-package orderless
+  :init
+  (setq completion-styles '(orderless)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles . (partial-completion))))))
 
 (use-package smex
     :config (smex-initialize))
@@ -373,70 +418,47 @@
     :after evil
     :init
     (setq evil-lookup-func #'helpful-at-point)
-    :custom
-    (counsel-describe-function-function #'helpful-callable)
-    (counsel-describe-variable-function #'helpful-variable)
     :bind
     ([remap describe-function] . counsel-describe-function)
     ([remap describe-command] . helpful-command)
     ([remap describe-variable] . counsel-describe-variable)
     ([remap describe-key] . helpful-key))
 
-(use-package projectile
-    :diminish projecttile-mode
-    :config (projectile-mode)
-    :bind-keymap
-    ("C-c p" . projectile-command-map)
-    ;; ("SPC P" . projectile-command-map))
-   :init
-   (if my/is-windows
-       (when (file-directory-p "C:\\Users\\IEUser\\projects")
-           (setq projectile-project-search-path '("C:\\Users\\IEUser\\projects")))
-       (when (file-directory-p "~/projects")
-           (setq projectile-project-search-path '("~/projects"))))
-   ;; action that triggers on switching projects (eg open dired)
-   (setq projectile-switch-project-action #'projectile-dired))
-
-(use-package counsel-projectile
-    :config (counsel-projectile-mode))
-
-(use-package neotree
-    :config
-    (setq neo-smart-open t)
-    (setq projectile-switch-project-action 'neotree-projectile-action))
+(use-package rg
+  :config
+  (rg-enable-menu))
 
 (use-package dwim-shell-command
   :config
-   (require 'dwim-shell-commands))
+  (require 'dwim-shell-commands))
 
 (use-package pdf-tools)
+
+; use tree-sitter
+; Install it first by M-x treesit-install-language-grammar
+(setq major-mode-remap-alist
+      '((python-mode . python-ts-mode)))
+
+(use-package nix-mode)
 
 (use-package cider
     :mode "\\.clj[sc]?\\'"
     :config
     (evil-collection-cider-setup))
 
-(use-package scala-mode
-  :interpreter ("scala" . scala-mode))
-
-(use-package sbt-mode
-  :commands sbt-start sbt-command
-  :config
-  ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
-  ;; allows using SPACE when in the minibuffer
-  (substitute-key-definition
-   'minibuffer-complete-word
-   'self-insert-command
-   minibuffer-local-completion-map)
-   ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
-   (setq sbt:program-options '("-Dsbt.supershell=false")))
-
-(use-package lsp-metals)
-
 (use-package rustic
   :config
   (setq rustic-lsp-client 'eglot)
   (setq rustic-format-on-save t))
+
+(use-package terraform-mode
+  :hook
+  (terraform-mode . terraform-format-on-save-mode))
+
+(use-package yaml-mode
+  :config
+  (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+  (add-to-list 'auto-mode-alist '("\\.yaml\\'" . yaml-mode)))
 
 (use-package elm-mode
   :hook
@@ -445,15 +467,65 @@
 
 (use-package lua-mode)
 
-;;(use-package flycheck
-;;  :defer t
-;;  :hook (eglot-mode . flycheck-mode))
+(use-package flycheck
+  :init (global-flycheck-mode))
 
-;; on windows dont enable it globally
-;;(unless my/is-windows
-;;  (global-flycheck-mode))
+;; Reformatter
+(use-package reformatter)
 
-(use-package format-all)
+;; Defining reformatters
+;; python
+(reformatter-define black-format
+  :program "black"
+  :args '("-"))
+(reformatter-define ruff-format
+  :program "ruff"
+  :args '("format" "-"))
+(reformatter-define prettier-format
+  :program "prettier"
+  :args '("--parser" "json"))
+;; terraform
+(reformatter-define terraform-format
+  :program "terraform"
+  :args '("fmt" "-"))
+;; yaml
+(reformatter-define yaml-format
+  :program "yamlfmt"
+  :args '("-"))
+;; terraform
+(reformatter-define pg-format
+  :program "pg_format"
+  :args '("-"))
+
+;; This function acts as entrypoint / dispatcher
+;; depending on the mode
+(defun my/reformat-buffer()
+    "Reformat the current buffer if there is
+ a reformatter configured for the active major mode."
+  (interactive)
+  (pcase major-mode
+    ('python-mode (ruff-format-buffer))
+    ('python-ts-mode (ruff-format-buffer))
+    ('yaml-mode (yaml-format-buffer))
+    ('terraform-mode (terraform-format-buffer))
+    ('js-mode (prettier-format-buffer))
+    ('sql-mode (pg-format-buffer))
+    (_ (message "No reformatted configured for `%s`" major-mode))
+    )
+  )
+  
+(defun my/reformat-region (beg end)
+    "Reformat the current buffer if there is
+ a reformatter configured for the active major mode."
+  (interactive "r")
+  (pcase major-mode
+    ;; ('python-mode (black-format-buffer))
+    ('yaml-mode (yaml-format-region beg end))
+    ;; ('terraform-mode (terraform-format-buffer))
+    ('js-mode (prettier-format-region beg end))
+    (_ (message "No reformatted configured for `%s`" major-mode))
+    )
+  )
 
 (use-package evil-nerd-commenter
     :bind ("C-/" . evilnc-comment-or-uncomment-lines))
@@ -463,39 +535,71 @@
     :defer t
     :commands (magit-status magit-get-current-branch))
 
-;; (use-package forge)
+(use-package hydra)
+(use-package smerge-mode
+  :config
+  (defhydra unpackaged/smerge-hydra
+    (:color pink :hint nil :post (smerge-auto-leave))
+    "
+^Move^       ^Keep^               ^Diff^                 ^Other^
+^^-----------^^-------------------^^---------------------^^-------
+_n_ext       _b_ase               _<_: upper/base        _C_ombine
+_p_rev       _u_pper              _=_: upper/lower       _r_esolve
+^^           _l_ower              _>_: base/lower        _k_ill current
+^^           _a_ll                _R_efine
+^^           _RET_: current       _E_diff
+"
+    ("n" smerge-next)
+    ("p" smerge-prev)
+    ("b" smerge-keep-base)
+    ("u" smerge-keep-upper)
+    ("l" smerge-keep-lower)
+    ("a" smerge-keep-all)
+    ("RET" smerge-keep-current)
+    ("\C-m" smerge-keep-current)
+    ("<" smerge-diff-base-upper)
+    ("=" smerge-diff-upper-lower)
+    (">" smerge-diff-base-lower)
+    ("R" smerge-refine)
+    ("E" smerge-ediff)
+    ("C" smerge-combine-with-next)
+    ("r" smerge-resolve)
+    ("k" smerge-kill-current)
+    ("ZZ" (lambda ()
+            (interactive)
+            (save-buffer)
+            (bury-buffer))
+     "Save and bury buffer" :color blue)
+    ("q" nil "cancel" :color blue))
+  :hook (magit-diff-visit-file . (lambda ()
+                                   (when smerge-mode
+                                     (unpackaged/smerge-hydra/body)))))
 
-;; TODO doesnt work well with org mode buffers for me
- (use-package git-gutter
-     :if (not my/is-windows)
-     :defer t
-     :hook ((text-mode . git-gutter-mode)
-             (prog-mode . git-gutter-mode)))
+(use-package git-gutter
+  :defer t
+  :hook ((text-mode . git-gutter-mode)
+         (prog-mode . git-gutter-mode)))
 
 (use-package magit-todos
-  :if (not my/is-windows)
   :hook (magit-mode . magit-todos-mode)
   :init
   (unless (executable-find "nice")
     (setq magit-todos-nice nil)))
 
-;; TODO
-  ;; (use-package eglot
-  ;;   :hook (scala-mode . eglot-ensure))
-
 (use-package lsp-mode
   :init
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-  (setq lsp-keymap-prefix "C-c l")
+  (setq lsp-keymap-prefix "C-l")
   :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
          (elm-mode . lsp)
-         (python-mode . lsp)
+         (python-ts-mode . lsp-deferred)
+         (python-mode . lsp-deferred)
          (clojure-mode . lsp)
          (rustic-mode . lsp)
          (scala-mode . lsp)
          ;; if you want which-key integration
          (lsp-mode . lsp-enable-which-key-integration))
-  :commands lsp)
+  :commands (lsp lsp-deferred))
 
 ;; optionally
 ;; (use-package lsp-ui :commands lsp-ui-mode)
@@ -508,73 +612,34 @@
 ;; (use-package dap-python)
 ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
 
-(use-package company
-    :init
-    (add-hook 'after-init-hook 'global-company-mode)
-    :bind (:map company-active-map
-           ("<tab>" . company-complete-common-or-cycle)) ; tab completes the selection instead next
-           ;; ("<tab>" . company-complete-selection)) ; tab completes the selection instead next
-    :custom
-    (company-minimum-prefix-lenght 2)
-    (company-idle-delay 0.3)
-    (company-show-numbers t))
-
-;; a little bit better interface
-(use-package company-box
-  :hook (company-mode . company-box-mode)
-  :config
-    (setq company-box-show-single-candidate t
-          company-box-backends-colors nil
-          company-box-max-candidates 50
-          company-box-icons-alist 'company-box-icons-all-the-icons
-          company-box-icons-all-the-icons
-          (let ((all-the-icons-scale-factor 0.8))
-            `((Unknown       . ,(all-the-icons-material "find_in_page"             :face 'all-the-icons-purple))
-              (Text          . ,(all-the-icons-material "text_fields"              :face 'all-the-icons-green))
-              (Method        . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-              (Function      . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-              (Constructor   . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-              (Field         . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-              (Variable      . ,(all-the-icons-material "adjust"                   :face 'all-the-icons-blue))
-              (Class         . ,(all-the-icons-material "class"                    :face 'all-the-icons-red))
-              (Interface     . ,(all-the-icons-material "settings_input_component" :face 'all-the-icons-red))
-              (Module        . ,(all-the-icons-material "view_module"              :face 'all-the-icons-red))
-              (Property      . ,(all-the-icons-material "settings"                 :face 'all-the-icons-red))
-              (Unit          . ,(all-the-icons-material "straighten"               :face 'all-the-icons-red))
-              (Value         . ,(all-the-icons-material "filter_1"                 :face 'all-the-icons-red))
-              (Enum          . ,(all-the-icons-material "plus_one"                 :face 'all-the-icons-red))
-              (Keyword       . ,(all-the-icons-material "filter_center_focus"      :face 'all-the-icons-red))
-              (Snippet       . ,(all-the-icons-material "short_text"               :face 'all-the-icons-red))
-              (Color         . ,(all-the-icons-material "color_lens"               :face 'all-the-icons-red))
-              (File          . ,(all-the-icons-material "insert_drive_file"        :face 'all-the-icons-red))
-              (Reference     . ,(all-the-icons-material "collections_bookmark"     :face 'all-the-icons-red))
-              (Folder        . ,(all-the-icons-material "folder"                   :face 'all-the-icons-red))
-              (EnumMember    . ,(all-the-icons-material "people"                   :face 'all-the-icons-red))
-              (Constant      . ,(all-the-icons-material "pause_circle_filled"      :face 'all-the-icons-red))
-              (Struct        . ,(all-the-icons-material "streetview"               :face 'all-the-icons-red))
-              (Event         . ,(all-the-icons-material "event"                    :face 'all-the-icons-red))
-              (Operator      . ,(all-the-icons-material "control_point"            :face 'all-the-icons-red))
-              (TypeParameter . ,(all-the-icons-material "class"                    :face 'all-the-icons-red))
-              (Template      . ,(all-the-icons-material "short_text"               :face 'all-the-icons-green))
-              (ElispFunction . ,(all-the-icons-material "functions"                :face 'all-the-icons-red))
-              (ElispVariable . ,(all-the-icons-material "check_circle"             :face 'all-the-icons-blue))
-              (ElispFeature  . ,(all-the-icons-material "stars"                    :face 'all-the-icons-orange))
-              (ElispFace     . ,(all-the-icons-material "format_paint"             :face 'all-the-icons-pink))))))
-
-(use-package smartparens
-    :config 
-    (smartparens-global-mode t))
+(electric-pair-mode 1)
 
 (use-package yasnippet
   :config
   (setq yas-snippet-dirs '("~/.config/emacs/yasnippets"))
   (yas-global-mode 1))
 
-(use-package vterm)
+(use-package vterm
+  :after evil-collection
+  :config
+  (setq vterm-shell "/usr/bin/fish")
+  (setq term-prompt-regexp "➜ *")
+  (evil-define-minor-mode-key 'normal 'vterm-mode (kbd "_") 'evil-collection-vterm-first-non-blank)
+  ;; (evil-define-key 'normal 'vterm-mode-map (kbd "cc") 'evil-collection-vterm-change-line)
+  :hook ((vterm-mode . (lambda () (setq-local hl-line-mode nil)))
+         (vterm-mode . (lambda () (display-line-numbers-mode -1)))))
+
+(defun my/vterm-buffer-p (buffer)
+ "Return non-nil if BUFFER is a vterm buffer."
+ (with-current-buffer buffer
+    (or (eq major-mode 'vterm-mode)
+        (eq major-mode 'vterm-copy-mode))))
+
+;; make sure project-kill-buffers kills vterm buffers
+(add-to-list 'project-kill-buffer-conditions 'my/vterm-buffer-p)
 
 (defun my/org-mode-setup()
-  (org-indent-mode)
-  (visual-line-mode 1))
+  (org-indent-mode))
 
 (use-package org
   :defer t
@@ -635,24 +700,13 @@
   :custom
   (org-bullets-bullet-list '("◐" "○" "●" "✖" "✚")))
 
-(defun my/org-mode-visual-fill ()
-    (setq visual-fill-column-width 100)
-    (visual-fill-column-mode 0))
-
-(defun my/org-mode-center-text ()
- "toggle centering text in buffer"
-    (interactive)
-    (setq visual-fill-column-center-text (not visual-fill-column-center-text)))
-
-(use-package visual-fill-column 
-    :hook (org-mode . my/org-mode-visual-fill))
-
 (org-babel-do-load-languages
     'org-babel-load-languages
     '((emacs-lisp . t)
       (python . t)
-      (lua . t)
-      (clojure . t)))
+      (clojure . t)
+      (shell . t)
+      (sql . t)))
 
 (push '("conf-unix" . conf-unix) org-src-lang-modes)
 
@@ -664,10 +718,12 @@
   :init
   (setq org-roam-v2-ack t)
   :custom
-  (org-roam-directory "~/org/roam/")
+  (org-roam-directory "~/notes/roam/")
   (org-roam-completion-everywhere t)
   (org-roam-completion-system 'default)
   :config
+  (setq org-roam-node-display-template
+        "${title:60} ${tags:*}")
   (org-roam-setup))
 
 (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
@@ -808,20 +864,40 @@
         :prefix "SPC"
         :global-prefix "C-SPC"))
 
+(defun my/find-file()
+  "Use project specific find if in project"
+  (interactive)
+  (if (project-current)
+      (project-find-file)
+    (consult-fd)))
+
+(defun my/toggle-scratch-buffer ()
+  "Toggle the scratch buffer. If it's currently displayed, close the window; otherwise, open it."
+  (interactive)
+  (let ((scratch-buffer (get-buffer "*scratch*")))
+    (if scratch-buffer
+        (let ((window (get-buffer-window scratch-buffer)))
+          (if window
+              (delete-window window)
+            (progn
+              (evil-window-split 20)
+              (switch-to-buffer scratch-buffer))))
+      (progn
+        (evil-window-split 20)
+        (switch-to-buffer (get-buffer-create "*scratch*"))))))
+
 (my/leader-key-def
-    ;; actions
-    "DEL" '(evil-switch-to-windows-last-buffer :which-key "Last buffer")
-    "RET" '(counsel-bookmark :which-key "Bookmarks")
-    "SPC" '(counsel-find-file :which-key "Find file")
-    "<home>" '(dashboard-refresh-buffer :which-key "Switch to Dashboard")
-    "'" '(ivy-resume :which-key "Resume last search")
-    "," '(projectile-switch-to-buffer :which-key "Switch project buffer")
-    "." '(counsel-find-file :which-key "Find file")
-    ":" '(counsel-M-x :which-key "M-x")
-    ";" '(eval-expression :which-key "Eval expression")
-    "<" '(counsel-switch-buffer :which-key "Switch buffer (all)")
-    "x" '(my/popup-scratch-buffer :which-key "Pop scratch buffer")
-    "X" '(org-capture :which-key "Org Capture"))
+  "DEL" '(evil-switch-to-windows-last-buffer :which-key "Last buffer")
+  "RET" '(consult-bookmark :which-key "Bookmarks")
+  "SPC" '(my/find-file :which-key "Find file")
+  "<home>" '(dashboard-refresh-buffer :which-key "Switch to Dashboard")
+  "<up>" '(evil-window-up :which-key "cursor up")
+  "<down>" '(evil-window-down :which-key "cursor down")
+  "<left>" '(evil-window-left :which-key "cursor left")
+  "<right>" '(evil-window-right :which-key "cursor right")
+  ";" '(eval-expression :which-key "Eval expression")
+  "x" '(my/toggle-scratch-buffer :which-key "Toggle scratch buffer")
+  "X" '(org-capture :which-key "Org Capture"))
 
 (my/leader-key-def
     "a"  '(:ignore t :which-key "Org Agenda")
@@ -830,41 +906,57 @@
     "am" '(org-tags-view :which-key "Tags view")
     "av" '(org-search-view :which-key "Search view"))
 
-(my/leader-key-def
-    "b"  '(:ignore t :which-key "buffer")
-    "bn" '(next-buffer :which-key "Next buffer")
-    "bp" '(next-buffer :which-key "Previous buffer")
-    "b>" '(next-buffer :which-key "Next buffer")
-    "b<" '(previous-buffer :which-key "Previous buffer")
-    "bb" '(projectile-switch-to-buffer :which-key "Switch project buffer")
-    "bi" '(ibuffer :which-key "ibuffer")
-    "bc" '(kill-current-buffer :which-key "Kill buffer")
-    "bd" '(kill-current-buffer :which-key "Kill buffer")
-    "bk" '(kill-current-buffer :which-key "Kill buffer")
-    "bl" '(evil-switch-to-windows-last-buffer :which-key "Switch to last buffer")
-    "bm" '(bookmark-set :which-key "Mark as bookmark")
-    "bs" '(basic-save-buffer :which-key "Save buffer")
-    ;; "u" '(:which-key "Save as root")
-    "bz" '(bury-buffer :which-key "Bury buffer")
-    "bm" '(bookmark-set :which-key "Mark as bookmark")
-    "bM" '(bookmark-delete :which-key "Delete bookmark")
-    "bR" '(revert-buffer :which-key "Revert buffer")
-    "bB" '(counsel-switch-buffer :which-key "Switch buffer")
-    "bT" '(ivy-switch-buffer :which-key "Switch buffer")
-    "bK" '(my/close-all-buffers :which-key "Kill all buffers")
-    "bN" '(evil-buffer-new :which-key "New buffer"))
+(defun my/consult-switch-buffer()
+  "Use project specific switcher if in project"
+  (interactive)
+  (if (project-current)
+      (consult-project-buffer)
+      (consult-buffer)))
 
-;; TODO bK use doom's better function
+(defun my/kill-matching-buffers-no-confirm (regexp)
+ "Kill all buffers matching REGEXP without confirmation."
+  (interactive)
+  (cl-letf (((symbol-function 'kill-buffer-ask) #'kill-buffer))
+    (kill-matching-buffers regexp)))
+
+(defun my/close-all-buffers ()
+  "Closes all buffers."
+  (interactive)
+  ;; (kill-matching-buffers ".*"))
+  (cl-loop for buf in (buffer-list)
+	if (not (or (string-match "^*dashboard" (buffer-name buf))
+				(string-match "^*Messages" (buffer-name buf))
+				(string-match "^*scratch" (buffer-name buf))
+				(string-match "^ " (buffer-name buf))))
+	do (kill-buffer buf))
+  (dashboard-refresh-buffer))
+
+(my/leader-key-def
+  "b"  '(:ignore t :which-key "buffer")
+  "bn" '(next-buffer :which-key "Next buffer")
+  "bp" '(previous-buffer :which-key "Previous buffer")
+  "bb" '(my/consult-switch-buffer :which-key "Switch buffer")
+  "bi" '(ibuffer :which-key "ibuffer")
+  "bk" '(kill-current-buffer :which-key "Kill buffer")
+  "bl" '(evil-switch-to-windows-last-buffer :which-key "Switch to last buffer")
+  "bs" '(basic-save-buffer :which-key "Save buffer")
+  "bz" '(bury-buffer :which-key "Bury buffer")
+  "bm" '(bookmark-set :which-key "Mark as bookmark")
+  "bM" '(bookmark-delete :which-key "Delete bookmark")
+  "bR" '(revert-buffer :which-key "Revert buffer")
+  "bB" '(consult-buffer :which-key "consult buffer")
+  "bK" '(my/close-all-buffers :which-key "Kill all buffers")
+  "bN" '(evil-buffer-new :which-key "New buffer"))
 
 (my/leader-key-def
     "c"  '(:ignore t :which-key "code")
-    "cc" '(counsel-compile :which-key "Compile")
-    "cd" '(evil-goto-definition :which-key "Jump to definition")
-    "cf" '(format-all-buffer :which-key "Format buffer/region")
-    "cx" '(flycheck-list-errors :which-key "List errors")
-    "cn" '(flycheck-next-error :which-key "Next error")
-    "cw" '(delete-trailing-whitespace :which-key "Delete trailing whitespace")
-    "cW" '(my/delete-trailing-newlines :which-key "Delete trailing newlines"))
+    "c <return>" '(lsp-execute-code-action :which-key "Code Actions")
+    "cc" '(project-compile :which-key "Compile")
+    "cd" '(lsp-find-definition :which-key "Jump to definition")
+    "cr" '(lsp-find-references :which-key "Jump to references")
+    "cf" '(my/reformat-buffer :which-key "Format buffer")
+    "cl" '(flycheck-list-errors :which-key "List errors")
+    "cn" '(flycheck-next-error :which-key "Next error"))
 
 (my/leader-key-def
     "e"  '(:ignore t :which-key "eval")
@@ -874,82 +966,91 @@
     "el" '(eval-last-sexp :which-key "Evaluate last sexpression")
     "er" '(eval-region :which-key "Evaluate region"))
 
-;; from system crafters's config
-(eval-when-compile (require 'cl))
-(defun my/dired-in (path)
-  (lexical-let ((target path))
-    (lambda () (interactive) (dired target))))
-
 (my/leader-key-def
-  "d"  '(dired :which-key "dired"))
-  ;; (my/leader-key-def
-  ;;   "d"   '(:ignore t :which-key "dired")
-  ;;   "dd"  '(dired :which-key "Here")
-  ;;   "dh"  `(,(my/dired-in "~") :which-key "Home")
-  ;;   "do"  `(,(my/dired-in "~/org") :which-key "Org")
-  ;;   "dD"  `(,(my/dired-in "~/downloads") :which-key "Downloads")
-  ;;   "dv"  `(,(my/dired-in "~/videos") :which-key "Videos")
-  ;;   "d."  `(,(my/dired-in "~/dotfiles") :which-key "dotfiles")
-  ;;   "de"  `(,(my/dired-in "~/.config/emacs") :which-key ".config/emacs")))
+  "d"  '(find-file :which-key "here"))
 
 (my/leader-key-def
     "f"  '(:ignore t :which-key "files")
-    "fd" '(projectile-dired :which-key "Find directory")
-    "ff" '(counsel-find-file :which-key "Find file")
-    "fl" '(counsel-locate :which-key "Locate file")
-    "fr" '(counsel-recentf :which-key "Recent files")
+    "ff" '(find-file :which-key "Find file")
+    "fl" '(consult-locate :which-key "Locate file")
+    "fr" '(consult-recent-file :which-key "Recent files")
     "fs" '(save-buffer :which-key "Save file")
     "fy" '(my/copy-filename-to-clipboard :which-key "Yank filename")
     "fC" '(copy-file :which-key "Copy this file")
     "fD" '(delete-file :which-key "Delete this file")
-    ;; "E" '(a :which-key "Browse emacs.d")
-    ;; "F" '(a :which-key "Find file from here")
     "fR" '(rename-file :which-key "Rename/Move file")
-    "fS" '(write-file :which-key "Save file as...")
-    ;; "U" '(a :which-key "Sudo this file")
-)
+    "fS" '(write-file :which-key "Save file as..."))
+
+(defun my/kill-magit-buffers()
+  "Kills all magit buffers"
+  (interactive)
+  (my/kill-matching-buffers-no-confirm "^magit.*"))
 
 (my/leader-key-def
-    "g"  '(:ignore t :which-key "git")
-    "gg" '(magit-status :which-key "Magit status")
-    "g/" '(magit-dispatch :which-key "Magit dispatch")
-    "gb" '(magit-branch-checkout :which-key "Magit switch branch")
-    "gC" '(magit-clone :which-key "Magit clone")
-    "gD" '(magit-file-delete :which-key "Magit file delete")
-    "gR" '(vc-revert :which-key "Revert file")
-    "gS" '(magit-stage-file :which-key "Magit stage file")
-    "gU" '(magit-unstage-file :which-key "Magit unstage file"))
+  "g"  '(:ignore t :which-key "git")
+  "gg" '(magit-status :which-key "Magit status")
+  "g/" '(magit-dispatch :which-key "Magit dispatch")
+  "gb" '(magit-branch-checkout :which-key "Magit switch branch")
+  "gC" '(magit-clone :which-key "Magit clone")
+  "gD" '(magit-file-delete :which-key "Magit file delete")
+  "gR" '(vc-revert :which-key "Revert file")
+  "gS" '(magit-stage-file :which-key "Magit stage file")
+  "gK" '(my/kill-magit-buffers :which-key "Kill all magit buffers")
+  "gU" '(magit-unstage-file :which-key "Magit unstage file"))
 
 (my/leader-key-def
     "h"  '(:ignore t :which-key "help")
-    "hRET" '(info-emacs-manual :which-key "Emacs manual")
+    "h <return>" '(info-emacs-manual :which-key "Emacs manual")
     "h'" '(describe-char :which-key "Describe char")
     "h." '(display-local-help :which-key "Local-help")
     "h?" '(help-for-help :which-key "Help for help")
     "ha" '(apropos :which-key "Apropos")
     "hc" '(describe-key-briefly :which-key "Describe key briefly")
     "he" '(view-echo-area-messages :which-key "View echo messages")
-    "hf" '(counsel-describe-function :which-key "Describe function")
+    "hf" '(describe-function :which-key "Describe function")
     "hi" '(info :which-key "Info")
     "hk" '(describe-key :which-key "Describe key")
     "hl" '(view-lossage :which-key "View lossage")
     "hm" '(describe-mode :which-key "Describe mode")
-    "hs" '(counsel-describe-symbol :which-key "Describe symbol")
+    "hs" '(describe-symbol :which-key "Describe symbol")
     "hq" '(help-quit :which-key "Help quit")
-    "hv" '(counsel-describe-variable :which-key "Describe variable")
+    "hv" '(describe-variable :which-key "Describe variable")
     "hw" '(where-is :which-key "Where is")
     "hA" '(apropos-documentation :which-key "Apropos docs")
     "hC" '(describe-coding-system :which-key "Describe coding system")
-    "hF" '(counsel-describe-face :which-key "Describe face")
+    "hF" '(describe-face :which-key "Describe face")
     "hV" '(set-variable :which-key "Set variable")
     "hH" '(help-for-help :which-key "Help for help"))
 
+;; TODO add note filtering functions here
 (my/leader-key-def
     "n"  '(:ignore t :which-key "notes")
     "nn" '(org-capture :which-key "Org Capture")
     "ni" '(org-roam-node-insert :which-key "org-roam-node-insert")
     "nf" '(org-roam-node-find :which-key "org-roam-node-find")
+    "nt" '(org-roam-tag-add :which-key "Add a TAG")
     "nl" '(org-roam-buffer-toggle :which-key "org-roam-buffer-toggle"))
+
+(defun my/vterm-switch-or-new()
+  (interactive)
+  (let ((vterm-target-name (my/vterm-buffer-name))
+        (default-directory (my/vterm-project-default-dir)))
+    (if (buffer-live-p (get-buffer vterm-target-name))
+        (switch-to-buffer-other-window vterm-target-name)
+        (vterm-other-window vterm-target-name))))
+
+(defun my/vterm-new()
+  (interactive)
+  (vterm-other-window (my/vterm-buffer-name)))
+
+(defun my/vterm-project-default-dir()
+  (if (project-current)
+      (project-root (project-current))
+    default-directory))
+
+(defun my/vterm-buffer-name()
+  (let ((default-directory (my/vterm-project-default-dir)))
+    (format "%s @ %s" vterm-buffer-name default-directory)))
 
 (my/leader-key-def
     "o"  '(:ignore t :which-key "open")
@@ -958,45 +1059,55 @@
     ;o; "d" '(org :which-key "debugger")
     "of" '(make-frame :which-key "New frame")
     "om" '(mu4e :which-key "Mu4e")
-    "op" '(neotree-toggle :which-key "Project sidebar")
     ;o; "r" '(org :which-key "REPL")
-    "oe" '(eshell-toggle :which-key "eshell"))
-    ;o; "t" '(org :which-key "Terminal")
+    "oe" '(eshell-toggle :which-key "eshell")
+    "ot" '(my/vterm-switch-or-new :which-key "vterm-switch")
+    "oT" '(my/vterm-new :which-key "vterm-new"))
+
+(defun my/switch-project-dired()
+ "Switch to a project and open dired in the project root."
+ (interactive)
+ (let ((project (project-prompt-project-dir)))
+    (when project
+      (dired (expand-file-name project)))))
+
+
+(defun my/goto-project-flake()
+  (interactive)
+  (if (project-current)
+      (let* ((project (project-name (project-current)))
+            (flake-project (expand-file-name project "~/projects/flakes")))
+        (find-file (expand-file-name "flake.nix" flake-project)))
+    (message "Not in a project.")))
 
 (my/leader-key-def
     "p"  '(:ignore t :which-key "projects")
-    "p!" '(projectile-run-shell-command-in-root :which-key "Run cmd in project root")
-    "p." '(projectile-recentf :which-key "Recent files in project")
-    "pa" '(projectile-add-known-project :which-key "Add project")
-    "pb" '(counsel-projectile-switch-to-buffer :which-key "Switch to project buffer")
-    "pd" '(projectile-dired :which-key "dired in project")
-    "pf" '(counsel-projectile-find-file :which-key "Find file in project")
-    "pk" '(projectile-kill-buffers :which-key "Kill project buffers")
-    "pp" '(counsel-projectile-switch-project :which-key "Switch project") 
-    "pr" '(projectile-recentf :which-key "Recent files in project")
-    "ps" '(projectile-save-project-buffers :which-key "Save project files")
+    "pb" '(consult-project-buffer :which-key "Switch project buffer")
+    "pd" '(project-dired :which-key "dired in project")
+    "pk" '(project-kill-buffers :which-key "Kill project buffers")
+    "pp" '(my/switch-project-dired :which-key "Switch project") 
+    "pf" '(my/goto-project-flake :which-key "Go to Flake")
+    "ps" '(consult-fd :which-key "consult find")
     "pt" '(magit-todos-list :which-key "Project TODOs")
-    "pD" '(projectile-remove-known-project :which-key "Delete project")
-    "pR" '(projectile-run-project :which-key "Run project"))
+    "pD" '(project-forget-project :which-key "Forget project"))
 
 (my/leader-key-def
     "q"  '(:ignore t :which-key "quit")
-    "qq" '(save-buffers-kill-terminal :which-key "Quit"))
+    "qq" '(delete-frame :which-key "quit frame"))
 
 (my/leader-key-def
     "s"  '(:ignore t :which-key "search")
-    "ss" '(swiper :which-key "Swiper")
-    ;; "sr" '(swiper :which-key "ripgrep")
-
-    )
-
- ;; TODO add bindings to search in project, etc
+    "ss" '(rg-dwim :which-key "ripgrep simple")
+    "sS" '(rg-menu :which-key "ripgrep menu")
+    "sp" '(rg-project :which-key "ripgrep project")
+    "sl" '(rg-literal :which-key "ripgrep literal anywhere")
+    "sr" '(rg--transient :which-key "ripgrep regex anywhere")
+    "s/" '(consult-ripgrep :which-key "ripgrep dwim"))
 
 (my/leader-key-def
     "t"  '(:ignore t :which-key "toggle")
     "tf" '(flycheck-mode :which-key "Flycheck")
     "tl" '(doom/toggle-line-numbers :which-key "Line numbers")
-    "tn" '(neotree-toggle :which-key "Neotree")
     "tt" '(toggle-truncate-lines :which-key "Truncate lines")
     "tI" '(doom/toggle-indent-style :which-key "Indentation"))
 
@@ -1027,36 +1138,32 @@
     "ww"  '(evil-window-next :which-key "next")
     "w|"  '(evil-window-set-width :which-key "set width")
     "wp"  '(evil-window-prev :which-key "prev")
-    "wSPC" '(rotate-layout :which-key "rotate layout")
+    "w SPC" '(rotate-layout :which-key "rotate layout") 
     "wr" '(rotate-window :which-key "rotate windows")
-    "w <up>" '(evil-window-up :which-key "cursor up")
-    "w <down>" '(evil-window-down :which-key "cursor down")
-    "w <left>" '(evil-window-left :which-key "cursor left")
-    "w <right>" '(evil-window-right :which-key "cursor right")
-    "w C-<up>" '(windmove-swap-states-up :which-key "move window up")
-    "w C-<down>" '(windmove-swap-states-down :which-key "move window down")
-    "w C-<left>" '(windmove-swap-states-left :which-key "move window left")
-    "w C-<right>" '(windmove-swap-states-right :which-key "move window right"))
+    "w <up>" '(windmove-swap-states-up :which-key "move window up")
+    "w <down>" '(windmove-swap-states-down :which-key "move window down")
+    "w <left>" '(windmove-swap-states-left :which-key "move window left")
+    "w <right>" '(windmove-swap-states-right :which-key "move window right"))
 
 (use-package winner
     :after evil
     :config
-    (winner-mode)
-    (my/leader-key-def
-        "<left>" '(winner-undo :which-key "winner undo")
-        "<right>" '(winner-redo :which-key "winner redo")))
+    (winner-mode))
+    ;; (my/leader-key-def
+    ;;     "<left>" '(winner-undo :which-key "winner undo")
+    ;;     "<right>" '(winner-redo :which-key "winner redo")))
 
 (general-define-key    
     :states 'normal
     "?" 'which-key-show-major-mode)
 
 (general-define-key
-    :states '(normal insert visual)
-    "C-s" 'swiper-isearch)
+ :states '(normal insert visual)
+ "C-s" 'consult-line)
 
 (general-define-key
-    :states '(normal visual)
-    "/" 'swiper-isearch)
+ :states '(normal visual)
+ "/" 'consult-line)
 
 (use-package drag-stuff)
 (drag-stuff-global-mode 1)
@@ -1065,6 +1172,10 @@
     :states 'normal
     :keymaps 'org-mode-map
     "RET" '+org/dwim-at-point)
+
+(use-package envrc
+  :config
+  (envrc-global-mode))
 
 (defun my/org-babel-tangle-config ()
     (when (string-equal (file-name-directory (buffer-file-name))
