@@ -217,8 +217,9 @@
 (use-package doom-themes
     :init
     (load-theme 'doom-monokai-pro t))
-    ;; (load-theme 'doom-ir-black t))
+    ;; (load-theme 'doom-monokai-machine t))
     ;; (load-theme 'doom-vibrant t))
+    ;; (load-theme 'doom-ir-black t))
     ;; (load-theme 'doom-dracula t))
 
 ;; all the icons is needed for doom-modeline
@@ -306,8 +307,6 @@
         (dired-find-file)
         (dwim-shell-commands-open-externally))))
 
-
-;; TODO fix this
 (use-package dired
     :ensure nil
     ;; :commands (dired dired-jump)
@@ -1183,4 +1182,5 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
           (let ((org-confirm-babel-evaluate nil))
     (org-babel-tangle))))
 
-(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'my/org-babel-tangle-config)))
+(add-hook 'org-mode-hook
+    (lambda () (add-hook 'after-save-hook #'my/org-babel-tangle-config)))
