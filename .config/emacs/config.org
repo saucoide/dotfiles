@@ -3,8 +3,6 @@
 #+STARTUP: content
 #+PROPERTY: header-args:emacs-lisp :tangle .config/emacs/init.el
 
-TODO - WIP bringing stuff from macflop
-
 * Table of Contents                                          :toc@2:noexport:
 - [[#startup][Startup]]
   - [[#early-initel][early-init.el]]
@@ -568,8 +566,6 @@ The emacs file manager
         (dired-find-file)
         (dwim-shell-commands-open-externally))))
 
-
-;; TODO fix this
 (use-package dired
     :ensure nil
     ;; :commands (dired dired-jump)
@@ -578,7 +574,6 @@ The emacs file manager
     ;; (setq insert-director-program "/usr/local/bin/")
     (setq dired-listing-switches "-algho --group-directories-first --time-style \"+%Y-%m-%d %H:%M\"")
     ;; (setq dired-dwim-target t)
-    ;; (all-the-icons-dired-mode 1)
     (dired-hide-dotfiles-mode 1)
     (evil-define-key 'normal dired-mode-map
       (kbd "RET") 'my/open-externally

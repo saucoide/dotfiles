@@ -6,6 +6,9 @@
 GUIX_PROFILE="$HOME/.guix-profile"
 . "$GUIX_PROFILE/etc/profile"
 
+# Fix locales for nix https://nixos.wiki/wiki/Locales
+export LOCALE_ARCHIVE=/usr/lib/locale/locale-archive
+
 # QT5 Style
 # Manage the style using kvantum
 export QT_STYLE_OVERRIDE=kvantum
@@ -17,5 +20,5 @@ export SHELL=/usr/bin/fish
 export PATH=$HOME/.local/bin:$HOME/.cargo/bin:$HOME/scripts:$PATH
 
 # Python debugging
-export PYTHONBREAKPOINT=ipdb.set_trace
+export PYTHONBREAKPOINT=pdb.set_trace
 export PYTHONSTARTUP=$HOME/.pythonrc.py

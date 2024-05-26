@@ -316,7 +316,6 @@
     ;; (setq insert-director-program "/usr/local/bin/")
     (setq dired-listing-switches "-algho --group-directories-first --time-style \"+%Y-%m-%d %H:%M\"")
     ;; (setq dired-dwim-target t)
-    ;; (all-the-icons-dired-mode 1)
     (dired-hide-dotfiles-mode 1)
     (evil-define-key 'normal dired-mode-map
       (kbd "RET") 'my/open-externally

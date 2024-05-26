@@ -69,8 +69,8 @@ See `display-line-numbers' for what these values mean."
            (org-roam-node-list))))
 
 (defun my/refresh-roam-gitignore()
-  "Create a new .gitignore file at the org-roam directory excluding the notes matching
-the criteria."
+  "Create a new .gitignore file at the org-roam directory.
+Excluding the notes matching the criteria."
   (interactive)
   (let (
      (notes (mapcar

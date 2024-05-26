@@ -138,12 +138,6 @@ set fish_color_autosuggestion "4c566a"
 # # fish_color_search_match
 # # ---------------------------------------------------------------------
 
-# pyenv setup
-set -Ux PYENV_ROOT $HOME/.pyenv
-fish_add_path $PYENV_ROOT/bin
-pyenv init - | source
-eval "$(pyenv virtualenv-init -)"
-
 # direnv for my .envrc files
 direnv hook fish | source
 # set -g direnv_fish_mode disable_arrow
