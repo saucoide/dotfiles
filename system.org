@@ -3969,8 +3969,8 @@ floating_layout = layout.Floating(
         Match(wm_class='Arandr'),
         Match(title='Open File'),
     ],
-    border_width=1,
-    border_focus="#bf616a", # TODO: change color
+    border_width=2,
+    border_focus="#bf616a",
 )
 
 # Groups
