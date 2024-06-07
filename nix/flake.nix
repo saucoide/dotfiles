@@ -67,6 +67,7 @@
           trash-cli
           flameshot
           nerdfonts
+          pandoc
           # libreoffice
 
           # MacOS
