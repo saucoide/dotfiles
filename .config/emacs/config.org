@@ -322,10 +322,13 @@ Evil, evil collection & undo-fu
     ;; remap :W -> :w)
     (evil-ex-define-cmd "W" 'evil-write))
 
+;; I use avy via evil-collection to jump around using `s`
+(use-package avy)
 (use-package evil-collection
   :after evil
   :config
-  (evil-collection-init))
+  (evil-collection-init)
+  (define-key evil-normal-state-map "s" 'evil-avy-goto-char-timer))
 
  ;; using undo-fu to get redo functionality
 (use-package undo-fu
@@ -344,21 +347,6 @@ evil org to get nicer keybindings in org-mode
     :hook (org-mode . evil-org-mode))
 
 #+end_src
-
-evil-snipe, search 2 character motions to jump around text with ~s~ and ~S~
-
-#+begin_src emacs-lisp
-
-(use-package evil-snipe
-    :after evil
-    :demand
-    :config
-    (evil-snipe-mode +1)
-    (evil-snipe-override-mode +1)
-    (setq evil-snipe-scope 'buffer))
-
-#+end_src
-
 
 * Basic GUI, Theme, etc.
 ** Basic GUI Elements

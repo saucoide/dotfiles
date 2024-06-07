@@ -140,10 +140,13 @@
     ;; remap :W -> :w)
     (evil-ex-define-cmd "W" 'evil-write))
 
+;; I use avy via evil-collection to jump around using `s`
+(use-package avy)
 (use-package evil-collection
   :after evil
   :config
-  (evil-collection-init))
+  (evil-collection-init)
+  (define-key evil-normal-state-map "s" 'evil-avy-goto-char-timer))
 
  ;; using undo-fu to get redo functionality
 (use-package undo-fu
@@ -154,14 +157,6 @@
 
 (use-package evil-org
     :hook (org-mode . evil-org-mode))
-
-(use-package evil-snipe
-    :after evil
-    :demand
-    :config
-    (evil-snipe-mode +1)
-    (evil-snipe-override-mode +1)
-    (setq evil-snipe-scope 'buffer))
 
 (scroll-bar-mode -1)	; disable visible scrollbar
 (tool-bar-mode -1)		; disable toolbar
