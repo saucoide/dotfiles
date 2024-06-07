@@ -219,7 +219,7 @@
 	;; (setq dashboard-center-content t)
     (setq dashboard-set-navigator t)
 	(setq dashboard-agenda-time-string-format "%Y-%m-%d %a")
-	(setq dashboard-match-agenda-entry "CATEGORY={TODO}")
+	(setq dashboard-match-agenda-entry "+TODO=\"TODO\"|+TODO=\"WAIT\"")
 	(setq dashboard-filter-agenda-entry 'dashboard-no-filter-agenda)
 	;; (setq dashboard-agenda-release-buffers t)
     (setq dashboard-set-file-icons t)
@@ -618,16 +618,14 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
           org-agenda-files (list org-directory)
 		  org-default-notes-file "~/org/notes.org"
           org-todo-keywords '((sequence "TODO"
-                                        "WIP"
-                                        "BLOCKED"
-                                        "REVIEW"
+                                        "NOTE"
+                                        "WAIT"
                                         "|"
                                         "DONE"
                                         "ARCHIVED"))
           org-todo-keyword-faces '(("TODO" . "GreenYellow")
-                                   ("WIP" . "Gold")
-                                   ("BLOCKED" . "FireBrick")
-                                   ("REVIEW" . "Violet"))
+                                   ("NOTE" . "Gold")
+                                   ("WAIT" . "Violet"))
           org-return-follows-link t))
 
 (use-package evil-org

@@ -285,12 +285,13 @@ If on a:
    '(all-the-icons-dired cider consult-dash corfu dash-docs dashboard dired-hide-dotfiles
                          dired-single diredfl doct doom-modeline doom-themes drag-stuff
                          elm-mode embark-consult envrc eval-in-repl evil-collection
-                         evil-nerd-commenter evil-org evil-snipe exec-path-from-shell
-                         flycheck gcmh general git-gutter helpful hydra kotlin-mode
-                         kotlin-ts-mode kubel-evil lsp-mode magit-todos marginalia
-                         nix-mode orderless org-bullets org-roam rainbow-delimiters rg
-                         rotate rustic scala-mode smex terraform-mode toc-org undo-fu
-                         vertico vterm which-key yasnippet)))
+                         evil-goggles evil-nerd-commenter evil-org evil-snipe
+                         exec-path-from-shell flycheck gcmh general git-gutter helpful
+                         hydra kotlin-mode kotlin-ts-mode kubel-evil lsp-mode
+                         magit-todos marginalia nix-mode ob-async ob-http ob-mermaid
+                         orderless org-bullets org-roam rainbow-delimiters rg rotate
+                         rustic scala-mode smex terraform-mode toc-org undo-fu vertico
+                         vterm which-key yasnippet)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
