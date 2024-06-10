@@ -59,6 +59,9 @@ alias podman-into-shell='podman run --tty --interactive --entrypoint="/bin/sh"'
 alias k="kubectl"
 alias kn="kube_namespace"
 alias kc="kube_context"
+# gcloud
+alias gcp="gcloud_change_project"
+alias gc="gcloud"
 # ---------------------------------------------------------------------
 
 
@@ -102,6 +105,16 @@ function kube_context --wraps "kubectl config use-context"
     kubectl config use-context $context $argv
   else
     kubectl config get-contexts
+  end
+end
+
+function gcloud_change_project --wraps "gcloud config set project"
+  if test (count $argv) -gt 0
+    set project $argv[1]
+    set -e argv[1]
+    gcloud config set project $project $argv
+  else
+    gcloud projects list
   end
 end
 
