@@ -118,6 +118,223 @@ function gcloud_change_project --wraps "gcloud config set project"
   end
 end
 
+
+function ai --argument action --argument model
+  # read from stdin
+  read -l -z input
+  set model (or $model "4o")
+  
+  switch $action
+    case "explain"
+      set system_prompt "
+        You are very experienced and knowledgable software developer, expert in the domain.
+        Your goal is to explain to newer developers the functionality of existing code.
+        You provide simple and concise explanations, using plain english and using jargon only if absolutely necessary.
+        Please explain to a new joiner what the code does, and how it is implemented."
+      
+      echo $input
+      set prompt $input
+      echo ""
+      echo "=== LLM ==="
+      echo ""
+    case "complete"
+      set system_prompt "
+        You are very experienced and knowledgable software developer, expert in the domain.
+        Your must finish the unfinished sections that have been marked with '# AI TODO'.
+        You must adhere to the existing style, and not make any modifications to the
+        sections that have not been marked.
+        You must produce high quality and readable code, that's easy to test.
+
+        INPUT:
+        @dataclass
+        class Email:
+          address: str
+          content: str
+          priority: str
+        
+        @dataclass
+        class SMS:
+          phone_numer: int
+          content: str
+          priority: str
+        
+        @dataclass
+        class Letter:
+          address: str
+          content: str
+          priority: str
+
+        # AI TODO add phone call 
+        
+        Notification = Email | SMS | Letter | PhoneCall
+
+        def send_notification(notification: Notification):
+            match notification:
+              case Email():
+                send_email(
+                  address_to=notification.address,
+                  content=notification.content,
+                  priority=notification.priority,
+                )
+              case SMS():
+                send_sms(
+                  phone_number=notification.phone_number,
+                  content=notification.content,
+                  priority=notification.priority,
+                )
+              case Letter():
+                send_letter(
+                  address_to=notification.address,
+                  address_from='sender_address',
+                  content=notification.content,
+                  priority=notification.priority,
+                )
+            
+              # AI TODO add missing cases
+
+
+        OUTPUT:
+        @dataclass
+        class Email:
+          address: str
+          content: str
+          priority: str
+        
+        @dataclass
+        class SMS:
+          phone_numer: int
+          content: str
+          priority: str
+        
+        @dataclass
+        class Letter:
+          address: str
+          content: str
+          priority: str
+
+        @dataclass
+        class PhoneCall:
+          phone_number: str
+          content: str
+          priority: str
+        
+        Notification = Email | SMS | Letter | PhoneCall | None
+
+        def send_notification(notification: Notification):
+            match notification:
+              case Email():
+                send_email(
+                  address_to=notification.address,
+                  content=notification.content,
+                  priority=notification.priority,
+                )
+              case SMS():
+                send_sms(
+                  phone_number=notification.phone_number,
+                  content=notification.content,
+                  priority=notification.priority,
+                )
+              case Letter():
+                send_letter(
+                  address_to=notification.address,
+                  address_from='sender_address',
+                  content=notification.content,
+                  priority=notification.priority,
+                )
+            
+              case Phonecall():
+                send_phone_call(
+                  phone_number=notification.address,
+                  content=notification.content,
+                  priority=notification.priority,
+                )
+                
+              case _:
+                # No notification
+                pass
+        "
+      set prompt "INPUT:\n$input" 
+    case "fix"
+      set system_prompt "
+        You are very experienced and knowledgable software developer, expert in the domain.
+        Your must fix the code in the sections that have been marked with '# AI FIX'.
+        You must adhere to the existing style, and not make any modifications to the
+        sections that have not been marked.
+        You must produce high quality and readable code, that's easy to test.
+        If there is nothing wrong with the code, do not modify it, and return it as is.
+        If there is something wrong to be fixed, fix it and add a short comment
+        explaining the fix.
+        Produce only valid code, do not talk, only add comments as comments within the code
+        all output should be valid code.
+
+        INPUT:
+        def add_to_queue(item, queue=None):
+            queue = queue or []
+            queue.append(name)
+            return queue
+
+        def refresh_queue(queue):
+            new_items = get_new_items(from=last_catchup)
+            for item in new_items:
+                add_to_queue(item)
+            # AI FIX
+            flag_invalid = [
+                item if valid_item(item) else False for item in queue
+            ]
+        
+
+        OUTPUT:
+        def add_to_queue(item, queue=None):
+            queue = queue or []
+            queue.append(name)
+            return queue
+
+        def refresh_queue(queue):
+            new_items = get_new_items(from=last_catchup)
+            for item in new_items:
+                add_to_queue(item)
+            flag_invalid = [
+                item for item in queue if valid_item(item) else False  # Fixed the previous as it was not valid syntax
+            ]
+        "
+      set prompt "INPUT:\n$input" 
+         
+    case "critique"
+      set system_prompt "
+        You are very experienced and knowledgable software developer, expert in the domain.
+        You must review the code provided, critizing it if needed, point out areas of
+        improvement, and any flaws or source of errors you can spot.
+        Be concise and to the point, use plain english"
+      echo $input
+      set prompt $input
+      echo ""
+      echo "=== LLM ==="
+      echo ""
+    case "tests"
+      set system_prompt "
+        You are very experienced and knowledgable software developer, expert in testing.
+        You must produce tests for the code provided, aim for good coverage.
+        You have a strong preference for end to end and integration tests, avoid using
+        mocks except when necessary, and use stubs or fakes in their place when possible.
+        Unit tests are acceptable when useful, but you should also aim to have end to
+        end tests.
+        You follow the 'dont mock what you dont own' principle.
+        If a piece of code would be better tested if we modified it, propose the
+        modification and the test that would go with it"
+        
+      echo $input
+      set prompt $input
+      echo ""
+      echo "=== LLM ==="
+      echo ""
+    case "*"
+      set system_prompt $argv[0]
+      set prompt $input
+         
+  end
+  llm prompt --system $system_prompt $prompt
+end
+
 # Function to extract a variety of archives
 # usage: extract <file>
 function extract
