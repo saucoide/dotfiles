@@ -2,6 +2,8 @@
 # Generated from ~/dotfiles/system.org
 # ************************************
 
+export XDG_DATA_DIRS="/usr/local/share/:/usr/share/"
+
 # Guix profile
 GUIX_PROFILE="$HOME/.guix-profile"
 . "$GUIX_PROFILE/etc/profile"

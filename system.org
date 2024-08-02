@@ -136,6 +136,8 @@ systemctl enable fstrim.timer
 # Generated from ~/dotfiles/system.org
 # ************************************
 
+export XDG_DATA_DIRS="/usr/local/share/:/usr/share/"
+
 # Guix profile
 GUIX_PROFILE="$HOME/.guix-profile"
 . "$GUIX_PROFILE/etc/profile"
@@ -1088,7 +1090,7 @@ so i'll just replace ~config.fish~
 # # Environment Variables
 # # ---------------------------------------------------------------------
 # set VISUAL "emacsclient -c -a ''"
-# set EDITOR "emacsclient -t -a ''"
+set EDITOR "emacsclient -t -a 'nvim'"
 
 # # Aliases
 # # ---------------------------------------------------------------------
@@ -1437,7 +1439,7 @@ font:
     style: Bold Italic
 
   # Point size
-  size: 9.0
+  size: 12.0
 
   # Offset is the extra space around each character. `offset.y` can be thought
   # of as modifying the line spacing, and `offset.x` as modifying the letter
@@ -4140,25 +4142,25 @@ def main():
     LOGIN_URL = "https://www.inoreader.com/accounts/ClientLogin"
 
     username = subprocess.run(
-        ["pass", "inoreader_user"],
+        ["pass", "inoreader/user"],
         check=True,
         capture_output=True,
         encoding="utf-8",
     ).stdout.strip()
     password = subprocess.run(
-        ["pass", "inoreader_password"],
+        ["pass", "inoreader/password"],
         check=True,
         capture_output=True,
         encoding="utf-8",
     ).stdout.strip()
     app_id = subprocess.run(
-        ["pass", "inoreader_appid"],
+        ["pass", "inoreader/appid"],
         check=True,
-        capture_output=True,
+        capture_output=True ,
         encoding="utf-8",
     ).stdout.strip()
     app_key = subprocess.run(
-        ["pass", "inoreader_appkey"],
+        ["pass", "inoreader/appkey"],
         check=True,
         capture_output=True,
         encoding="utf-8",
@@ -4219,13 +4221,13 @@ logger.addHandler(handler)
 def main():
 
     email = subprocess.run(
-        ["pass", "email_user"],
+        ["pass", "email/user"],
         check=True,
         capture_output=True,
         encoding="utf-8",
     ).stdout.strip()
     password = subprocess.run(
-        ["pass", "email_password"],
+        ["pass", "email/password"],
         check=True,
         capture_output=True,
         encoding="utf-8",

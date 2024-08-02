@@ -17,25 +17,25 @@ def main():
     LOGIN_URL = "https://www.inoreader.com/accounts/ClientLogin"
 
     username = subprocess.run(
-        ["pass", "inoreader_user"],
+        ["pass", "inoreader/user"],
         check=True,
         capture_output=True,
         encoding="utf-8",
     ).stdout.strip()
     password = subprocess.run(
-        ["pass", "inoreader_password"],
+        ["pass", "inoreader/password"],
         check=True,
         capture_output=True,
         encoding="utf-8",
     ).stdout.strip()
     app_id = subprocess.run(
-        ["pass", "inoreader_appid"],
+        ["pass", "inoreader/appid"],
         check=True,
-        capture_output=True,
+        capture_output=True ,
         encoding="utf-8",
     ).stdout.strip()
     app_key = subprocess.run(
-        ["pass", "inoreader_appkey"],
+        ["pass", "inoreader/appkey"],
         check=True,
         capture_output=True,
         encoding="utf-8",

@@ -1,7 +1,7 @@
 # # Environment Variables
 # # ---------------------------------------------------------------------
 # set VISUAL "emacsclient -c -a ''"
-# set EDITOR "emacsclient -t -a ''"
+set EDITOR "emacsclient -t -a 'nvim'"
 
 # # Aliases
 # # ---------------------------------------------------------------------

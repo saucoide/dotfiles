@@ -320,6 +320,10 @@
 
 ;; (add-hook 'dired-mode-hook #'my/dired-customizations)
 
+(use-package ready-player
+  :config
+  (ready-player-mode +1))
+
 (use-package transient
   :config
   (define-key transient-map (kbd "<escape>") 'transient-quit-one)

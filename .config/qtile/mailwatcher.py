@@ -13,13 +13,13 @@ logger.addHandler(handler)
 def main():
 
     email = subprocess.run(
-        ["pass", "email_user"],
+        ["pass", "email/user"],
         check=True,
         capture_output=True,
         encoding="utf-8",
     ).stdout.strip()
     password = subprocess.run(
-        ["pass", "email_password"],
+        ["pass", "email/password"],
         check=True,
         capture_output=True,
         encoding="utf-8",

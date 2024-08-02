@@ -26,6 +26,7 @@
   - [[#window-title][Window title]]
 - [[#package-configuration][Package Configuration]]
   - [[#dired][Dired]]
+  - [[#ready-player][Ready-Player]]
   - [[#command-completion][Command Completion]]
   - [[#help][Help]]
   - [[#ripgrep][Ripgrep]]
@@ -568,7 +569,13 @@ The emacs file manager
 
 ;; (add-hook 'dired-mode-hook #'my/dired-customizations)
 #+end_src
+** Ready-Player
 
+#+begin_src emacs-lisp
+(use-package ready-player
+  :config
+  (ready-player-mode +1))
+#+end_src
 ** Command Completion
 *** Transient
 
