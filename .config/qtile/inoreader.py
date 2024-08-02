@@ -11,55 +11,50 @@ logger = logging.getLogger(__name__)
 handler = logging.FileHandler(LOGFILE)
 logger.addHandler(handler)
 
-def main():
 
+def pass_get(key: str) -> str:
+    return subprocess.run(
+        ["pass", key],
+        check=True,
+        capture_output=True,
+        encoding="utf-8",
+    ).stdout.strip()
+
+
+def main():
     BASE_URL = "https://www.inoreader.com/reader/api/0"
     LOGIN_URL = "https://www.inoreader.com/accounts/ClientLogin"
 
-    username = subprocess.run(
-        ["pass", "inoreader/user"],
-        check=True,
-        capture_output=True,
-        encoding="utf-8",
-    ).stdout.strip()
-    password = subprocess.run(
-        ["pass", "inoreader/password"],
-        check=True,
-        capture_output=True,
-        encoding="utf-8",
-    ).stdout.strip()
-    app_id = subprocess.run(
-        ["pass", "inoreader/appid"],
-        check=True,
-        capture_output=True ,
-        encoding="utf-8",
-    ).stdout.strip()
-    app_key = subprocess.run(
-        ["pass", "inoreader/appkey"],
-        check=True,
-        capture_output=True,
-        encoding="utf-8",
-    ).stdout.strip()
-    
-    resp = requests.post(LOGIN_URL,
-                         data={'Email':username,
-                               'Passwd':password,})
+    username = pass_get("inoreader/user")
+    password = pass_get("inoreader/password")
+    app_id = pass_get("inoreader/appid")
+    app_key = pass_get("inoreader/appkey")
+
+    resp = requests.post(
+        LOGIN_URL,
+        data={
+            "Email": username,
+            "Passwd": password,
+        },
+    )
 
     content = {}
-    for line in resp.text.split('\n'):
+    for line in resp.text.split("\n"):
         if line:
             key, val = line.split("=")
             content[key] = val
-            
-    token = content['Auth']
-    headers = {'Authorization': 'GoogleLogin auth=' + token,
-               'Appid': app_id,
-               'AppKey': app_key}
+
+    token = content["Auth"]
+    headers = {
+        "Authorization": "GoogleLogin auth=" + token,
+        "Appid": app_id,
+        "AppKey": app_key,
+    }
 
     resp = requests.get(BASE_URL + "/unread-count", headers=headers)
     resp.raise_for_status()
     unreadcounts = resp.json()
-    unread = unreadcounts['unreadcounts'][0]['count']
+    unread = unreadcounts["unreadcounts"][0]["count"]
     return str(unread)
 
 

@@ -1124,6 +1124,15 @@ alias mirrors="sudo reflector --latest 50 --sort rate --save /etc/pacman.d/mirro
 # ## yt-dlp
 alias yt="yt-dlp"
 alias yt-audio="yt-dlp -x -f bestaudio"
+## docker/podman
+alias docker="podman"
+alias docker-compose="podman-compose"
+alias podman-into-bash='podman run --tty --interactive --entrypoint="/bin/bash"'
+alias podman-into-shell='podman run --tty --interactive --entrypoint="/bin/sh"'
+## kubectl
+alias k="kubectl"
+alias kn="kube_namespace"
+alias kc="kube_context"
 
 # ---------------------------------------------------------------------
 # Functions
@@ -1140,12 +1149,9 @@ function fish_user_key_bindings
   fish_vi_key_bindings
 end
 
-# # Function for creating a backup file
-# # ex: backup file.txt
-# # result: copies file as file.txt.bak
-# function backup --argument filename
-#     cp $filename $filename.bak
-# end
+function backup --argument filename
+    cp $filename $filename.bak
+end
 
 # # Function to extract a variety of archives
 # # usage: extract <file>
@@ -1201,11 +1207,33 @@ end
 function webcam
   ~/.config/fish/scripts/webcam.sh
 end
-# # ---------------------------------------------------------------------
 
+# ---------------------------------------------------------------------
+# Kubernetes utility functions
+# ---------------------------------------------------------------------
+function kube_namespace --wraps "kubectl get namespaces"
+  if test (count $argv) -gt 0
+    set namespace $argv[1]
+    set -e argv[1]
+    kubectl config set-context --current --namespace=$namespace $argv
+  else
+    kubectl get namespaces
+  end
+end
 
-# # Fish colors
-# # ---------------------------------------------------------------------
+function kube_context --wraps "kubectl config use-context"
+  if test (count $argv) -gt 0
+    set context $argv[1]
+    set -e argv[1]
+    kubectl config use-context $context $argv
+  else
+    kubectl config get-contexts
+  end
+end
+
+# ---------------------------------------------------------------------
+#  Fish colors
+# ---------------------------------------------------------------------
 set fish_color_normal white
 set fish_color_command blue
 set fish_color_keyword yellow
@@ -1264,920 +1292,52 @@ disabled = true
 In addition to this config, i clone =alacritty-theme=, from a which a theme is imported
 here
 
-#+begin_src conf :tangle .config/alacritty/alacritty.yml
-# Configuration for Alacritty, the GPU enhanced terminal emulator.
 
-# Import additional configuration files
-#
-# Imports are loaded in order, skipping all missing files, with the importing
-# file being loaded last. If a field is already present in a previous import, it
-# will be replaced.
-#
-# All imports must either be absolute paths starting with `/`, or paths relative
-# to the user's home directory starting with `~/`.
-#import:
-#  - /path/to/alacritty.yml
+#+begin_src toml :tangle .config/alacritty/alacritty.toml
+import = ["/home/saucoide/.config/alacritty/alacritty-theme/themes/taerminal.toml"]
 
-# Any items in the `env` entry below will be added as
-# environment variables. Some entries may override variables
-# set by alacritty itself.
-#env:
-  # TERM variable
-  #
-  # This value is used to set the `$TERM` environment variable for
-  # each instance of Alacritty. If it is not present, alacritty will
-  # check the local terminfo database and use `alacritty` if it is
-  # available, otherwise `xterm-256color` is used.
-  #TERM: alacritty
-import:
-  - ~/.config/alacritty/alacritty-theme/themes/taerminal.yaml
-  
-window:
-  # Window dimensions (changes require restart)
-  #
-  # Number of lines/columns (not pixels) in the terminal. Both lines and columns
-  # must be non-zero for this to take effect. The number of columns must be at
-  # least `2`, while using a value of `0` for columns and lines will fall back
-  # to the window manager's recommended size
-  #dimensions:
-  #  columns: 0
-  #  lines: 0
+[font]
+size = 11.0
 
-  # Window position (changes require restart)
-  #
-  # Specified in number of pixels.
-  # If the position is not set, the window manager will handle the placement.
-  #position:
-  #  x: 0
-  #  y: 0
+[font.bold]
+family = "JetBrainsMono Nerd Font"
+style = "Bold"
 
-  # Window padding (changes require restart)
-  #
-  # Blank space added around the window in pixels. This padding is scaled
-  # by DPI and the specified value is always added at both opposing sides.
-  padding:
-    x: 6
-    y: 6
+[font.bold_italic]
+family = "JetBrainsMono Nerd Font"
+style = "Bold Italic"
 
-  # Spread additional padding evenly around the terminal content.
-  #dynamic_padding: false
+[font.italic]
+family = "JetBrainsMono Nerd Font"
+style = "Italic"
 
-  # Window decorations
-  #
-  # Values for `decorations`:
-  #     - full: Borders and title bar
-  #     - none: Neither borders nor title bar
-  #
-  # Values for `decorations` (macOS only):
-  #     - transparent: Title bar, transparent background and title bar buttons
-  #     - buttonless: Title bar, transparent background and no title bar buttons
-  decorations: None
+[font.normal]
+family = "JetBrainsMono Nerd Font"
+style = "Regular"
 
-  # Background opacity
-  #
-  # Window opacity as a floating point number from `0.0` to `1.0`.
-  # The value `0.0` is completely transparent and `1.0` is opaque.
-  #opacity: 1.0
+[font.offset]
+x = 0
+y = 0
 
-  # Startup Mode (changes require restart)
-  #
-  # Values for `startup_mode`:
-  #   - Windowed
-  #   - Maximized
-  #   - Fullscreen
-  #
-  # Values for `startup_mode` (macOS only):
-  #   - SimpleFullscreen
-  #startup_mode: Windowed
+[font.glyph_offset]
+x = 0
+y = 0
 
-  # Window title
-  title: alacritty
+[scrolling]
+history = 10000
 
-  # Allow terminal applications to change Alacritty's window title.
-  #dynamic_title: true
+[window]
+decorations = "None"
+title = "alacritty"
 
-  # Window class (Linux/BSD only):
-  class:
-    # Application instance name
-    instance: alacritty
-    # General application class
-    general: alacritty
+[window.class]
+general = "alacritty"
+instance = "alacritty"
 
-  # Decorations theme variant
-  #
-  # Override the variant of the System theme/GTK theme/Wayland client side
-  # decorations. Commonly supported values are `Dark`, `Light`, and `None` for
-  # auto pick-up. Set this to `None` to use the default theme variant.
-  #decorations_theme_variant: None
+[window.padding]
+x = 6
+y = 6
 
-  # Resize increments
-  #
-  # Prefer resizing window by discrete steps equal to cell dimensions.
-  #resize_increments: false
-
-  # Make `Option` key behave as `Alt` (macOS only):
-  #   - OnlyLeft
-  #   - OnlyRight
-  #   - Both
-  #   - None (default)
-  #option_as_alt: None
-
-scrolling:
-  # Maximum number of lines in the scrollback buffer.
-  # Specifying '0' will disable scrolling.
-  history: 10000
-
-  # Scrolling distance multiplier.
-  #multiplier: 3
-
-# Font configuration
-font:
-  # Normal (roman) font face
-  normal:
-    # Font family
-    #
-    # Default:
-    #   - (macOS) Menlo
-    #   - (Linux/BSD) monospace
-    #   - (Windows) Consolas
-    family: JetBrainsMono Nerd Font
-
-    # The `style` can be specified to pick a specific face.
-    style: Regular
-
-  # Bold font face
-  bold:
-    # Font family
-    #
-    # If the bold family is not specified, it will fall back to the
-    # value specified for the normal font.
-    family: JetBrainsMono Nerd Font
-
-    # The `style` can be specified to pick a specific face.
-    style: Bold
-
-  # Italic font face
-  italic:
-    # Font family
-    #
-    # If the italic family is not specified, it will fall back to the
-    # value specified for the normal font.
-    family: JetBrainsMono Nerd Font
-
-    # The `style` can be specified to pick a specific face.
-    style: Italic
-
-  # Bold italic font face
-  bold_italic:
-    # Font family
-    #
-    # If the bold italic family is not specified, it will fall back to the
-    # value specified for the normal font.
-    family: JetBrainsMono Nerd Font
-
-    # The `style` can be specified to pick a specific face.
-    style: Bold Italic
-
-  # Point size
-  size: 12.0
-
-  # Offset is the extra space around each character. `offset.y` can be thought
-  # of as modifying the line spacing, and `offset.x` as modifying the letter
-  # spacing.
-  offset:
-    x: 0
-    y: 0
-
-  # Glyph offset determines the locations of the glyphs within their cells with
-  # the default being at the bottom. Increasing `x` moves the glyph to the
-  # right, increasing `y` moves the glyph upward.
-  #glyph_offset:
-  #  x: 0
-  #  y: 0
-
-  # Use built-in font for box drawing characters.
-  #
-  # If `true`, Alacritty will use a custom built-in font for box drawing
-  # characters (Unicode points 2500 - 259f).
-  #
-  #builtin_box_drawing: true
-
-# If `true`, bold text is drawn using the bright color variants.
-#draw_bold_text_with_bright_colors: false
-
-# Colors (Tomorrow Night)
-#colors:
-  # Default colors
-  #primary:
-  #  background: '#1d1f21'
-  #  foreground: '#c5c8c6'
-
-    # Bright and dim foreground colors
-    #
-    # The dimmed foreground color is calculated automatically if it is not
-    # present. If the bright foreground color is not set, or
-    # `draw_bold_text_with_bright_colors` is `false`, the normal foreground
-    # color will be used.
-    #dim_foreground: '#828482'
-    #bright_foreground: '#eaeaea'
-
-  # Cursor colors
-  #
-  # Colors which should be used to draw the terminal cursor.
-  #
-  # Allowed values are CellForeground/CellBackground, which reference the
-  # affected cell, or hexadecimal colors like #ff00ff.
-  #cursor:
-  #  text: CellBackground
-  #  cursor: CellForeground
-
-  # Vi mode cursor colors
-  #
-  # Colors for the cursor when the vi mode is active.
-  #
-  # Allowed values are CellForeground/CellBackground, which reference the
-  # affected cell, or hexadecimal colors like #ff00ff.
-  #vi_mode_cursor:
-  #  text: CellBackground
-  #  cursor: CellForeground
-
-  # Search colors
-  #
-  # Colors used for the search bar and match highlighting.
-  #search:
-    # Allowed values are CellForeground/CellBackground, which reference the
-    # affected cell, or hexadecimal colors like #ff00ff.
-    #matches:
-    #  foreground: '#000000'
-    #  background: '#ffffff'
-    #focused_match:
-    #  foreground: '#ffffff'
-    #  background: '#000000'
-
-  # Keyboard hints
-  #hints:
-    # First character in the hint label
-    #
-    # Allowed values are CellForeground/CellBackground, which reference the
-    # affected cell, or hexadecimal colors like #ff00ff.
-    #start:
-    #  foreground: '#1d1f21'
-    #  background: '#e9ff5e'
-
-    # All characters after the first one in the hint label
-    #
-    # Allowed values are CellForeground/CellBackground, which reference the
-    # affected cell, or hexadecimal colors like #ff00ff.
-    #end:
-    #  foreground: '#e9ff5e'
-    #  background: '#1d1f21'
-
-  # Line indicator
-  #
-  # Color used for the indicator displaying the position in history during
-  # search and vi mode.
-  #
-  # By default, these will use the opposing primary color.
-  #line_indicator:
-  #  foreground: None
-  #  background: None
-
-  # Footer bar
-  #
-  # Color used for the footer bar on the bottom, used by search regex input,
-  # hyperlink URI preview, etc.
-  #
-  #footer_bar:
-  #  background: '#c5c8c6'
-  #  foreground: '#1d1f21'
-
-  # Selection colors
-  #
-  # Colors which should be used to draw the selection area.
-  #
-  # Allowed values are CellForeground/CellBackground, which reference the
-  # affected cell, or hexadecimal colors like #ff00ff.
-  #selection:
-  #  text: CellBackground
-  #  background: CellForeground
-
-  # Normal colors
-  #normal:
-  #  black:   '#1d1f21'
-  #  red:     '#cc6666'
-  #  green:   '#b5bd68'
-  #  yellow:  '#f0c674'
-  #  blue:    '#81a2be'
-  #  magenta: '#b294bb'
-  #  cyan:    '#8abeb7'
-  #  white:   '#c5c8c6'
-
-  # Bright colors
-  #bright:
-  #  black:   '#666666'
-  #  red:     '#d54e53'
-  #  green:   '#b9ca4a'
-  #  yellow:  '#e7c547'
-  #  blue:    '#7aa6da'
-  #  magenta: '#c397d8'
-  #  cyan:    '#70c0b1'
-  #  white:   '#eaeaea'
-
-  # Dim colors
-  #
-  # If the dim colors are not set, they will be calculated automatically based
-  # on the `normal` colors.
-  #dim:
-  #  black:   '#131415'
-  #  red:     '#864343'
-  #  green:   '#777c44'
-  #  yellow:  '#9e824c'
-  #  blue:    '#556a7d'
-  #  magenta: '#75617b'
-  #  cyan:    '#5b7d78'
-  #  white:   '#828482'
-
-  # Indexed Colors
-  #
-  # The indexed colors include all colors from 16 to 256.
-  # When these are not set, they're filled with sensible defaults.
-  #
-  # Example:
-  #   `- { index: 16, color: '#ff00ff' }`
-  #
-  #indexed_colors: []
-
-  # Transparent cell backgrounds
-  #
-  # Whether or not `window.opacity` applies to all cell backgrounds or only to
-  # the default background. When set to `true` all cells will be transparent
-  # regardless of their background color.
-  #transparent_background_colors: false
-
-# Bell
-#
-# The bell is rung every time the BEL control character is received.
-#bell:
-  # Visual Bell Animation
-  #
-  # Animation effect for flashing the screen when the visual bell is rung.
-  #
-  # Values for `animation`:
-  #   - Ease
-  #   - EaseOut
-  #   - EaseOutSine
-  #   - EaseOutQuad
-  #   - EaseOutCubic
-  #   - EaseOutQuart
-  #   - EaseOutQuint
-  #   - EaseOutExpo
-  #   - EaseOutCirc
-  #   - Linear
-  #animation: EaseOutExpo
-
-  # Duration of the visual bell flash in milliseconds. A `duration` of `0` will
-  # disable the visual bell animation.
-  #duration: 0
-
-  # Visual bell animation color.
-  #color: '#ffffff'
-
-  # Bell Command
-  #
-  # This program is executed whenever the bell is rung.
-  #
-  # When set to `command: None`, no command will be executed.
-  #
-  # Example:
-  #   command:
-  #     program: notify-send
-  #     args: ["Hello, World!"]
-  #
-  #command: None
-
-#selection:
-  # This string contains all characters that are used as separators for
-  # "semantic words" in Alacritty.
-  #semantic_escape_chars: ",│`|:\"' ()[]{}<>\t"
-
-  # When set to `true`, selected text will be copied to the primary clipboard.
-  #save_to_clipboard: false
-
-#cursor:
-  # Cursor style
-  #style:
-    # Cursor shape
-    #
-    # Values for `shape`:
-    #   - ▇ Block
-    #   - _ Underline
-    #   - | Beam
-    #shape: Block
-
-    # Cursor blinking state
-    #
-    # Values for `blinking`:
-    #   - Never: Prevent the cursor from ever blinking
-    #   - Off: Disable blinking by default
-    #   - On: Enable blinking by default
-    #   - Always: Force the cursor to always blink
-    #blinking: Off
-
-  # Vi mode cursor style
-  #
-  # If the vi mode cursor style is `None` or not specified, it will fall back to
-  # the style of the active value of the normal cursor.
-  #
-  # See `cursor.style` for available options.
-  #vi_mode_style: None
-
-  # Cursor blinking interval in milliseconds.
-  #blink_interval: 750
-
-  # Time after which cursor stops blinking, in seconds.
-  #
-  # Specifying '0' will disable timeout for blinking.
-  #blink_timeout: 5
-
-  # If this is `true`, the cursor will be rendered as a hollow box when the
-  # window is not focused.
-  #unfocused_hollow: true
-
-  # Thickness of the cursor relative to the cell width as floating point number
-  # from `0.0` to `1.0`.
-  #thickness: 0.15
-
-# Live config reload (changes require restart)
-#live_config_reload: true
-
-# Shell
-#
-# You can set `shell.program` to the path of your favorite shell, e.g.
-# `/bin/fish`. Entries in `shell.args` are passed unmodified as arguments to the
-# shell.
-#
-# Default:
-#   - (Linux/BSD/macOS) `$SHELL` or the user's login shell, if `$SHELL` is unset
-#   - (Windows) powershell
-#shell:
-#  program: /bin/bash
-#  args:
-#    - --login
-
-# Startup directory
-#
-# Directory the shell is started in. If this is unset, or `None`, the working
-# directory of the parent process will be used.
-#working_directory: None
-
-# Offer IPC using `alacritty msg` (unix only)
-#ipc_socket: true
-
-#mouse:
-  # Click settings
-  #
-  # The `double_click` and `triple_click` settings control the time
-  # alacritty should wait for accepting multiple clicks as one double
-  # or triple click.
-  #double_click: { threshold: 300 }
-  #triple_click: { threshold: 300 }
-
-  # If this is `true`, the cursor is temporarily hidden when typing.
-  #hide_when_typing: false
-
-# Hints
-#
-# Terminal hints can be used to find text or hyperlink in the visible part of
-# the terminal and pipe it to other applications.
-#hints:
-  # Keys used for the hint labels.
-  #alphabet: "jfkdls;ahgurieowpq"
-
-  # List with all available hints
-  #
-  # Each hint must have any of `regex` or `hyperlinks` field and either an
-  # `action` or a `command` field. The fields `mouse`, `binding` and
-  # `post_processing` are optional.
-  #
-  # The `hyperlinks` option will cause OSC 8 escape sequence hyperlinks to be
-  # highlighted.
-  #
-  # The fields `command`, `binding.key`, `binding.mods`, `binding.mode` and
-  # `mouse.mods` accept the same values as they do in the `key_bindings` section.
-  #
-  # The `mouse.enabled` field controls if the hint should be underlined while
-  # the mouse with all `mouse.mods` keys held or the vi mode cursor is above it.
-  #
-  # If the `post_processing` field is set to `true`, heuristics will be used to
-  # shorten the match if there are characters likely not to be part of the hint
-  # (e.g. a trailing `.`). This is most useful for URIs and applies only to
-  # `regex` matches.
-  #
-  # Values for `action`:
-  #   - Copy
-  #       Copy the hint's text to the clipboard.
-  #   - Paste
-  #       Paste the hint's text to the terminal or search.
-  #   - Select
-  #       Select the hint's text.
-  #   - MoveViModeCursor
-  #       Move the vi mode cursor to the beginning of the hint.
-  #enabled:
-  # - regex: "(ipfs:|ipns:|magnet:|mailto:|gemini:|gopher:|https:|http:|news:|file:|git:|ssh:|ftp:)\
-  #           [^\u0000-\u001F\u007F-\u009F<>\"\\s{-}\\^⟨⟩`]+"
-  #   hyperlinks: true
-  #   command: xdg-open
-  #   post_processing: true
-  #   mouse:
-  #     enabled: true
-  #     mods: None
-  #   binding:
-  #     key: U
-  #     mods: Control|Shift
-
-# Mouse bindings
-#
-# Mouse bindings are specified as a list of objects, much like the key
-# bindings further below.
-#
-# To trigger mouse bindings when an application running within Alacritty
-# captures the mouse, the `Shift` modifier is automatically added as a
-# requirement.
-#
-# Each mouse binding will specify a:
-#
-# - `mouse`:
-#
-#   - Middle
-#   - Left
-#   - Right
-#   - Numeric identifier such as `5`
-#
-# - `action` (see key bindings for actions not exclusive to mouse mode)
-#
-# - Mouse exclusive actions:
-#
-#   - ExpandSelection
-#       Expand the selection to the current mouse cursor location.
-#
-# And optionally:
-#
-# - `mods` (see key bindings)
-#mouse_bindings:
-#  - { mouse: Right,                 action: ExpandSelection }
-#  - { mouse: Right,  mods: Control, action: ExpandSelection }
-#  - { mouse: Middle, mode: ~Vi,     action: PasteSelection  }
-
-# Key bindings
-#
-# Key bindings are specified as a list of objects. For example, this is the
-# default paste binding:
-#
-# `- { key: V, mods: Control|Shift, action: Paste }`
-#
-# Each key binding will specify a:
-#
-# - `key`: Identifier of the key pressed
-#
-#    - A-Z
-#    - F1-F24
-#    - Key0-Key9
-#
-#    A full list with available key codes can be found here:
-#    https://docs.rs/winit/*/winit/event/enum.VirtualKeyCode.html#variants
-#
-#    Instead of using the name of the keys, the `key` field also supports using
-#    the scancode of the desired key. Scancodes have to be specified as a
-#    decimal number. This command will allow you to display the hex scancodes
-#    for certain keys:
-#
-#       `showkey --scancodes`.
-#
-# Then exactly one of:
-#
-# - `chars`: Send a byte sequence to the running application
-#
-#    The `chars` field writes the specified string to the terminal. This makes
-#    it possible to pass escape sequences. To find escape codes for bindings
-#    like `PageUp` (`"\x1b[5~"`), you can run the command `showkey -a` outside
-#    of tmux. Note that applications use terminfo to map escape sequences back
-#    to keys. It is therefore required to update the terminfo when changing an
-#    escape sequence.
-#
-# - `action`: Execute a predefined action
-#
-#   - ToggleViMode
-#   - SearchForward
-#       Start searching toward the right of the search origin.
-#   - SearchBackward
-#       Start searching toward the left of the search origin.
-#   - Copy
-#   - Paste
-#   - IncreaseFontSize
-#   - DecreaseFontSize
-#   - ResetFontSize
-#   - ScrollPageUp
-#   - ScrollPageDown
-#   - ScrollHalfPageUp
-#   - ScrollHalfPageDown
-#   - ScrollLineUp
-#   - ScrollLineDown
-#   - ScrollToTop
-#   - ScrollToBottom
-#   - ClearHistory
-#       Remove the terminal's scrollback history.
-#   - Hide
-#       Hide the Alacritty window.
-#   - Minimize
-#       Minimize the Alacritty window.
-#   - Quit
-#       Quit Alacritty.
-#   - ToggleFullscreen
-#   - ToggleMaximized
-#   - SpawnNewInstance
-#       Spawn a new instance of Alacritty.
-#   - CreateNewWindow
-#       Create a new Alacritty window from the current process.
-#   - ClearLogNotice
-#       Clear Alacritty's UI warning and error notice.
-#   - ClearSelection
-#       Remove the active selection.
-#   - ReceiveChar
-#   - None
-#
-# - Vi mode exclusive actions:
-#
-#   - Open
-#       Perform the action of the first matching hint under the vi mode cursor
-#       with `mouse.enabled` set to `true`.
-#   - ToggleNormalSelection
-#   - ToggleLineSelection
-#   - ToggleBlockSelection
-#   - ToggleSemanticSelection
-#       Toggle semantic selection based on `selection.semantic_escape_chars`.
-#   - CenterAroundViCursor
-#       Center view around vi mode cursor
-#
-# - Vi mode exclusive cursor motion actions:
-#
-#   - Up
-#       One line up.
-#   - Down
-#       One line down.
-#   - Left
-#       One character left.
-#   - Right
-#       One character right.
-#   - First
-#       First column, or beginning of the line when already at the first column.
-#   - Last
-#       Last column, or beginning of the line when already at the last column.
-#   - FirstOccupied
-#       First non-empty cell in this terminal row, or first non-empty cell of
-#       the line when already at the first cell of the row.
-#   - High
-#       Top of the screen.
-#   - Middle
-#       Center of the screen.
-#   - Low
-#       Bottom of the screen.
-#   - SemanticLeft
-#       Start of the previous semantically separated word.
-#   - SemanticRight
-#       Start of the next semantically separated word.
-#   - SemanticLeftEnd
-#       End of the previous semantically separated word.
-#   - SemanticRightEnd
-#       End of the next semantically separated word.
-#   - WordLeft
-#       Start of the previous whitespace separated word.
-#   - WordRight
-#       Start of the next whitespace separated word.
-#   - WordLeftEnd
-#       End of the previous whitespace separated word.
-#   - WordRightEnd
-#       End of the next whitespace separated word.
-#   - Bracket
-#       Character matching the bracket at the cursor's location.
-#   - SearchNext
-#       Beginning of the next match.
-#   - SearchPrevious
-#       Beginning of the previous match.
-#   - SearchStart
-#       Start of the match to the left of the vi mode cursor.
-#   - SearchEnd
-#       End of the match to the right of the vi mode cursor.
-#
-# - Search mode exclusive actions:
-#   - SearchFocusNext
-#       Move the focus to the next search match.
-#   - SearchFocusPrevious
-#       Move the focus to the previous search match.
-#   - SearchConfirm
-#   - SearchCancel
-#   - SearchClear
-#       Reset the search regex.
-#   - SearchDeleteWord
-#       Delete the last word in the search regex.
-#   - SearchHistoryPrevious
-#       Go to the previous regex in the search history.
-#   - SearchHistoryNext
-#       Go to the next regex in the search history.
-#
-# - macOS exclusive actions:
-#   - ToggleSimpleFullscreen
-#       Enter fullscreen without occupying another space.
-#
-# - Linux/BSD exclusive actions:
-#
-#   - CopySelection
-#       Copy from the selection buffer.
-#   - PasteSelection
-#       Paste from the selection buffer.
-#
-# - `command`: Fork and execute a specified command plus arguments
-#
-#    The `command` field must be a map containing a `program` string and an
-#    `args` array of command line parameter strings. For example:
-#       `{ program: "alacritty", args: ["-e", "vttest"] }`
-#
-# And optionally:
-#
-# - `mods`: Key modifiers to filter binding actions
-#
-#    - Command
-#    - Control
-#    - Option
-#    - Super
-#    - Shift
-#    - Alt
-#
-#    Multiple `mods` can be combined using `|` like this:
-#       `mods: Control|Shift`.
-#    Whitespace and capitalization are relevant and must match the example.
-#
-# - `mode`: Indicate a binding for only specific terminal reported modes
-#
-#    This is mainly used to send applications the correct escape sequences
-#    when in different modes.
-#
-#    - AppCursor
-#    - AppKeypad
-#    - Search
-#    - Alt
-#    - Vi
-#
-#    A `~` operator can be used before a mode to apply the binding whenever
-#    the mode is *not* active, e.g. `~Alt`.
-#
-# Bindings are always filled by default, but will be replaced when a new
-# binding with the same triggers is defined. To unset a default binding, it can
-# be mapped to the `ReceiveChar` action. Alternatively, you can use `None` for
-# a no-op if you do not wish to receive input characters for that binding.
-#
-# If the same trigger is assigned to multiple actions, all of them are executed
-# in the order they were defined in.
-#key_bindings:
-  #- { key: Paste,                                       action: Paste          }
-  #- { key: Copy,                                        action: Copy           }
-  #- { key: L,         mods: Control,                    action: ClearLogNotice }
-  #- { key: L,         mods: Control, mode: ~Vi|~Search, chars: "\x0c"          }
-  #- { key: PageUp,    mods: Shift,   mode: ~Alt,        action: ScrollPageUp   }
-  #- { key: PageDown,  mods: Shift,   mode: ~Alt,        action: ScrollPageDown }
-  #- { key: Home,      mods: Shift,   mode: ~Alt,        action: ScrollToTop    }
-  #- { key: End,       mods: Shift,   mode: ~Alt,        action: ScrollToBottom }
-
-  # Vi Mode
-  #- { key: Space,  mods: Shift|Control, mode: ~Search,    action: ToggleViMode            }
-  #- { key: Space,  mods: Shift|Control, mode: Vi|~Search, action: ScrollToBottom          }
-  #- { key: Escape,                      mode: Vi|~Search, action: ClearSelection          }
-  #- { key: I,                           mode: Vi|~Search, action: ToggleViMode            }
-  #- { key: I,                           mode: Vi|~Search, action: ScrollToBottom          }
-  #- { key: C,      mods: Control,       mode: Vi|~Search, action: ToggleViMode            }
-  #- { key: Y,      mods: Control,       mode: Vi|~Search, action: ScrollLineUp            }
-  #- { key: E,      mods: Control,       mode: Vi|~Search, action: ScrollLineDown          }
-  #- { key: G,                           mode: Vi|~Search, action: ScrollToTop             }
-  #- { key: G,      mods: Shift,         mode: Vi|~Search, action: ScrollToBottom          }
-  #- { key: B,      mods: Control,       mode: Vi|~Search, action: ScrollPageUp            }
-  #- { key: F,      mods: Control,       mode: Vi|~Search, action: ScrollPageDown          }
-  #- { key: U,      mods: Control,       mode: Vi|~Search, action: ScrollHalfPageUp        }
-  #- { key: D,      mods: Control,       mode: Vi|~Search, action: ScrollHalfPageDown      }
-  #- { key: Y,                           mode: Vi|~Search, action: Copy                    }
-  #- { key: Y,                           mode: Vi|~Search, action: ClearSelection          }
-  #- { key: Copy,                        mode: Vi|~Search, action: ClearSelection          }
-  #- { key: V,                           mode: Vi|~Search, action: ToggleNormalSelection   }
-  #- { key: V,      mods: Shift,         mode: Vi|~Search, action: ToggleLineSelection     }
-  #- { key: V,      mods: Control,       mode: Vi|~Search, action: ToggleBlockSelection    }
-  #- { key: V,      mods: Alt,           mode: Vi|~Search, action: ToggleSemanticSelection }
-  #- { key: Return,                      mode: Vi|~Search, action: Open                    }
-  #- { key: Z,                           mode: Vi|~Search, action: CenterAroundViCursor    }
-  #- { key: K,                           mode: Vi|~Search, action: Up                      }
-  #- { key: J,                           mode: Vi|~Search, action: Down                    }
-  #- { key: H,                           mode: Vi|~Search, action: Left                    }
-  #- { key: L,                           mode: Vi|~Search, action: Right                   }
-  #- { key: Up,                          mode: Vi|~Search, action: Up                      }
-  #- { key: Down,                        mode: Vi|~Search, action: Down                    }
-  #- { key: Left,                        mode: Vi|~Search, action: Left                    }
-  #- { key: Right,                       mode: Vi|~Search, action: Right                   }
-  #- { key: Key0,                        mode: Vi|~Search, action: First                   }
-  #- { key: Key4,   mods: Shift,         mode: Vi|~Search, action: Last                    }
-  #- { key: Key6,   mods: Shift,         mode: Vi|~Search, action: FirstOccupied           }
-  #- { key: H,      mods: Shift,         mode: Vi|~Search, action: High                    }
-  #- { key: M,      mods: Shift,         mode: Vi|~Search, action: Middle                  }
-  #- { key: L,      mods: Shift,         mode: Vi|~Search, action: Low                     }
-  #- { key: B,                           mode: Vi|~Search, action: SemanticLeft            }
-  #- { key: W,                           mode: Vi|~Search, action: SemanticRight           }
-  #- { key: E,                           mode: Vi|~Search, action: SemanticRightEnd        }
-  #- { key: B,      mods: Shift,         mode: Vi|~Search, action: WordLeft                }
-  #- { key: W,      mods: Shift,         mode: Vi|~Search, action: WordRight               }
-  #- { key: E,      mods: Shift,         mode: Vi|~Search, action: WordRightEnd            }
-  #- { key: Key5,   mods: Shift,         mode: Vi|~Search, action: Bracket                 }
-  #- { key: Slash,                       mode: Vi|~Search, action: SearchForward           }
-  #- { key: Slash,  mods: Shift,         mode: Vi|~Search, action: SearchBackward          }
-  #- { key: N,                           mode: Vi|~Search, action: SearchNext              }
-  #- { key: N,      mods: Shift,         mode: Vi|~Search, action: SearchPrevious          }
-
-  # Search Mode
-  #- { key: Return,                mode: Search|Vi,  action: SearchConfirm         }
-  #- { key: Escape,                mode: Search,     action: SearchCancel          }
-  #- { key: C,      mods: Control, mode: Search,     action: SearchCancel          }
-  #- { key: U,      mods: Control, mode: Search,     action: SearchClear           }
-  #- { key: W,      mods: Control, mode: Search,     action: SearchDeleteWord      }
-  #- { key: P,      mods: Control, mode: Search,     action: SearchHistoryPrevious }
-  #- { key: N,      mods: Control, mode: Search,     action: SearchHistoryNext     }
-  #- { key: Up,                    mode: Search,     action: SearchHistoryPrevious }
-  #- { key: Down,                  mode: Search,     action: SearchHistoryNext     }
-  #- { key: Return,                mode: Search|~Vi, action: SearchFocusNext       }
-  #- { key: Return, mods: Shift,   mode: Search|~Vi, action: SearchFocusPrevious   }
-
-  # (Windows, Linux, and BSD only)
-  #- { key: V,              mods: Control|Shift, mode: ~Vi,        action: Paste            }
-  #- { key: C,              mods: Control|Shift,                   action: Copy             }
-  #- { key: F,              mods: Control|Shift, mode: ~Search,    action: SearchForward    }
-  #- { key: B,              mods: Control|Shift, mode: ~Search,    action: SearchBackward   }
-  #- { key: C,              mods: Control|Shift, mode: Vi|~Search, action: ClearSelection   }
-  #- { key: Insert,         mods: Shift,                           action: PasteSelection   }
-  #- { key: Key0,           mods: Control,                         action: ResetFontSize    }
-  #- { key: Equals,         mods: Control,                         action: IncreaseFontSize }
-  #- { key: Plus,           mods: Control,                         action: IncreaseFontSize }
-  #- { key: NumpadAdd,      mods: Control,                         action: IncreaseFontSize }
-  #- { key: Minus,          mods: Control,                         action: DecreaseFontSize }
-  #- { key: NumpadSubtract, mods: Control,                         action: DecreaseFontSize }
-
-  # (Windows only)
-  #- { key: Return,   mods: Alt,           action: ToggleFullscreen }
-
-  # (macOS only)
-  #- { key: K,              mods: Command, mode: ~Vi|~Search, chars: "\x0c"                 }
-  #- { key: K,              mods: Command, mode: ~Vi|~Search, action: ClearHistory          }
-  #- { key: Key0,           mods: Command,                    action: ResetFontSize         }
-  #- { key: Equals,         mods: Command,                    action: IncreaseFontSize      }
-  #- { key: Plus,           mods: Command,                    action: IncreaseFontSize      }
-  #- { key: NumpadAdd,      mods: Command,                    action: IncreaseFontSize      }
-  #- { key: Minus,          mods: Command,                    action: DecreaseFontSize      }
-  #- { key: NumpadSubtract, mods: Command,                    action: DecreaseFontSize      }
-  #- { key: V,              mods: Command,                    action: Paste                 }
-  #- { key: C,              mods: Command,                    action: Copy                  }
-  #- { key: C,              mods: Command, mode: Vi|~Search,  action: ClearSelection        }
-  #- { key: H,              mods: Command,                    action: Hide                  }
-  #- { key: H,              mods: Command|Alt,                action: HideOtherApplications }
-  #- { key: M,              mods: Command,                    action: Minimize              }
-  #- { key: Q,              mods: Command,                    action: Quit                  }
-  #- { key: W,              mods: Command,                    action: Quit                  }
-  #- { key: N,              mods: Command,                    action: CreateNewWindow       }
-  #- { key: F,              mods: Command|Control,            action: ToggleFullscreen      }
-  #- { key: F,              mods: Command, mode: ~Search,     action: SearchForward         }
-  #- { key: B,              mods: Command, mode: ~Search,     action: SearchBackward        }
-
-#debug:
-  # Display the time it takes to redraw each frame.
-  #render_timer: false
-
-  # Keep the log file after quitting Alacritty.
-  #persistent_logging: false
-
-  # Log level
-  #
-  # Values for `log_level`:
-  #   - Off
-  #   - Error
-  #   - Warn
-  #   - Info
-  #   - Debug
-  #   - Trace
-  #log_level: Warn
-
-  # Renderer override.
-  #   - glsl3
-  #   - gles2
-  #   - gles2_pure
-  #renderer: None
-
-  # Print all received window events.
-  #print_events: false
-
-  # Highlight window damage information.
-  #highlight_damage: false
 #+end_src
 
 * Programming
@@ -3738,11 +2898,9 @@ xinput set-prop "Elan TrackPoint" "libinput Accel Speed" -0.3
 
 #+begin_src python :tangle .config/qtile/config.py
 # -*- coding: utf-8 -*-
-#
 # Generated from ~/dotfiles/system.org
 # Author: saucoide
 # configuration file for a customized  Qtile window manager (http://www.qtile.org)
-# based on a version by Derek Taylor  (http://www.gitlab.com/dwt1/ )
 #
 # The following comments are the copyright and licensing information from the default
 # qtile config. Copyright (c) 2010 Aldo Cortesi, 2010, 2014 dequis, 2012 Randall Ma,
@@ -3790,23 +2948,24 @@ prompt = "{0}@{1}: ".format(os.environ["USER"], socket.gethostname())
 
 # Colors
 COLORS = {
-    "white":"ffffff",
-    "background_0":"#2e3440",           # backgrounds 0 darkest - 3 lighest
-    "background_1":"#3B4252",           
-    "background_2":"#434c5e",          
-    "background_3":"#4c566a",          
-    "group_highlight":"#ff5555",      # border line color for current group
-    "border_line":"#8d62a9",          # border line color for other tab and odd widgets
-    "border_focus":"#5e81ac",
-    "win_name":"#81a1c1",             # current window name
-    "frost0":"#5e81ac",               # Theme colors (nord)
-    "frost1":"#81a1c1",
-    "frost2":"#434C5E",
-    "frost3":"#4C566A",
+    "white": "ffffff",
+    "background_0": "#2e3440",  # backgrounds 0 darkest - 3 lighest
+    "background_1": "#3B4252",
+    "background_2": "#434c5e",
+    "background_3": "#4c566a",
+    "group_highlight": "#ff5555",  # border line color for current group
+    "border_line": "#8d62a9",  # border line color for other tab and odd widgets
+    "border_focus": "#5e81ac",
+    "win_name": "#81a1c1",  # current window name
+    "frost0": "#5e81ac",  # Theme colors (nord)
+    "frost1": "#81a1c1",
+    "frost2": "#434C5E",
+    "frost3": "#4C566A",
     "nord_white": "#c7cdd8",
-    "nord_red":"#bf616a",
+    "nord_red": "#bf616a",
     "lime": "#50fa7b",
 }
+
 
 # Custom Functions
 @lazy.function
@@ -3815,118 +2974,137 @@ def float_to_front():
         for window in group.windows:
             if window.floating:
                 window.cmd_bring_to_front()
-                
+
+
 def get_wallpaper():
     wp_path = pathlib.Path.home() / ".config/qtile/wallpapers"
-    wallpapers = list(filter(lambda x: x.suffix in (".png",".jpg"), wp_path.glob("*")))
+    wallpapers = list(filter(lambda x: x.suffix in (".png", ".jpg"), wp_path.glob("*")))
     return random.choice(wallpapers)
 
+
 def launch_rofi():
-    lazy.spawn_cmd('rofi -show drun')
+    lazy.spawn_cmd("rofi -show drun")
+
 
 # Key bindings
 keys = [
-    
     # Basics
-    Key([mod], "y", lazy.spawncmd(), desc='launch prompt'),
-    Key([mod], "k", lazy.window.kill(), desc='Kill active window'),
-    Key([mod], "q", lazy.window.kill(), desc='Kill active window'),
-    Key([mod, "shift"], "r", lazy.restart(), desc='Restart Qtile'),
-    Key([mod, "shift"], "q", lazy.shutdown(), desc='Shutdown Qtile'),
+    Key([mod], "y", lazy.spawncmd(), desc="launch prompt"),
+    Key([mod], "k", lazy.window.kill(), desc="Kill active window"),
+    Key([mod], "q", lazy.window.kill(), desc="Kill active window"),
+    Key([mod, "shift"], "r", lazy.restart(), desc="Restart Qtile"),
+    Key([mod, "shift"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
     Key([mod, "control"], "r", lazy.reload_config(), desc="Reload the config"),
-
     # Window Control
-
     ## Focus
-    Key([mod], "Down", lazy.layout.down(), desc = "Move focus down"),
-    Key([mod], "Up", lazy.layout.up(), desc = "Move focus up"),
-    Key([mod], "Right", lazy.layout.left(), desc = "Move focus to right"),
-    Key([mod], "Left", lazy.layout.right(),desc="Move focus to left"),
+    Key([mod], "Down", lazy.layout.down(), desc="Move focus down"),
+    Key([mod], "Up", lazy.layout.up(), desc="Move focus up"),
+    Key([mod], "Right", lazy.layout.left(), desc="Move focus to right"),
+    Key([mod], "Left", lazy.layout.right(), desc="Move focus to left"),
     # Key([mod], "h", lazy.layout.left(), desc="Move focus to left"),
     # Key([mod], "l", lazy.layout.right(), desc="Move focus to right"),
     # Key([mod], "j", lazy.layout.down(), desc="Move focus down"),
     # Key([mod], "k", lazy.layout.up(), desc="Move focus up"),
     Key([mod], "space", lazy.layout.next(), desc="Move window focus to other window"),
-
     ## Toggle Fullscreen
-    Key([mod], "f", lazy.window.toggle_fullscreen(), desc = "Toggle fullscreen for the current window"),
-    
+    Key(
+        [mod],
+        "f",
+        lazy.window.toggle_fullscreen(),
+        desc="Toggle fullscreen for the current window",
+    ),
     ## Move
-    Key([mod, "shift"], "Down", lazy.layout.shuffle_down(), desc = "Move window down"),
-    Key([mod, "shift"], "Up", lazy.layout.shuffle_up(), desc = "Move window up"),
-    Key([mod, "shift"], "Left", lazy.layout.shuffle_left(), desc = "Move window left"),
-    Key([mod, "shift"], "Right", lazy.layout.shuffle_right(), desc = "Move window right"),
+    Key([mod, "shift"], "Down", lazy.layout.shuffle_down(), desc="Move window down"),
+    Key([mod, "shift"], "Up", lazy.layout.shuffle_up(), desc="Move window up"),
+    Key([mod, "shift"], "Left", lazy.layout.shuffle_left(), desc="Move window left"),
+    Key([mod, "shift"], "Right", lazy.layout.shuffle_right(), desc="Move window right"),
     # Key([mod, "shift"], "h", lazy.layout.shuffle_left(), desc="Move window to the left"),
     # Key([mod, "shift"], "l", lazy.layout.shuffle_right(), desc="Move window to the right"),
     # Key([mod, "shift"], "j", lazy.layout.shuffle_down(), desc="Move window down"),
     # Key([mod, "shift"], "k", lazy.layout.shuffle_up(), desc="Move window up"),
-
     ## Resize
-    Key([mod], "n",
-        lazy.layout.normalize(),
-        desc="Reset all window sizes"),
-    Key([mod, "control"], "Down",
+    Key([mod], "n", lazy.layout.normalize(), desc="Reset all window sizes"),
+    Key(
+        [mod, "control"],
+        "Down",
         lazy.layout.grow_down(),
         lazy.layout.shrink(),
-        desc = "Increase size down"),
-    Key([mod, "control"], "Up",
+        desc="Increase size down",
+    ),
+    Key(
+        [mod, "control"],
+        "Up",
         lazy.layout.grow_up(),
         lazy.layout.grow(),
-        desc = "Increase size up"),
-    Key([mod, "control"], "Left",
+        desc="Increase size up",
+    ),
+    Key(
+        [mod, "control"],
+        "Left",
         lazy.layout.grow_left(),
         lazy.layout.shrink(),
         lazy.layout.decrease_ratio(),
-        desc = "Increase size left"),
-    Key([mod, "control"], "Right",
+        desc="Increase size left",
+    ),
+    Key(
+        [mod, "control"],
+        "Right",
         lazy.layout.grow_right(),
         lazy.layout.grow(),
         lazy.layout.increase_ratio(),
-        desc = "Increase size right"),
+        desc="Increase size right",
+    ),
     # Key([mod, "control"], "h", lazy.layout.grow_left(), desc="Grow window to the left"),
     # Key([mod, "control"], "l", lazy.layout.grow_right(), desc="Grow window to the right"),
     # Key([mod, "control"], "j", lazy.layout.grow_down(), desc="Grow window down"),
     # Key([mod, "control"], "k", lazy.layout.grow_up(), desc="Grow window up"),
-
     # Layout Control
-    
     ## Switching layouts
-    Key([mod], "Tab", lazy.next_layout(), desc='Toggle through layouts'),
-    Key([mod], "c", lazy.to_layout_index(0), desc='switch to COLUMNS layout'),
-    Key([mod], "t", lazy.to_layout_index(0), desc='switch to COLUMNS layout'),
-    Key([mod], "m", lazy.to_layout_index(1), desc='switch to MAX layout'),
-
+    Key([mod], "Tab", lazy.next_layout(), desc="Toggle through layouts"),
+    Key([mod], "c", lazy.to_layout_index(0), desc="switch to COLUMNS layout"),
+    Key([mod], "t", lazy.to_layout_index(0), desc="switch to COLUMNS layout"),
+    Key([mod], "m", lazy.to_layout_index(1), desc="switch to MAX layout"),
     ## Layout specific
-    Key([mod], "Return", lazy.layout.toggle_split(),lazy.layout.flip(),
-        desc = "Switch between Stack/Tile modes"),
-    
+    Key(
+        [mod],
+        "Return",
+        lazy.layout.toggle_split(),
+        lazy.layout.flip(),
+        desc="Switch between Stack/Tile modes",
+    ),
     ## Float
-    Key([mod, "shift"], "f", lazy.window.toggle_floating(), desc='toggle floating'),
-    Key([mod, "control"], "f", float_to_front, desc='Surface all floating windows'),
-
+    Key([mod, "shift"], "f", lazy.window.toggle_floating(), desc="toggle floating"),
+    Key([mod, "control"], "f", float_to_front, desc="Surface all floating windows"),
     # Application Launching
-
     ## Super + Key
-    Key([mod], "space", lazy.spawn('rofi -show drun'), desc='Launch rofi drun'),
-    Key([mod], "e", lazy.spawn(FILE_MANAGER), desc='Launch file manager'),
-    Key([mod], "Escape", lazy.spawn('xkill'), desc = 'Click to kill window'),
-
+    Key([mod], "space", lazy.spawn("rofi -show drun"), desc="Launch rofi drun"),
+    Key([mod], "e", lazy.spawn(FILE_MANAGER), desc="Launch file manager"),
+    Key([mod], "Escape", lazy.spawn("xkill"), desc="Click to kill window"),
     ## (CONTROL + ALT + KEY) // alt+super+key?
-    Key(["control", "mod1"], "t", lazy.spawn(TERMINAL), desc='terminal'),
-    Key(["control", "mod1"], "f", lazy.spawn(f"{BROWSER}"), desc='Launch browser'),
-    Key(["control", "mod1"], "n", lazy.spawn(TEXT_EDITOR), desc='Launch text editor'),
-
+    Key(["control", "mod1"], "t", lazy.spawn(TERMINAL), desc="terminal"),
+    Key(["control", "mod1"], "f", lazy.spawn(f"{BROWSER}"), desc="Launch browser"),
+    Key(["control", "mod1"], "n", lazy.spawn(TEXT_EDITOR), desc="Launch text editor"),
     ## Screenshots
-    Key([], "Print", lazy.spawn('flameshot gui'), desc='Take a Screenshot'),
-    Key([mod], "Print", lazy.spawn('flameshot launcher'), desc='Screenshot Menu'),
-
+    Key([], "Print", lazy.spawn("flameshot gui"), desc="Take a Screenshot"),
+    Key([mod], "Print", lazy.spawn("flameshot launcher"), desc="Screenshot Menu"),
     ## Volume & Media keys
     # TODO:
-    Key([], "XF86AudioRaiseVolume", lazy.spawn("pactl set-sink-volume @DEFAULT_SINK@ +5%")),
-    Key([], "XF86AudioLowerVolume", lazy.spawn("pactl set-sink-volume @DEFAULT_SINK@ -5%")),
+    Key(
+        [],
+        "XF86AudioRaiseVolume",
+        lazy.spawn("pactl set-sink-volume @DEFAULT_SINK@ +5%"),
+    ),
+    Key(
+        [],
+        "XF86AudioLowerVolume",
+        lazy.spawn("pactl set-sink-volume @DEFAULT_SINK@ -5%"),
+    ),
     Key([], "XF86AudioMute", lazy.spawn("pactl set-sink-mute @DEFAULT_SINK@ toggle")),
-    Key([], "XF86AudioMicMute", lazy.spawn("pactl set-source-mute @DEFAULT_SOURCE@ toggle")),
-
+    Key(
+        [],
+        "XF86AudioMicMute",
+        lazy.spawn("pactl set-source-mute @DEFAULT_SOURCE@ toggle"),
+    ),
     # Key([], "XF86AudioPlay", lazy.spawn("playerctl play-pause")),
     # Key([], "XF86AudioNext", lazy.spawn("playerctl next")),
     # Key([], "XF86AudioPrev", lazy.spawn("playerctl previous")),
@@ -3941,8 +3119,15 @@ bring_front_click = False
 cursor_warp = False
 ## Drag floating layouts.
 mouse = [
-    Drag([mod], "Button1", lazy.window.set_position_floating(), start=lazy.window.get_position()),
-    Drag([mod], "Button3", lazy.window.set_size_floating(), start=lazy.window.get_size()),
+    Drag(
+        [mod],
+        "Button1",
+        lazy.window.set_position_floating(),
+        start=lazy.window.get_position(),
+    ),
+    Drag(
+        [mod], "Button3", lazy.window.set_size_floating(), start=lazy.window.get_size()
+    ),
     Click([mod], "Button2", lazy.window.bring_to_front()),
 ]
 
@@ -3957,19 +3142,19 @@ mouse = [
 floating_layout = layout.Floating(
     float_rules=[
         # Run the utility of `xprop` to see the wm class and name of an X client.
-        ,*layout.Floating.default_float_rules,
+        *layout.Floating.default_float_rules,
         Match(wm_class="ssh-askpass"),  # ssh-askpass
         Match(wm_class="pinentry"),
-        Match(wm_class='confirm'),
-        Match(wm_class='dialog'),
-        Match(wm_class='download'),
-        Match(wm_class='error'),
-        Match(wm_class='file_progress'),
-        Match(wm_class='notification'),
-        Match(wm_class='splash'),
-        Match(wm_class='toolbar'),
-        Match(wm_class='Arandr'),
-        Match(title='Open File'),
+        Match(wm_class="confirm"),
+        Match(wm_class="dialog"),
+        Match(wm_class="download"),
+        Match(wm_class="error"),
+        Match(wm_class="file_progress"),
+        Match(wm_class="notification"),
+        Match(wm_class="splash"),
+        Match(wm_class="toolbar"),
+        Match(wm_class="Arandr"),
+        Match(title="Open File"),
     ],
     border_width=2,
     border_focus="#bf616a",
@@ -3985,26 +3170,39 @@ keys.append(Key([mod], "BackSpace", lazy.screen.toggle_group()))
 
 ### Number keys for each group
 for number, group in enumerate(groups, start=1):
-    #Mod+Num = Switch group/view
-    #Mod+Shift+Num = Send window to group & switch to it
-    #Mod+Control+Num = Send window to group
+    # Mod+Num = Switch group/view
+    # Mod+Shift+Num = Send window to group & switch to it
+    # Mod+Control+Num = Send window to group
     keys.append(Key([mod], str(number), lazy.group[group.name].toscreen()))
-    keys.append(Key([mod, "shift"], str(number), lazy.window.togroup(group.name, switch_group=True)))
-    keys.append(Key([mod, "control"], str(number), lazy.window.togroup(group.name, switch_group=False)))
+    keys.append(
+        Key(
+            [mod, "shift"],
+            str(number),
+            lazy.window.togroup(group.name, switch_group=True),
+        )
+    )
+    keys.append(
+        Key(
+            [mod, "control"],
+            str(number),
+            lazy.window.togroup(group.name, switch_group=False),
+        )
+    )
 
 # Layouts
 layouts = [
     layout.Columns(
         margin=2,
-        border_width= 2,
+        border_width=2,
         border_normal=COLORS["background_0"],
         border_focus=COLORS["lime"],
-        border_focus_stack=COLORS["nord_red"]),
+        border_focus_stack=COLORS["nord_red"],
+    ),
     layout.Max(
         margin=0,
         border_width=1,
         border_focus=COLORS["frost3"],
-        ),
+    ),
 ]
 
 # Screens & Widgets
@@ -4019,7 +3217,7 @@ widget_defaults = dict(
     font="JetBrainsMono Nerd Font",
     fontsize=12,
     padding=2,
-    background=COLORS["background_0"]
+    background=COLORS["background_0"],
 )
 extension_defaults = widget_defaults.copy()
 
@@ -4028,13 +3226,13 @@ screens = [
         top=bar.Bar(
             [
                 widget.Image(
-                    filename = "~/.config/qtile/icons/arcolinux.png",
-                    margin = 3,
-                    mouse_callbacks = {'Button1': lazy.spawn("rofi -show drun")}
+                    filename="~/.config/qtile/icons/arcolinux.png",
+                    margin=3,
+                    mouse_callbacks={"Button1": lazy.spawn("rofi -show drun")},
                 ),
                 widget.GroupBox(
                     font="JetBrainsMono Nerd Font",
-                    fontsize=16,
+                    fontsize=12,
                     margin_x=4,
                     padding_x=4,
                     borderwidth=3,
@@ -4050,8 +3248,8 @@ screens = [
                 ),
                 widget.CurrentLayoutIcon(
                     custom_icon_paths=[os.path.expanduser("~/.config/qtile/icons")],
-                    background = COLORS["background_0"],
-                    scale=0.6
+                    background=COLORS["background_0"],
+                    scale=0.6,
                 ),
                 widget.Prompt(),
                 widget.WindowTabs(
@@ -4078,32 +3276,38 @@ screens = [
                 widget.PulseVolume(
                     fmt=" {} |",
                     update_interval=1,
-                ), 
+                ),
                 widget.Systray(
+                    icon_size=12,
+                    padding=5,
                 ),
                 widget.Clock(
                     format="%Y-%m-%d %H:%M |",
-                    mouse_callbacks={"Button1": lazy.spawn(
-                        cmd="alacritty --hold --title 'terminal-calendar' --command cal --monday --three --columns=3"
-                    )}
+                    padding=5,
+                    mouse_callbacks={
+                        "Button1": lazy.spawn(
+                            cmd="alacritty --hold --title 'terminal-calendar' --command cal --monday --three --columns=3"
+                        )
+                    },
                 ),
                 widget.TextBox(
-                    fmt="󰐥 ",
-                    mouse_callbacks={'Button1': lazy.spawn("logout-menu")}
+                    fmt="󰐥 ", mouse_callbacks={"Button1": lazy.spawn("logout-menu")}
                 ),
             ],
-            24,
+            21,
         ),
-        wallpaper = get_wallpaper(),
-        wallpaper_mode = 'fill',
+        wallpaper=get_wallpaper(),
+        wallpaper_mode="fill",
     ),
 ]
+
 
 # Startup Applications
 @hook.subscribe.startup_once
 def autostart():
     autostart_script = pathlib.Path.home() / ".config/qtile/autostart.sh"
     subprocess.call([autostart_script])
+
 
 # XXX: Gasp! We're lying here. In fact, nobody really uses or cares about this
 # string besides java UI toolkits; you can see several discussions on the
@@ -4136,55 +3340,50 @@ logger = logging.getLogger(__name__)
 handler = logging.FileHandler(LOGFILE)
 logger.addHandler(handler)
 
-def main():
 
+def pass_get(key: str) -> str:
+    return subprocess.run(
+        ["pass", key],
+        check=True,
+        capture_output=True,
+        encoding="utf-8",
+    ).stdout.strip()
+
+
+def main():
     BASE_URL = "https://www.inoreader.com/reader/api/0"
     LOGIN_URL = "https://www.inoreader.com/accounts/ClientLogin"
 
-    username = subprocess.run(
-        ["pass", "inoreader/user"],
-        check=True,
-        capture_output=True,
-        encoding="utf-8",
-    ).stdout.strip()
-    password = subprocess.run(
-        ["pass", "inoreader/password"],
-        check=True,
-        capture_output=True,
-        encoding="utf-8",
-    ).stdout.strip()
-    app_id = subprocess.run(
-        ["pass", "inoreader/appid"],
-        check=True,
-        capture_output=True ,
-        encoding="utf-8",
-    ).stdout.strip()
-    app_key = subprocess.run(
-        ["pass", "inoreader/appkey"],
-        check=True,
-        capture_output=True,
-        encoding="utf-8",
-    ).stdout.strip()
-    
-    resp = requests.post(LOGIN_URL,
-                         data={'Email':username,
-                               'Passwd':password,})
+    username = pass_get("inoreader/user")
+    password = pass_get("inoreader/password")
+    app_id = pass_get("inoreader/appid")
+    app_key = pass_get("inoreader/appkey")
+
+    resp = requests.post(
+        LOGIN_URL,
+        data={
+            "Email": username,
+            "Passwd": password,
+        },
+    )
 
     content = {}
-    for line in resp.text.split('\n'):
+    for line in resp.text.split("\n"):
         if line:
             key, val = line.split("=")
             content[key] = val
-            
-    token = content['Auth']
-    headers = {'Authorization': 'GoogleLogin auth=' + token,
-               'Appid': app_id,
-               'AppKey': app_key}
+
+    token = content["Auth"]
+    headers = {
+        "Authorization": "GoogleLogin auth=" + token,
+        "Appid": app_id,
+        "AppKey": app_key,
+    }
 
     resp = requests.get(BASE_URL + "/unread-count", headers=headers)
     resp.raise_for_status()
     unreadcounts = resp.json()
-    unread = unreadcounts['unreadcounts'][0]['count']
+    unread = unreadcounts["unreadcounts"][0]["count"]
     return str(unread)
 
 
@@ -4198,7 +3397,6 @@ def main_wrapper():
 
 if __name__ == "__main__":
     main_wrapper()
-
 #+END_SRC
 
 ** mailwatcher.py
@@ -4218,29 +3416,29 @@ logger = logging.getLogger(__name__)
 handler = logging.FileHandler(LOGFILE)
 logger.addHandler(handler)
 
-def main():
 
-    email = subprocess.run(
-        ["pass", "email/user"],
+def pass_get(key: str) -> str:
+    return subprocess.run(
+        ["pass", key],
         check=True,
         capture_output=True,
         encoding="utf-8",
     ).stdout.strip()
-    password = subprocess.run(
-        ["pass", "email/password"],
-        check=True,
-        capture_output=True,
-        encoding="utf-8",
-    ).stdout.strip()
+
+
+def main():
+    email = pass_get("email/user")
+    password = pass_get("email/password")
     SMTP_SERVER = "imap.gmail.com"
     SMTP_PORT = 993
 
     mail = imaplib.IMAP4_SSL(SMTP_SERVER)
     mail.login(email, password)
     mail.select("inbox")
-    _, mail_ids = mail.search(None,"UNSEEN")
+    _, mail_ids = mail.search(None, "UNSEEN")
     unread = len(mail_ids[0].split())
     return str(unread)
+
 
 def main_wrapper():
     try:
@@ -4249,9 +3447,9 @@ def main_wrapper():
         logger.exception(e)
         return "Err"
 
+
 if __name__ == "__main__":
     main_wrapper()
-
 #+END_SRC
 
 * TODO GPG
@@ -4282,77 +3480,3 @@ XDG_VIDEOS_DIR="$HOME/videos"
 
 #+end_src
 
-* Lenovo Specific
-** SD Card reader
-
-According to the archwiki, the SD card has a high power consumption, so i'm using the
-following script to toggle it on demand, while remainig disabled
-
-#+begin_src bash :tangle scripts/sdcard :tangle-mode (identity #o755)
-#!/usr/bin/env bash
-
-set -euo pipefail
-
-# Check if the driver is enabled
-if [[ -d "/sys/bus/usb/devices/2-3/driver" ]]; then
-    status="Enabled"
-else
-    status="Disabled"
-fi
-
- 
-# Update status
-if [[ $# -eq 0 ]]; then
-    echo "SD Card reader status: ${status}"
-elif [[ "${1}" == "on" ]]; then
-    if [[ ${status} == "Disabled" ]]; then
-        echo 2-3 >> /sys/bus/usb/drivers/usb/bind
-        echo "Enabled SD Card reader."
-    else
-        echo "SD Card reader already enabled. No action taken."
-    fi
-elif [[ "${1}" == "off" ]]; then
-    if [[ ${status} == "Enabled" ]]; then
-        echo 2-3 >> /sys/bus/usb/drivers/usb/unbind
-        echo "Disabled SD Card reader."
-    else
-        echo "SD Card reader already disabled. No action taken."
-    fi
-else
-    echo "SD Card reader status: ${status}"
-fi
-
-#+end_src
-
-And a systemd Unit to handle it on startup
-=/etc/systemd/system/sdcardoff.service=
-and copy the script above to
-=/usr/share/scripts/sdcard=
-
-#+begin_src conf
-[Unit]
-Description=SD Card Reader Disable
-
-[Service]
-Type=oneshot
-RemainAfterExit=true
-ExecStart=/usr/share/scripts/sdcard
-
-[Install]
-WantedBy=default.target
-#+end_src
-
-** Undervolting
-
-I'm using ~intel-undervolt~ and undervolted by -90mv
-
-set on ~/etc/intel-undervolt.conf~: =undervolt 2 'CPU Cache' -100=
-
-#+begin_src bash
-# install
-pacman -Syyu intel-undervolt
-# edit /etc/intel-undervolt.conf and then:
-intel-undervolt apply
-intel-undervolt read
-systemctl enable intel-undervolt
-#+end_src

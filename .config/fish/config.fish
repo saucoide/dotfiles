@@ -35,6 +35,15 @@ alias mirrors="sudo reflector --latest 50 --sort rate --save /etc/pacman.d/mirro
 # ## yt-dlp
 alias yt="yt-dlp"
 alias yt-audio="yt-dlp -x -f bestaudio"
+## docker/podman
+alias docker="podman"
+alias docker-compose="podman-compose"
+alias podman-into-bash='podman run --tty --interactive --entrypoint="/bin/bash"'
+alias podman-into-shell='podman run --tty --interactive --entrypoint="/bin/sh"'
+## kubectl
+alias k="kubectl"
+alias kn="kube_namespace"
+alias kc="kube_context"
 
 # ---------------------------------------------------------------------
 # Functions
@@ -51,12 +60,9 @@ function fish_user_key_bindings
   fish_vi_key_bindings
 end
 
-# # Function for creating a backup file
-# # ex: backup file.txt
-# # result: copies file as file.txt.bak
-# function backup --argument filename
-#     cp $filename $filename.bak
-# end
+function backup --argument filename
+    cp $filename $filename.bak
+end
 
 # # Function to extract a variety of archives
 # # usage: extract <file>
@@ -112,11 +118,33 @@ end
 function webcam
   ~/.config/fish/scripts/webcam.sh
 end
-# # ---------------------------------------------------------------------
 
+# ---------------------------------------------------------------------
+# Kubernetes utility functions
+# ---------------------------------------------------------------------
+function kube_namespace --wraps "kubectl get namespaces"
+  if test (count $argv) -gt 0
+    set namespace $argv[1]
+    set -e argv[1]
+    kubectl config set-context --current --namespace=$namespace $argv
+  else
+    kubectl get namespaces
+  end
+end
 
-# # Fish colors
-# # ---------------------------------------------------------------------
+function kube_context --wraps "kubectl config use-context"
+  if test (count $argv) -gt 0
+    set context $argv[1]
+    set -e argv[1]
+    kubectl config use-context $context $argv
+  else
+    kubectl config get-contexts
+  end
+end
+
+# ---------------------------------------------------------------------
+#  Fish colors
+# ---------------------------------------------------------------------
 set fish_color_normal white
 set fish_color_command blue
 set fish_color_keyword yellow
