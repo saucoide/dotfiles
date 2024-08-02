@@ -382,13 +382,13 @@ no frame at init
         (add-to-list 'default-frame-alist '(font . "JetBrainsMono Nerd Font"))
         (set-face-attribute 'default nil
                             :font "JetBrainsMono Nerd Font"
-                            :height 120)
+                            :height 100)
         (set-face-attribute 'fixed-pitch nil
                             :font "JetBrainsMono Nerd Font"
-                            :height 120) ; monospace font
+                            :height 100) ; monospace font
         (set-face-attribute 'variable-pitch nil
                             :font "JetBrainsMono Nerd Font"
-                            :height 120)
+                            :height 100)
         )
     )
   )
