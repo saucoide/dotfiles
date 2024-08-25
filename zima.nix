@@ -61,7 +61,7 @@
     ## Window Manager / Qtile
     windowManager.qtile = {
       enable = true;
-      # configFile = "$HOME/dotfiles/.config/qtile/config.py";
+      configFile = "$HOME/dotfiles/.config/qtile/config.py";
       extraPackages = python3Packages: with python3Packages; [
           pulsectl-asyncio
       ];
@@ -106,36 +106,6 @@
     curl
   ];
   programs.fish.enable = true;
-
-  # Services
-# 
-#   ## Display Manager / Login Screen
-#   services.greetd = {
-#     enable = true;
-#     settings = {
-#       default_session = {
-#         command = "${pkgs.greetd.tuigreet}/bin/tuigreet \\
-#                       --remember \\
-#                       --user-menu \\
-#                       --asterisks \\
-#                       --time \\
-#                       --time-format '%F %R' \\
-#                       --window-padding 0 \\
-#                       --container-padding 2 \\
-#                       --cmd Hyprland";
-# 	user = "greeter";
-#       };
-#     restart = true;
-#     };
-#   };
-
-    
-
-#   programs.hyprland.enable = true;
-#   xdg.portal = {
-#     enable = true;
-#     extraPortals = [ pkgs.xdg-desktop-portal-hyprland ];
-#   };
 
   ## Sound with pipewire
   security.rtkit.enable = true;

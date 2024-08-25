@@ -37,40 +37,40 @@
       add_newline = true;
     };
   };
-  programs.kitty = {
+  programs.wezterm = {
     enable = true;
-    shellIntegration.enableFishIntegration = true;
-    settings = {
-      confirm_os_window_close = 0;
-    };
-    theme = "Flatland";
-    font.name = "JetBrainsMono";
+    # shellIntegration.enableFishIntegration = true;
+    extraConfig = ''
+    return {
+      font = wezterm.font("JetBrains Mono"),
+      color_scheme = "Flatland",
+      enable_tab_bar = false,
+    }
+    '';
   };
 
 
   home.packages = with pkgs; [
     # Desktop
-    # waybar                # top bar
-    swww                  # wallpaper
+    # swww   # wallpaper
 
     # Notifications
     dunst
     libnotify
 
     # Terminal
-    kitty
+    wezterm
 
     # CLI Tools
     neovim
     lsd                    # A better ls
     htop
-    wl-clipboard           # pbcopy/pbpaste
     trashy                 # A better trash-cli
     neofetch
     
 
     # Launcher
-    rofi-wayland
+    rofi
 
     # GUI Applications
     xfce.thunar
