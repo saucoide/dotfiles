@@ -46,7 +46,7 @@
   # Harware
   hardware = {
     # opengl
-    opengl.enable = true;
+    graphics.enable = true;
     # bluetooth
     bluetooth.enable = true;
     bluetooth.powerOnBoot = false;
@@ -61,15 +61,17 @@
     ## Window Manager / Qtile
     windowManager.qtile = {
       enable = true;
-      configFile = "$HOME/dotfiles/.config/qtile/config.py";
+      configFile = .config/qtile/config.py;
       extraPackages = python3Packages: with python3Packages; [
           pulsectl-asyncio
       ];
     };
 
     # Keyboard Settings
-    layout = "us";
-    xkbVariant = "";
+    xkb = {
+      layout = "us";
+      variant = "";
+    };
   };
 
   services.libinput = {

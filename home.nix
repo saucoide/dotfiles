@@ -11,8 +11,6 @@
   };
 
   imports = [
-   configs/hyprland.nix
-   configs/waybar.nix
   ];
 
   programs.fish = {
