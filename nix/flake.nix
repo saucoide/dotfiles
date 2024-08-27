@@ -68,6 +68,7 @@
           flameshot
           nerdfonts
           pandoc
+          mpv
           # libreoffice
 
           # MacOS
@@ -82,17 +83,16 @@
 
           # Development Tools
 
-          ## Python
-          python311Packages.nox
-          python311Packages.black
-          python311Packages.ipython
-          python311Packages.ipdb
-          python311Packages.rich
+          ## Python Tools (system-wide)
+          python312Packages.nox
+          python312Packages.black
           pylsp
           ruff
           ruff-lsp
           poetry
           pipx
+          rye
+          uv
 
           ## Databases
           pgcli
