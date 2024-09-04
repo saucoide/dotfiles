@@ -2,14 +2,21 @@
   description = "A flake containing everything I install in profile";
 
   inputs = {
-   nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+   nixpkgs23.url = "github:nixos/nixpkgs/nixos-23.05";
+   nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
+   nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
    # emacs-overlay = {
    #   url = "github:nix-community/emacs-overlay";
    #   inputs.nixpkgs.follows = "nixpkgs";
    # };
   };
 
-  outputs = { self, nixpkgs, emacs-overlay }:
+  outputs = { self,
+              nixpkgs23,
+              nixpkgs,
+              nixpkgs-unstable,
+              # emacs-overlay
+            }:
     let
       system = "x86_64-darwin";
       pkgs =  import nixpkgs { 
@@ -21,6 +28,14 @@
         #       (import emacs-overlay)
         #       (import ./overlays/emacs.nix)
         #     ];
+      };
+      pkgs23 =  import nixpkgs23 { 
+        inherit system;
+        config.allowUnfree = true;
+      };
+      pkgs-unstable = import nixpkgs-unstable {
+        inherit system;
+        config.allowUnfree = true;
       };
       gdk = pkgs.google-cloud-sdk.withExtraComponents(
         with pkgs.google-cloud-sdk.components; [
@@ -38,77 +53,76 @@
     {
       packages.${system}.default = pkgs.buildEnv {
         name = "sauco-profile-packages";
-        paths = with pkgs; [
+        paths = [
           # Nix
-          nix-direnv
-          cachix
+          pkgs.nix-direnv
+          pkgs.cachix
           # Install devenv separately
           # https://devenv.sh/getting-started/
 
           # Basics
-          alacritty
-          fish
-          starship
-          git
-          ripgrep
-          just
-          fd
-          fzf
-          jq
-          lsd
-          watch
-          bat
-          htop
-          stow
-          direnv
-          pass
-          parallel
-          neofetch
-          trash-cli
-          flameshot
-          nerdfonts
-          pandoc
-          mpv
+          pkgs.alacritty
+          pkgs.fish
+          pkgs.starship
+          pkgs.git
+          pkgs.ripgrep
+          pkgs.just
+          pkgs.fd
+          pkgs.fzf
+          pkgs.jq
+          pkgs.lsd
+          pkgs.watch
+          pkgs.bat
+          pkgs.htop
+          pkgs.stow
+          pkgs.direnv
+          pkgs.pass
+          pkgs.parallel
+          pkgs.neofetch
+          pkgs.trash-cli
+          # flameshot
+          pkgs.nerdfonts
+          pkgs.pandoc
+          pkgs23.mpv  # fails on 24.05 because swift doesnt build correctly
           # libreoffice
 
           # MacOS
-          yabai
-          skhd
-          sketchybar
-          raycast
+          pkgs.yabai
+          pkgs.skhd
+          pkgs.sketchybar
+          pkgs.raycast
 
           # Editors
-          neovim
+          pkgs.neovim
           # vscodium-fhs
 
           # Development Tools
 
           ## Python Tools (system-wide)
-          python312Packages.nox
-          python312Packages.black
+          pkgs.python312Packages.nox
           pylsp
-          ruff
-          ruff-lsp
-          poetry
-          pipx
-          rye
-          uv
+          pkgs.ruff
+          pkgs.ruff-lsp
+          pkgs.poetry
+          pkgs.pipx
+          pkgs.rye
+          pkgs-unstable.uv
 
           ## Databases
-          pgcli
-          litecli
-          sqlite
+          pkgs.pgcli
+          pkgs.litecli
+          pkgs.sqlite
 
           ## Other
           gdk
-          kubectl
-          terraform
-          vault
-          nmap
-          podman
-          podman-compose
-          yamlfmt
-          nodePackages.prettier
+          pkgs.kubectl
+          pkgs.terraform
+          pkgs.vault
+          pkgs.nmap
+          pkgs.podman
+          pkgs.podman-compose
+          pkgs.yamlfmt
+          pkgs.nodePackages.prettier
           # llm
 
         ];
