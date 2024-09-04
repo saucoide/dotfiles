@@ -259,6 +259,10 @@
 
 (use-package dired-single)
 
+(use-package ready-player
+  :config
+  (ready-player-mode +1))
+
 (use-package transient
   :config
   (define-key transient-map (kbd "<escape>") 'transient-quit-one)
@@ -416,17 +420,10 @@
                  (local-set-key (kbd "C-<return>") 'eir-eval-in-shell)))
   )
 
-(use-package kubel
-  :defer t
-  :after (vterm)
-  :config (kubel-vterm-setup))
-
-;; https://github.com/abrochard/kubel/pull/127
-(use-package kubel-evil
-  :defer t
-  :after (kubel)
-  :config 
-  (kubel-evil-mode))
+;; (use-package kele
+;;   :config
+;;   (kele-mode 1)
+;;   (bind-key (kbd "s-k") kele-command-map kele-mode-map))
 
 (use-package flycheck
   :init (global-flycheck-mode))
@@ -674,10 +671,11 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
       (python . t)
       (clojure . t)
       (shell . t)
-      (http . t)
       (sql . t)))
 
 (push '("conf-unix" . conf-unix) org-src-lang-modes)
+
+(use-package ob-async)
 
 (use-package toc-org
     :hook (org-mode . toc-org-mode))

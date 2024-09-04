@@ -44,7 +44,7 @@ alias wget="wget -c"
 ## Userlist
 alias userlist="cut -d: -f1 /etc/passwd"
 ## Calendar show full year
-alias cal="cal -y -m"
+alias cal="cal -y"
 ## neovim
 alias vim="nvim"
 ## yabai toggle
@@ -59,6 +59,7 @@ alias podman-into-shell='podman run --tty --interactive --entrypoint="/bin/sh"'
 alias k="kubectl"
 alias kn="kube_namespace"
 alias kc="kube_context"
+alias kinto="kube_shell_into_pod"
 # gcloud
 alias gcp="gcloud_change_project"
 alias gc="gcloud"
@@ -108,6 +109,14 @@ function kube_context --wraps "kubectl config use-context"
   end
 end
 
+function kube_shell_into_pod --wraps "kubectl get pods"
+  if test (count $argv) -gt 0
+    kubectl exec --stdin --tty $argv[1] -- /bin/bash
+  else
+    kubectl get pods
+  end
+end
+
 function gcloud_change_project --wraps "gcloud config set project"
   if test (count $argv) -gt 0
     set project $argv[1]
@@ -119,10 +128,9 @@ function gcloud_change_project --wraps "gcloud config set project"
 end
 
 
-function ai --argument action --argument model
+function ai --argument action
   # read from stdin
   read -l -z input
-  set model (or $model "4o")
   
   switch $action
     case "explain"
@@ -131,16 +139,21 @@ function ai --argument action --argument model
         Your goal is to explain to newer developers the functionality of existing code.
         You provide simple and concise explanations, using plain english and using jargon only if absolutely necessary.
         Please explain to a new joiner what the code does, and how it is implemented."
-      
-      echo $input
       set prompt $input
-      echo ""
-      echo "=== LLM ==="
-      echo ""
+    case "rewrite"
+      set system_prompt "
+        You are very experienced and knowledgable software developer, expert in the domain.
+        Your must rewrite the code given improving its readability, performance and testability.
+        You lean towards functional patterns, but not strictly so, if something is
+        better left non functional, you are pragmatic and always choose the best
+        solution.
+        Choose pythonic list comprehensions or generators, instead of maps/reduce when sensible.
+        You must produce high quality and readable code, that's easy to test."
+      set prompt $input
     case "complete"
       set system_prompt "
         You are very experienced and knowledgable software developer, expert in the domain.
-        Your must finish the unfinished sections that have been marked with '# AI TODO'.
+        Your must finish the unfinished sections that have been marked with '# AI'.
         You must adhere to the existing style, and not make any modifications to the
         sections that have not been marked.
         You must produce high quality and readable code, that's easy to test.
@@ -164,7 +177,7 @@ function ai --argument action --argument model
           content: str
           priority: str
 
-        # AI TODO add phone call 
+        # AI add phone call 
         
         Notification = Email | SMS | Letter | PhoneCall
 
@@ -190,7 +203,7 @@ function ai --argument action --argument model
                   priority=notification.priority,
                 )
             
-              # AI TODO add missing cases
+              # AI add missing cases
 
 
         OUTPUT:
@@ -305,11 +318,7 @@ function ai --argument action --argument model
         You must review the code provided, critizing it if needed, point out areas of
         improvement, and any flaws or source of errors you can spot.
         Be concise and to the point, use plain english"
-      echo $input
       set prompt $input
-      echo ""
-      echo "=== LLM ==="
-      echo ""
     case "tests"
       set system_prompt "
         You are very experienced and knowledgable software developer, expert in testing.
@@ -321,18 +330,19 @@ function ai --argument action --argument model
         You follow the 'dont mock what you dont own' principle.
         If a piece of code would be better tested if we modified it, propose the
         modification and the test that would go with it"
-        
-      echo $input
       set prompt $input
-      echo ""
-      echo "=== LLM ==="
-      echo ""
     case "*"
-      set system_prompt $argv[0]
+      set system_prompt $argv
       set prompt $input
          
   end
-  llm prompt --system $system_prompt $prompt
+  echo $input
+  echo ""
+  echo "=== LLM ==="
+  echo ""
+  llm prompt --system "$system_prompt" $prompt
+  echo ""
+  echo "=== LLM END ==="
 end
 
 # Function to extract a variety of archives

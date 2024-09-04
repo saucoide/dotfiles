@@ -25,6 +25,7 @@
   - [[#dashboard][Dashboard]]
 - [[#package-configuration][Package Configuration]]
   - [[#dired][Dired]]
+  - [[#ready-player][Ready Player]]
   - [[#completions][Completions]]
   - [[#help][Help]]
   - [[#ripgrep][Ripgrep]]
@@ -46,6 +47,7 @@
   - [[#capture-templates][Capture Templates]]
   - [[#header-bullets][Header Bullets]]
   - [[#source-code-blocks][Source Code Blocks]]
+  - [[#ob-async][ob-async]]
   - [[#toc-org][Toc-Org]]
 - [[#org-roam][Org Roam]]
 - [[#key-bindings][Key Bindings]]
@@ -497,6 +499,14 @@ The emacs file manager
 (use-package dired-single)
 
 #+end_src
+** Ready Player
+
+#+begin_src emacs-lisp
+(use-package ready-player
+  :config
+  (ready-player-mode +1))
+
+#+end_src
 
 ** Completions
 *** Transient
@@ -734,7 +744,7 @@ helpful is an enhanced version of the builtin emacs help, with more information
 This is just for org-babel
 
 #+begin_src emacs-lisp
-(use-package ob-http)
+;;(use-package ob-http)
 #+end_src>
 ** REPL
 
@@ -773,20 +783,12 @@ eval in repl all the things
 
 ** Kubernetes
 
+
 #+begin_src emacs-lisp
-
-(use-package kubel
-  :defer t
-  :after (vterm)
-  :config (kubel-vterm-setup))
-
-;; https://github.com/abrochard/kubel/pull/127
-(use-package kubel-evil
-  :defer t
-  :after (kubel)
-  :config 
-  (kubel-evil-mode))
-  
+;; (use-package kele
+;;   :config
+;;   (kele-mode 1)
+;;   (bind-key (kbd "s-k") kele-command-map kele-mode-map))
 #+end_src
 
 ** Linting
@@ -1145,11 +1147,18 @@ Here we enable the list of languages we want code blocks to work with
       (python . t)
       (clojure . t)
       (shell . t)
-      (http . t)
       (sql . t)))
 
 (push '("conf-unix" . conf-unix) org-src-lang-modes)
 
+#+end_src
+
+** ob-async
+
+To execute org-mode code blocks without locking
+
+#+begin_src emacs-lisp
+(use-package ob-async)
 #+end_src
 
 ** Toc-Org
