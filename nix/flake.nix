@@ -5,6 +5,7 @@
    nixpkgs23.url = "github:nixos/nixpkgs/nixos-23.05";
    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
+   # nixpkgs-master.url = "github:nixos/nixpkgs/master";
    # emacs-overlay = {
    #   url = "github:nix-community/emacs-overlay";
    #   inputs.nixpkgs.follows = "nixpkgs";
@@ -15,6 +16,7 @@
               nixpkgs23,
               nixpkgs,
               nixpkgs-unstable,
+              # nixpkgs-master,
               # emacs-overlay
             }:
     let
@@ -37,6 +39,10 @@
         inherit system;
         config.allowUnfree = true;
       };
+      # pkgs-master = import nixpkgs-master {
+      #   inherit system;
+      #   config.allowUnfree = true;
+      # };
       gdk = pkgs.google-cloud-sdk.withExtraComponents(
         with pkgs.google-cloud-sdk.components; [
             gke-gcloud-auth-plugin
@@ -72,6 +78,7 @@
           pkgs.jq
           pkgs.lsd
           pkgs.watch
+          pkgs.mtr
           pkgs.bat
           pkgs.htop
           pkgs.stow
@@ -80,6 +87,7 @@
           pkgs.parallel
           pkgs.neofetch
           pkgs.trash-cli
+          pkgs.sipcalc
           # flameshot
           pkgs.nerdfonts
           pkgs.pandoc
@@ -101,12 +109,12 @@
           ## Python Tools (system-wide)
           pkgs.python312Packages.nox
           pylsp
-          pkgs.ruff
-          pkgs.ruff-lsp
           pkgs.poetry
           pkgs.pipx
           pkgs.rye
           pkgs-unstable.uv
+          pkgs-unstable.ruff
+          pkgs-unstable.ruff-lsp
 
           ## Databases
           pkgs.pgcli
@@ -116,6 +124,7 @@
           ## Other
           gdk
           pkgs.kubectl
+          pkgs.k9s
           pkgs.terraform
           pkgs.vault
           pkgs.nmap
@@ -123,6 +132,8 @@
           pkgs.podman-compose
           pkgs.yamlfmt
           pkgs.nodePackages.prettier
+          pkgs.nodePackages.mermaid-cli
+          # pkgs.mermaid-cli
           # llm
 
         ];

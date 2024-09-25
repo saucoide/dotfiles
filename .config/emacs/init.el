@@ -364,10 +364,10 @@
 
 (use-package nix-mode)
 
-(use-package cider
-    :mode "\\.clj[sc]?\\'"
-    :config
-    (evil-collection-cider-setup))
+;; (use-package cider
+;;     :mode "\\.clj[sc]?\\'"
+;;     :config
+;;     (evil-collection-cider-setup))
 
 (use-package scala-mode
   :interpreter ("scala" . scala-mode))
@@ -665,17 +665,44 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
   :custom
   (org-bullets-bullet-list '("◐" "○" "●" "✖" "✚")))
 
+(use-package ob-mermaid
+  :config
+  (setq ob-mermaid-cli-path "//bin/mmdc"))
+
+(defun my/preview-mermaid ()
+  "Render region in firefox"
+  (interactive)
+  (unless (region-active-p)
+    (user-error "Select a region first"))
+  (let* ((path (concat (make-temp-file (temporary-file-directory)) ".html"))
+         (mermaid-code (buffer-substring-no-properties (region-beginning) (region-end))))
+    (save-excursion
+      (with-temp-buffer
+        (insert "<body>
+  <pre class=\"mermaid\">")
+        (insert mermaid-code)
+        ;; js script copied from mermaid documentation
+        (insert "</pre>
+  <script type=\"module\">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true });
+  </script>
+</body>")
+        (write-file path)))
+    (browse-url (format "file://%s" path))))
+
+(use-package ob-async)
+
 (org-babel-do-load-languages
     'org-babel-load-languages
     '((emacs-lisp . t)
       (python . t)
-      (clojure . t)
+      ;; (clojure . t)
+      (mermaid . t)
       (shell . t)
       (sql . t)))
 
 (push '("conf-unix" . conf-unix) org-src-lang-modes)
-
-(use-package ob-async)
 
 (use-package toc-org
     :hook (org-mode . toc-org-mode))

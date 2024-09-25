@@ -46,8 +46,9 @@
   - [[#org-basic-config][Org Basic Config]]
   - [[#capture-templates][Capture Templates]]
   - [[#header-bullets][Header Bullets]]
-  - [[#source-code-blocks][Source Code Blocks]]
+  - [[#ob-mermaid][ob-mermaid]]
   - [[#ob-async][ob-async]]
+  - [[#source-code-blocks][Source Code Blocks]]
   - [[#toc-org][Toc-Org]]
 - [[#org-roam][Org Roam]]
 - [[#key-bindings][Key Bindings]]
@@ -681,10 +682,10 @@ helpful is an enhanced version of the builtin emacs help, with more information
 *** Clojure
 
 #+begin_src emacs-lisp
-(use-package cider
-    :mode "\\.clj[sc]?\\'"
-    :config
-    (evil-collection-cider-setup))
+;; (use-package cider
+;;     :mode "\\.clj[sc]?\\'"
+;;     :config
+;;     (evil-collection-cider-setup))
 #+end_src
 
 *** Scala
@@ -1135,21 +1136,40 @@ YASnippet is a template system for emaxs, it lets you create custom templates th
 
 #+end_src
 
-** Source Code Blocks
+** ob-mermaid
 
-Here we enable the list of languages we want code blocks to work with
+#+begin_src emacs-lisp
+(use-package ob-mermaid
+  :config
+  (setq ob-mermaid-cli-path "//bin/mmdc"))
+
+#+end_src
+
+This one is a test to preview mermaid in your default browser
 
 #+begin_src emacs-lisp
 
-(org-babel-do-load-languages
-    'org-babel-load-languages
-    '((emacs-lisp . t)
-      (python . t)
-      (clojure . t)
-      (shell . t)
-      (sql . t)))
-
-(push '("conf-unix" . conf-unix) org-src-lang-modes)
+(defun my/preview-mermaid ()
+  "Render region in firefox"
+  (interactive)
+  (unless (region-active-p)
+    (user-error "Select a region first"))
+  (let* ((path (concat (make-temp-file (temporary-file-directory)) ".html"))
+         (mermaid-code (buffer-substring-no-properties (region-beginning) (region-end))))
+    (save-excursion
+      (with-temp-buffer
+        (insert "<body>
+  <pre class=\"mermaid\">")
+        (insert mermaid-code)
+        ;; js script copied from mermaid documentation
+        (insert "</pre>
+  <script type=\"module\">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true });
+  </script>
+</body>")
+        (write-file path)))
+    (browse-url (format "file://%s" path))))
 
 #+end_src
 
@@ -1160,6 +1180,26 @@ To execute org-mode code blocks without locking
 #+begin_src emacs-lisp
 (use-package ob-async)
 #+end_src
+
+** Source Code Blocks
+
+Here we enable the list of languages we want code blocks to work with
+
+#+begin_src emacs-lisp
+
+(org-babel-do-load-languages
+    'org-babel-load-languages
+    '((emacs-lisp . t)
+      (python . t)
+      ;; (clojure . t)
+      (mermaid . t)
+      (shell . t)
+      (sql . t)))
+
+(push '("conf-unix" . conf-unix) org-src-lang-modes)
+
+#+end_src
+
 
 ** Toc-Org
 
