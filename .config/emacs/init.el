@@ -362,6 +362,14 @@
 (setq major-mode-remap-alist
       '((python-mode . python-ts-mode)))
 
+(use-package py-vterm-interaction
+  :hook (python-ts-mode . py-vterm-interaction-mode)
+  :config
+  (setq-default py-vterm-interaction-repl-program "ipython")
+  (setq-default py-vterm-interaction-silent-cells t)
+  :bind (:map python-ts-mode-map
+              ("<C-return>" . py-vterm-interaction-send-region-or-current-line)))
+
 (use-package nix-mode)
 
 ;; (use-package cider
@@ -391,34 +399,16 @@
   (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
   (add-to-list 'auto-mode-alist '("\\.yaml\\'" . yaml-mode)))
 
-(use-package eval-in-repl
-  :config
-  (setq eir-repl-placement 'right)
-  (setq eir-jump-after-eval nil)
-  (setq eir-always-split-script-window t)
-  (setq eir-use-python-shell-send-string nil)
-  ;;; Emacs-lisp
-  (require 'eval-in-repl-ielm)
-  (setq eir-ielm-eval-in-current-buffer t)
-  (define-key emacs-lisp-mode-map (kbd "<C-return>") 'eir-eval-in-ielm)
-  (define-key lisp-interaction-mode-map (kbd "<C-return>") 'eir-eval-in-ielm)
-  (define-key Info-mode-map (kbd "<C-return>") 'eir-eval-in-ielm)
-  ;;; Clojure
-  (require 'eval-in-repl-cider)
-  (define-key clojure-mode-map (kbd "<C-return>") 'eir-eval-in-cider)
-  ;;; Python
-  (setq python-shell-interpreter "ipython"
-        python-shell-interpreter-args "-i --simple-prompt --InteractiveShell.display_page=True")
-  (require 'eval-in-repl-python)
-  (add-hook 'python-mode-hook
-            '(lambda ()
-               (local-set-key (kbd "<C-return>") 'eir-eval-in-python)))
-  ;;; Shell
-  (require 'eval-in-repl-shell)
-    (add-hook 'sh-mode-hook
-              '(lambda()
-                 (local-set-key (kbd "C-<return>") 'eir-eval-in-shell)))
-  )
+(defun my/goto-repl ()
+  "Open a REPL based on the current major mode."
+  (interactive)
+  (cond
+   ((eq major-mode 'python-mode)
+    (py-vterm-interaction-switch-to-repl-buffer))
+   ((eq major-mode 'python-ts-mode)
+    (py-vterm-interaction-switch-to-repl-buffer))
+   (t
+    (message "No REPL configured for this mode"))))
 
 ;; (use-package kele
 ;;   :config
@@ -450,6 +440,10 @@
 (reformatter-define yaml-format
   :program "yamlfmt"
   :args '("-"))
+;; toml
+(reformatter-define toml-format
+  :program "taplo"
+  :args '("fmt" "-"))
 ;; terraform
 (reformatter-define pg-format
   :program "pg_format"
@@ -467,6 +461,7 @@
     ('yaml-mode (yaml-format-buffer))
     ('terraform-mode (terraform-format-buffer))
     ('js-mode (prettier-format-buffer))
+    ('conf-toml-mode (toml-format-buffer))
     ('sql-mode (pg-format-buffer))
     (_ (message "No reformatted configured for `%s`" major-mode))
     )
@@ -685,6 +680,13 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
         (insert "</pre>
   <script type=\"module\">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.registerIconPacks([
+    {
+        name: 'logos',
+        loader: () =>
+        fetch('https://unpkg.com/@iconify-json/logos/icons.json').then((res) => res.json()),
+    },
+    ]);
     mermaid.initialize({ startOnLoad: true });
   </script>
 </body>")
@@ -974,6 +976,10 @@ _p_rev       _u_pper              _=_: upper/lower       _r_esolve
 (my/leader-key-def
     "q"  '(:ignore t :which-key "quit")
     "qq" '(delete-frame :which-key "quit frame"))
+
+(my/leader-key-def
+    "r"  '(:ignore t :which-key "REPL")
+    "rr" '(my/goto-repl :which-key "Open REPL"))
 
 (my/leader-key-def
     "s"  '(:ignore t :which-key "search")

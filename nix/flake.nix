@@ -126,13 +126,14 @@
           pkgs.kubectl
           pkgs.k9s
           pkgs.terraform
-          pkgs.vault
+          pkgs.vault-bin
           pkgs.nmap
           pkgs.podman
           pkgs.podman-compose
           pkgs.yamlfmt
           pkgs.nodePackages.prettier
           pkgs.nodePackages.mermaid-cli
+          pkgs.taplo
           # pkgs.mermaid-cli
           # llm
 
