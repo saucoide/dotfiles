@@ -246,7 +246,8 @@
     :ensure nil
     ;; :commands (dired dired-jump)
     :config
-    (setq insert-directory-program "/usr/local/bin/gls")
+    ;(setq insert-directory-program "/usr/local/bin/gls")
+    (setq dired-use-ls-dired nil)
     (setq dired-listing-switches "-algho --group-directories-first --time-style \"+%Y-%m-%d %H:%M\"")
     (all-the-icons-dired-mode 1)
     (dired-hide-dotfiles-mode 1)

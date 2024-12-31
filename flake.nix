@@ -26,6 +26,7 @@
 
         # The platform the configuration will be used on.
         nixpkgs.hostPlatform = "aarch64-darwin";
+	nixpkgs.config.allowUnfree = true;
       };
   in
   {
@@ -33,7 +34,7 @@
     # $ darwin-rebuild build --flake .macflop)
 
     # macflop
-    darwinConfigurations.macflop = nix-darwin.lib.darwinSystem {
+    darwinConfigurations.prgm-snavarro4 = nix-darwin.lib.darwinSystem {
       system = "aarch64-darwin";
       modules = [ 
         # nix itself config

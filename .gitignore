@@ -25,3 +25,4 @@ projectile-bookmarks.eld
 /.config/emacs/logview-cache.extmap
 github-dotfiles
 /.config/pgcli/log
+.private_envvars

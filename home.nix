@@ -4,6 +4,22 @@ let
   gdk = pkgs.google-cloud-sdk.withExtraComponents(
     [pkgs.google-cloud-sdk.components.gke-gcloud-auth-plugin]
   );
+  pyslp = pkgs.python312.withPackages(
+    p: with p; [
+      python-lsp-server
+      pylsp-mypy
+    ]
+  );
+  # emacs-overlay = import ( fetchTarBall {
+  #   url = ;
+  #   sha256 = ;
+  # });
+  customEmacs = pkgs.emacs30.override {
+    withNativeCompilation = true;
+    withSQLite3 = true;
+    withTreeSitter = true;
+    withImageMagick = true;
+  };
 in
  {
   
@@ -17,10 +33,63 @@ in
     USE_GKE_CLOUD_AUTH_PLUGIN = "True";
     # Maybe rye path
   };
+
   home.packages = [
-    # Other packages
-    gdk
+    # Compilers & general build tools
     pkgs.gcc
+    pkgs.cmake
+
+    # Tooling
+    pkgs.bat
+    pkgs.fd
+    pkgs.fzf
+    pkgs.jq
+    pkgs.just
+    pkgs.lsd
+    pkgs.neofetch
+    pkgs.magic-wormhole
+    pkgs.pandoc
+    pkgs.parallel
+    pkgs.pass
+    pkgs.ripgrep
+    pkgs.trash-cli
+    pkgs.sipcalc
+    pkgs.watch
+
+    # Python
+    pkgs.uv
+    pkgs.ruff
+    pkgs.ruff-lsp
+    pyslp
+
+    # Formatters
+    pkgs.nodePackages.prettier
+    pkgs.yamlfmt
+    pkgs.taplo
+
+    # Network
+    pkgs.mtr
+    pkgs.nmap
+    
+    # Infra
+    gdk
+    pkgs.kubectl
+    pkgs.podman
+    pkgs.podman-compose
+    pkgs.terraform
+    pkgs.vault-bin
+
+    # TUIs
+    pkgs.htop
+    pkgs.pgcli
+    pkgs.litecli
+    pkgs.sqlite
+
+    # GUIs
+    pkgs.slack
+
+    # MacOS
+    pkgs.raycast
   ];
 
 
@@ -99,7 +168,7 @@ in
           {action="DecreaseFontSize"; key="Minus"; mods="Control";}
           {action="ToggleFullScreen"; key="F11"; mods="None";}
           {action="ClearLogNotice"; key="L"; mods="Control";}
-          {chars="\f"; key="L"; mods="Control";}
+          {chars="\\f"; key="L"; mods="Control";}
           {action="ScrollPageUp"; key="PageUp"; mods="None"; mode="~Alt";}
           {action="ScrollPageDown"; key="PageDown"; mods="None"; mode="~Alt";}
           {action="ScrollToTop"; key="Home"; mods="Shift"; mode="~Alt";}
@@ -109,24 +178,143 @@ in
     };
   };
 
-  programs.emacs = {
+
+  programs.fish = {
     enable = true;
-    package = pkgs.emacs;
-  };
-  home.file.".config/emacs/early-init.el" = {
-    # TODO move this to source from the actual file
-    text = ''
-      (menu-bar-mode t)
-      (tool-bar-mode -1)
-      (scroll-bar-mode -1)
-      (add-to-list 'default-frame-alist '(undecorated .t))
+    interactiveShellInit = ''
+      # Get most envvars from .profile (requires oh-my-fish & fenv)
+      # fenv source $HOME/.profile   # TODO .profile
+      source $HOME/dotfiles/.private_envvars
     '';
+    shellAliases = {
+      # lsd
+      ls = "lsd --long --group-dirs=first --date '+%Y-%m-%d %H:%M'";
+      lsa = "lsd --long --group-dirs=first --almost-all --date '+%Y-%m-%d %H:%M'";
+      lst = "lsd --long --group-dirs=first --tree --depth=2 --date '+%Y-%m-%d %H:%M'";
+
+      # podman
+      docker = "podman";
+      docker-compose = "podman-compose";
+      podmansh = "podman run --tty --interactive --entrypoint='/bin/sh'";
+
+      # kubectl
+      k = "kubectl";
+      kc = "kube_context";
+      kn = "kube_namespace";
+      kinto = "kube_shell_into_pod";
+
+      # gcloud
+      gcp = "gcloud_change_project";
+      gc = "gcloud";
+      
+      # others
+      "cd.." = "cd ..";
+      vim = "nvim";
+      cat = "bat";
+      grep = "grep --color=auto";
+      df = "df -H";
+      # free = "free -mt";
+      wget = "wget -c";
+      userlist = "cut -d: -f1 /etc/passwd";
+      cal = "cal -y";
+    };
+
+    functions = {
+      fish_greeting = ''
+        neofetch --cpu_temp on --disable gpu term de wm kernel packages distro shell resolution cols cpu --memory_percent on --off
+      '';
+    };
+
+    generateCompletions = true;
   };
+
+  # SSH
+  programs.ssh = {
+    enable = true;
+    addKeysToAgent = "yes";
+    #extraConfig = ''
+    #  UseKeychain yes
+    #  IdentityFile ~/.ssh/id_ed25519
+    #'';
+  };
+  programs.gpg.enable = true;
+  programs.password-store.enable = true;
+
+  programs.direnv = {
+    enable = true;
+    # enableFishIntegration = true;  # defaults to true
+    silent = false;
+    nix-direnv.enable = true;
+  };
+
+  programs.neovim = {
+    enable = true;
+    viAlias = true;
+    vimAlias = true;
+    vimdiffAlias = true;
+    plugins = with pkgs.vimPlugins; [
+      { plugin = nvim-lspconfig; }
+      { plugin = telescope-nvim; }
+      { plugin = lualine-nvim; }
+      # { plugin = lualine-nvim; config = "something something something"; }
+      
+      # treesitter
+      { plugin = (pkgs.vimPlugins.nvim-treesitter.withPlugins( p: [
+         p.tree-sitter-nix
+         p.tree-sitter-vim
+         p.tree-sitter-bash
+         p.tree-sitter-python
+         p.tree-sitter-lua
+         p.tree-sitter-json
+         ]));
+       }
+    ];
+    extraLuaConfig = ''
+      vim.wo.number = true
+    '';
+     #  ${builtins.readFile ./nvim/plugin/something.lua}}  this can go insied extraluaconfig
+     # or 
+     # programs.neovim.extraLuaConfig = lib.fileContents ../my/init.lua;
+  };
+
+ # programs.emacs = {
+ #   enable = true;
+ #   package = pkgs.emacs30;
+ # };
+  xdg.configFile.emacs.source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/emacs";
+  # home.file.".config/emacs" = {
+  #   source = ./config/emacs;
+  # };
 
 
   programs.starship = {
     enable = true;
     enableFishIntegration = true;
+    settings = {
+      # Inserts a blank line between shell prompts
+      add_newline = true;
+      
+      character = {
+        success_symbol = "[➜](green)";
+        error_symbol = "[➜](red)";
+        vicmd_symbol = "[N](bold blue)";
+      };
+
+      python.symbol = " ";
+      
+      # Disable the package module, hiding it from the prompt completely
+      package.disabled = true;
+      
+      # Disabled modules
+      aws.disabled = true;
+      battery.disabled = true;
+      buf.disabled = true;
+      gcloud.disabled = true;
+      kubernetes = {
+        disabled = true;
+        style = "#0189f8 bold";
+      };
+    };
   };
 
 
@@ -139,27 +327,21 @@ in
     };
   };
 
-  # SKETCHYBAR PLUGINS
-  home.file.".config/sketchybar/plugins/aerospace.sh" = {
-    text = ''
-        #!/usr/bin/env bash
-        
-        if [ "$1" = "$FOCUSED_WORKSPACE" ]; then
-            sketchybar --set $NAME background.drawing=on
-        else
-            sketchybar --set $NAME background.drawing=off
-        fi
-    '';
-    executable = true;
+  programs.poetry = {
+    enable = true;
   };
-  home.file.".config/sketchybar/plugins/front_app.sh" = {
-    text = ''
-        #!/bin/sh
-        
-        if [ "$SENDER" = "front_app_switched" ]; then
-            sketchybar --set $NAME label="$INFO"
-        fi
-    '';
-    executable = true;
+
+  programs.k9s = {
+    enable = true;
+    aliases = { cj = "cronjobs"; };
   };
-}
+
+  xdg.configFile."k9s/skins/" = {
+    source = ./config/k9s/skins;
+    recursive = true;
+  };
+
+  # Need to pull the whole config as a whole, no symlinks until this is fixed: https://github.com/FelixKratz/SketchyBar/issues/553
+  # config = pkgs.lib.fileContents ./config/sketchybar/sketchybarrc;
+  xdg.configFile.sketchybar.source = ./config/sketchybar;
+  }

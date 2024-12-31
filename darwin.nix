@@ -11,6 +11,10 @@
   system.defaults.NSGlobalDomain."com.apple.keyboard.fnState" = true;  # default F keys
   system.defaults.NSGlobalDomain.AppleMetricUnits = 1;  # Metric units
   system.defaults.NSGlobalDomain.NSDocumentSaveNewDocumentsToCloud = false;
+
+  environment.variables = {
+    LANG = "en_US.UTF-8";
+  };
   
 
   system.defaults.controlcenter = {
@@ -28,13 +32,17 @@
     show-recents = false;
     static-only = true;
     tilesize = 42;
+    wvous-bl-corner = 1;
+    wvous-br-corner = 1;
+    wvous-tl-corner = 1;
+    wvous-tr-corner = 1;
   };
   
-  # Keyboard
+  # Keyboard (built-in only?)
   system.keyboard = {
     enableKeyMapping = true;
     remapCapsLockToControl = true;
-    swapLeftCommandAndLeftAlt = true;
+    # swapLeftCommandAndLeftAlt = true;
     nonUS.remapTilde = true;
   };
 
@@ -47,9 +55,9 @@
 
   # Networking
   networking = {
-    computerName = "macflop";
-    hostName = "macflop";
-    localHostName = "macflop";
+    computerName = "prgm-snavarro4";
+    hostName = "prgm-snavarro4";
+    localHostName = "prgm-snavarro4";
     knownNetworkServices = [
       "Wi-Fi"
       "Thunderbolt Bridge"
@@ -58,11 +66,12 @@
   };
 
   # Sleep
-  power.sleep.display = 5;
+  power.sleep.display = 15;
   power.sleep.computer = 15;
 
   # Use TouchID for sudo
   security.pam.enableSudoTouchIdAuth = true;
+
 
   # Fonts
   # fonts.packages = [pkgs.nerdfonts.override {fonts = ["JetBrainsMono"];}];
@@ -81,16 +90,17 @@
       default-root-container-orientation = "auto";
       on-focused-monitor-changed = [];  # do not follow mouse
       automatically-unhide-macos-hidden-apps = true;
+      exec.inherit-env-vars = true;
       exec-on-workspace-change = [
           "/bin/bash"
           "-c"
-          "sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE"
+          "/run/current-system/sw/bin/sketchybar --trigger aerospace_workspace_change FOCUSED=$AEROSPACE_FOCUSED_WORKSPACE"
       ];
       gaps = {
-        outer.top = 6;
-        outer.bottom = 6;
-        outer.left = 6;
-        outer.right = 6;
+        outer.top = [{monitor."built-in.*retina.*" = 6; } 36];  # 6 on the built-in display, 36 default for all else
+        outer.bottom = [{monitor."built-in.*retina.*" = 4; } 2];
+        outer.left = 4;
+        outer.right = 4;
         inner.horizontal = 6;
         inner.vertical = 6;
       };
@@ -174,69 +184,7 @@
   services.sketchybar = {
     # NOTE: this depends on plugins which are managed in home.nix
     enable = true;
-    config = ''
-      PLUGIN_DIR="$CONFIG_DIR/plugins"
-
-      ## Bar Appereance
-      sketchybar --bar     \
-          height=32        \
-          blur_radius=20   \
-          position=top     \
-          sticky=off       \
-          padding_left=5   \
-          padding_right=5  \
-          color=0xff333333
-
-      # Set Defaults
-      sketchybar --default                               \
-          icon.font="JetBrainsMono Nerd Font:Bold:12.0"  \
-          icon.color=0xffffffff                          \
-          label.font="JetBrainsMono Nerd Font:Bold:10.0" \
-          label.color=0xffffffff                         \
-          padding_left=5                                 \
-          padding_right=5                                \
-          label.padding_left=5                           \
-          label.padding_right=5                          \
-          icon.padding_left=5                            \
-          icon.padding_right=5                           \
-
-      # Workspace indicators
-      for sid in $(aerospace list-workspaces --all)
-      do
-          sketchybar --add item space.$sid left                 \
-              --subscribe space.$sid aerospace_workspace_change \
-              --set space.$sid                                  \
-              icon=$sid                                         \
-              label.padding_left=0                              \
-              label.padding_right=0                             \
-              background.color=0x44ffffff                       \
-              background.corner_radius=12                       \
-              background.height=18                              \  
-              background.drawing=off                            \  
-              label.drawing=off                                 \  
-              click_script="aerospace workspace $sid"           \  
-              script="$CONFIG_DIR/plugins/aerospace.sh"
-      done
-
-
-      # Other Left-Side Indicators
-
-      sketchybar --add item space_separator left    \
-          --set space_separator                     \
-          icon=**                                   \
-          padding_left=10                           \
-          padding_right=10                          \
-          label.drawing=off                         \
-                                                    \
-          --add item front_app left                 \
-          --set front_app                           \
-          script="$CONFIG_DIR/plugins/front_app.sh" \
-          icon.drawing=off                          \
-          --subscribe front_app front_app_switched  
-
-      sketchybar --update
-  
-    '';
+    # config = pkgs.lib.fileContents ./config/sketchybar/sketchybarrc;
   };
 
 
@@ -252,56 +200,18 @@
   # FISH
   programs.fish = {
     enable = true;
-    interactiveShellInit = ''
-      # Get most envvars from .profile (requires oh-my-fish & fenv)
-      # fenv source $HOME/.profile   # TODO .profile
-      source $HOME/dotfiles/.private_envvars
-    '';
-    shellAliases = {
-      # lsd
-      ls = "lsd --long --group-dirs=first --date '+%Y-%n-%d %H:%M'";
-      lsa = "lsd --long --group-dirs=first --almost-all --date '+%Y-%n-%d %H:%M'";
-      lst = "lsd --long --group-dirs=first --tree --depth=2 --date '+%Y-%n-%d %H:%M'";
-
-      # podman
-      docker = "podman";
-      docker-compose = "podman-compose";
-      podmansh = "podman run --tty --interactive --entrypoint='/bin/sh'";
-
-      # kubectl
-      k = "kubectl";
-      kc = "kube_context";
-      kn = "kube_namespace";
-      kinto = "kube_shell_into_pod";
-
-      # gcloud
-      gcp = "gcloud_change_project";
-      gc = "gcloud";
-      
-      # others
-      "cd.." = "cd ..";
-      vim = "nvim";
-      cat = "bat";
-      grep = "grep --color=auto";
-      df = "df -H";
-      free = "free -mt";
-      wget = "wget -c";
-      userlist = "cut -d: -f1 /etc/passwd";
-      cal = "cal -y";
-    };
-    #functions = '' '';
   };
 
   # Homebrew (if needed for anything)
-  #homebrew = {
-  #  enable = true;
-  #  taps = [ d12frosted/emacs-plus ];
-  # brews = [];
-  # casks = [];
-  #  extraConfig =''
-  #    brew "emacs-plus@30", args:["with-ctags", "with-no-frame-refocus", "with-native-comp" "with-imagemagick" "with-poll"]
-  #  '';
-  #};
+  homebrew = {
+    enable = true;
+    taps = [ "d12frosted/emacs-plus" ];
+    brews = [ "coreutils" ];
+    casks = [];
+   extraConfig =''
+      brew "emacs-plus@31", args:["with-ctags", "with-no-frame-refocus", "with-native-comp", "with-imagemagick"]
+   '';
+  };
 
   # environment.systemPackages =
   #  [ pkgs.home-manager
