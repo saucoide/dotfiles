@@ -97,8 +97,8 @@
           "/run/current-system/sw/bin/sketchybar --trigger aerospace_workspace_change FOCUSED=$AEROSPACE_FOCUSED_WORKSPACE"
       ];
       gaps = {
-        outer.top = [{monitor."built-in.*retina.*" = 6; } 36];  # 6 on the built-in display, 36 default for all else
-        outer.bottom = [{monitor."built-in.*retina.*" = 4; } 2];
+        outer.top = [{monitor."built-in" = 6; } 36];  # 6 on the built-in display, 36 default for all else
+        outer.bottom = [{monitor."built-in" = 4; } 2];
         outer.left = 4;
         outer.right = 4;
         inner.horizontal = 6;
@@ -203,15 +203,15 @@
   };
 
   # Homebrew (if needed for anything)
-  homebrew = {
-    enable = true;
-    taps = [ "d12frosted/emacs-plus" ];
-    brews = [ "coreutils" ];
-    casks = [];
-   extraConfig =''
-      brew "emacs-plus@31", args:["with-ctags", "with-no-frame-refocus", "with-native-comp", "with-imagemagick"]
-   '';
-  };
+#   homebrew = {
+#     enable = true;
+#     taps = [ "d12frosted/emacs-plus" ];
+#     brews = [ "coreutils" ];
+#     casks = [];
+#    extraConfig =''
+#       brew "emacs-plus@31", args:["with-ctags", "with-no-frame-refocus", "with-native-comp", "with-imagemagick"]
+#    '';
+#   };
 
   # environment.systemPackages =
   #  [ pkgs.home-manager

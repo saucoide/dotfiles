@@ -10,9 +10,13 @@
       url ="github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixvim = {
+      url = "github:nix-community/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = inputs@{ self, nix-darwin, home-manager, nixpkgs }:
+  outputs = inputs@{ self, nix-darwin, home-manager, nixpkgs, nixvim }:
     let 
       baseconfiguration = {pkgs, ...}:{
         nix.settings.experimental-features = "nix-command flakes";
@@ -48,6 +52,7 @@
           home-manager.verbose = true;
           home-manager.users."sauco.navarro" = import ./home.nix;
 	  # Optional home-manager.extraSpecialArgs to pass arguments to home.nix
+          home-manager.extraSpecialArgs = { inherit inputs; };
           users.users."sauco.navarro" = {
             name = "sauco.navarro";
             home = "/Users/sauco.navarro";
