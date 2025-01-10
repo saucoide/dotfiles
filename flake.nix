@@ -19,7 +19,15 @@
   outputs = inputs@{ self, nix-darwin, home-manager, nixpkgs, nixvim }:
     let 
       baseconfiguration = {pkgs, ...}:{
+        nix.channel.enable = false;
         nix.settings.experimental-features = "nix-command flakes";
+        nix.settings.substituters = [ 
+          "https://cache.nixos.org/"
+          "https://devenv.cachix.org"
+          "https://nix-community.cachix.org"
+        ];
+        # nix.settings.trusted-substituters = ;
+        nix.settings.trusted-users = [ "sauco.navarro" ];
 
         # Set Git commit hash for darwin-version.
         system.configurationRevision = self.rev or self.dirtyRev or null;
