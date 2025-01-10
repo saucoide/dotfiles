@@ -511,7 +511,6 @@
         };
       };
 
-      # TODO - test the defaults and modify - TOMORROW!!!!!!!!!!!!
       cmp = {
         enable = true;
         autoEnableSources = true;
@@ -531,6 +530,9 @@
             "<Tab>" = "cmp.mapping(cmp.mapping.select_next_item(), {'i', 's'})";
           };
         };
+      };
+      neogit = {
+        enable = true;
       };
     };
 
