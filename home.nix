@@ -14,12 +14,12 @@ let
   #   url = ;
   #   sha256 = ;
   # });
-  customEmacs = pkgs.emacs30.override {
-    withNativeCompilation = true;
-    withSQLite3 = true;
-    withTreeSitter = true;
-    withImageMagick = true;
-  };
+ # customEmacs = pkgs.emacs30.override {
+ #   withNativeCompilation = true;
+ #   withSQLite3 = true;
+ #   withTreeSitter = true;
+ #   withImageMagick = true;
+ # };
 in
  {
 
@@ -27,7 +27,7 @@ in
   home.username = "sauco.navarro";
   home.homeDirectory = "/Users/sauco.navarro";
   home.sessionVariables = {
-    EDITOR = ''emacsclient -a nvim -t "$@"'';
+    EDITOR = "nvim";
     PYTHONBREAKPOINT = "pdb.set_trace";
     PYTHONSTARTUP = "$HOME/dotfiles/config/python/.pythonrc.py";
     USE_GKE_CLOUD_AUTH_PLUGIN = "True";
@@ -128,11 +128,11 @@ in
   };
 
 
- # programs.emacs = {
- #   enable = true;
- #   package = pkgs.emacs30;
- # };
-  xdg.configFile.emacs.source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/emacs";
+ #  programs.emacs = {
+ #    enable = true;
+ #    package = pkgs.emacs30;
+ #  };
+ #  xdg.configFile.emacs.source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/emacs";
   # home.file.".config/emacs" = {
   #   source = ./config/emacs;
   # };
@@ -153,7 +153,7 @@ in
 
   programs.k9s = {
     enable = true;
-    aliases = { cj = "cronjobs"; };
+    # aliases = { cj = "cronjobs"; };
   };
 
   xdg.configFile."k9s/skins/" = {

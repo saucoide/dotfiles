@@ -17,23 +17,23 @@
         size = 12.0;
         offset = {x = 0; y = 1;};
         normal = {
-          family = "JetBrainsMono Nerd Font Mono";
+          family = "JetBrainsMono Nerd Font";
           style = "Regular";
         };
         bold = {
-          family = "JetBrainsMono Nerd Font Mono";
+          family = "JetBrainsMono Nerd Font";
           style = "Bold";
         };
         bold_italic = {
-          family = "JetBrainsMono Nerd Font Mono";
+          family = "JetBrainsMono Nerd Font";
           style = "Bold Italic";
         };
         italic = {
-          family = "JetBrainsMono Nerd Font Mono";
+          family = "JetBrainsMono Nerd Font";
           style = "Italic";
         };
       };
-     
+
       colors = {
         draw_bold_text_with_bright_colors = true;
         primary = {

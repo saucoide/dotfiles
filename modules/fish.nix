@@ -7,6 +7,10 @@
       source $HOME/dotfiles/.private_envvars
     '';
     shellAliases = {
+
+      # nix 
+      hms = "darwin-rebuild switch --flake ~/dotfiles";
+
       # lsd
       ls = "lsd --long --group-dirs=first --date '+%Y-%m-%d %H:%M'";
       lsa = "lsd --long --group-dirs=first --almost-all --date '+%Y-%m-%d %H:%M'";
@@ -40,6 +44,9 @@
     };
 
     functions = {
+      fish_user_key_bindings = ''
+        fish_vi_key_bindings
+      '';
       fish_greeting = ''
         neofetch --cpu_temp on --disable gpu term de wm kernel packages distro shell resolution cols cpu --memory_percent on --off
       '';

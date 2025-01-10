@@ -15,7 +15,7 @@
   environment.variables = {
     LANG = "en_US.UTF-8";
   };
-  
+
 
   system.defaults.controlcenter = {
     NowPlaying = false;  # Do not show "now playing"
