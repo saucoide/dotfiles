@@ -52,10 +52,24 @@
       # lua: <cmd>.lua<CR>
       # lua: <cmd>source %<CR>
 
+      # Quitting
+      {
+        mode = "n";
+        key = "<leader>qq";
+        action = "<cmd>qall<CR>";
+        options.desc = "[q]uit neovim";
+      }
+      {
+        mode = "n";
+        key = "<leader>qQ";
+        action = "<cmd>qall!<CR>";
+        options.desc = "[Q]uit neovim - discard unsaved";
+      }
+
       # Terminal
       {
         mode = "t";
-        key = "<esc><esc>";
+        key = "<esc>";
         action = "<c-\\><c-n>";
         options.desc = "Exit terminal mode";
       }
@@ -207,7 +221,7 @@
         key = "<leader>bk";
         action.__raw = ''
           function()
-            local is_term = vim.bo.filetype == "toggleterm"
+            local is_term = vim.bo.filetype == "terminal"
             local buff = vim.api.nvim_get_current_buf()
             if is_term then
               vim.api.nvim_buf_delete(buff, {force = true})
@@ -294,18 +308,24 @@
       }
       {
         mode = "n";
-        key = "<leader>ss";
+        key = "<leader>sr";
         action = "<cmd>Telescope grep_string<CR>";
-        options.desc = "grep string under cursor";
+        options.desc = "grep for [r]eferences to the string under cursor";
       }
       {
         mode = "n";
-        key = "<leader>sp";
+        key = "<leader>ss";
         action = "<cmd>Telescope live_grep<CR>";
         options.desc = "live grep in current dir";
       }
 
       # Code / Lsp
+      {
+        mode = "n";
+        key = "<leader>cf";
+        action = "<cmd>Format<CR>";
+        options.desc = "[f]ormat buffer";
+      }
       {
         mode = "n";
         key = "<leader>cl";
@@ -350,14 +370,25 @@
       # Terminal
       {
         mode = "n";
-        key = "<leader>tT";
-        action = "<cmd>ToggleTermToggleAll<CR>";
-        options.desc = "Toggle all [T]erminals";
+        key = "<leader>ot";
+        action.__raw = "function() ToggleTerminal() end";
+        options.desc = "Toggle [t]erminal";
       }
       {
         mode = "n";
-        key = "<leader>tl";
-        action = "<cmd>TermSelect<CR>";
+        key = "<leader>oT";
+        action.__raw = ''function() 
+          local terminal = CreateTerminal() 
+          local window = vim.api.nvim_get_current_win()
+          vim.api.nvim_win_set_buf(window, terminal)
+          vim.cmd.startinsert()
+        end'';
+        options.desc = "Open new [T]erminal";
+      }
+      {
+        mode = "n";
+        key = "<leader>lt";
+        action.__raw = "function() ListTerminals() end";
         options.desc = "[l]ist terminals";
       }
 
@@ -380,7 +411,7 @@
     autoGroups = {
       #     neovim-startup = { clear = true; };
       kickstart-highlight-yank = {clear = true;};
-      #      customize-term-open = { clear = true; };
+      customize-term-open = {clear = true;};
     };
 
     # [[ Basic Autocommands ]]
@@ -398,8 +429,19 @@
           end
         '';
       }
+      # Terminal customiization
+      {
+        event = ["TermOpen"];
+        desc = " yanking (copying) text";
+        group = "customize-term-open";
+        callback.__raw = ''
+          function()
+            vim.opt.number = false
+            vim.opt.relativenumber = false
 
-      # TODO startup to a custom buffer
+          end
+        '';
+      }
     ];
 
     plugins = {
@@ -467,7 +509,10 @@
       telescope = {
         enable = true;
         settings = {
-          pickers.buffers.mappings.i = {"<C-d>" = "delete_buffer";};
+          pickers = {
+            buffers.mappings.i = {"<C-d>" = "delete_buffer";};
+            find_files.hidden = true;
+          };
         };
         extensions = {
           ui-select.enable = true;
@@ -586,6 +631,7 @@
         enable = true;
         settings = {
           graph_style = "ascii";
+          disable_insert_on_commit = true;
           mappings = {
             popup = {
               F = "PullPopup";
@@ -600,6 +646,50 @@
         settings = {
           org_agenda_files = "~/notes/agenda/**/*";
           org_default_notes_file = "~/notes/todo.org";
+          org_todo_keywords = ["TODO" "WIP" "DONE"];
+          # TODO continue  https://github.com/nvim-orgmode/orgmode/blob/master/lua/orgmode/config/defaults.lua
+        };
+      };
+
+      startup = {
+        enable = true;
+        mappings = {
+          executeCommand = "<CR>";
+          openFile = "<CR>";
+          openFileSplit = "<C-o>";
+        };
+        parts = ["header" "recent"];
+        options.paddings = [4 4];
+        sections = {
+          header = {
+            type = "text";
+            oldfilesDirectory = false;
+            align = "center";
+            foldSection = false;
+            title = "Header";
+            margin = 5;
+            content = [
+              "                        _           "
+              "  _ __   ___  _____   _(_)_ __ ___  "
+              " | '_ \\ / _ \\/ _ \\ \\ / / | '_ ` _ \\ "
+              " | | | |  __/ (_) \\ V /| | | | | | |"
+              " |_| |_|\\___|\\___/ \\_/ |_|_| |_| |_|"
+            ];
+            highlight = "Statement";
+            defaultColor = "";
+            oldfilesAmount = 0;
+          };
+          recent = {
+            type = "oldfiles";
+            #   oldfilesDirectory = true;
+            align = "center";
+            foldSection = false;
+            title = "Recent Files";
+            content = "";
+            margin = 5;
+            highlight = "String";
+            oldfilesAmount = 10;
+          };
         };
       };
     };
@@ -632,11 +722,110 @@
           python = { require("formatter.filetypes.python").ruff },
           terraform = { require("formatter.filetypes.terraform").terraformfmt },
           toml = { require("formatter.filetypes.toml").taplo },
-          yaml = { require("formatter.filetypes.yaml").yamlfmt },
+          yaml = {
+            function()
+              return {
+                exe = "yamlfmt",
+                args = { "-in", "-formatter", "retain_line_breaks_single=true"},
+                stdin = true,
+              }
+            end
+          },
           json = { require("formatter.filetypes.json").jq },
           ["*"] = { require("formatter.filetypes.any").remove_trailing_whitespace, }
         }
-      }'';
+      }
+
+      --  ** Terminal Toggling Functions **
+
+      -- create new terminal
+      function CreateTerminal()
+        local buf = vim.api.nvim_create_buf(true, true)
+        vim.api.nvim_buf_call(buf, function()
+          vim.cmd.term()
+          vim.bo.filetype = "terminal"
+        end)
+        return buf
+      end
+
+      -- list terminasl
+      function ListTerminals()
+        local terminal_buffers = {}
+
+        -- Iterate through all buffers
+        for _, bufnr in pairs(vim.api.nvim_list_bufs()) do
+          -- Check if the buffer is valid and its filetype is 'terminal'
+          if vim.bo[bufnr].filetype == "terminal" then
+            table.insert(terminal_buffers, bufnr)
+          end
+        end
+
+        -- show them to pick
+        vim.ui.select(terminal_buffers, {
+          prompt = "List of Terminals:",
+          format_item = function(bufnr)
+            return string.format("%s (Buffer %d)", item.name, item.bufnr)
+          end,
+        }, function(choice)
+            if choice then
+              vim.api.nvim_set_current_buf(choice)
+            end
+          end)
+      end
+
+      -- toggling behavior
+      function ToggleTerminal()
+        local windows = vim.api.nvim_tabpage_list_wins(0)
+        local current_win = vim.api.nvim_get_current_win()
+        local terminal_win = nil
+        local terminal_buf = nil
+
+        -- Find existing terminal buffer
+        for _, buf in pairs(vim.api.nvim_list_bufs()) do
+          if vim.bo[buf].buftype == 'terminal' then
+            terminal_buf = buf
+            break
+          end
+        end
+
+        -- Create terminal buffer if it doesn't exist
+        if not terminal_buf then
+          terminal_buf = CreateTerminal()
+        end
+
+        -- Find existing terminal window
+        for _, win in pairs(windows) do
+          if vim.api.nvim_win_get_buf(win) == terminal_buf then
+            terminal_win = win
+            break
+          end
+        end
+
+        -- If terminal window exists, close it and return
+        if terminal_win then
+          vim.api.nvim_win_close(terminal_win, true)
+          return
+        end
+
+        -- If no terminal window, open one
+        if #windows == 1 then
+          -- Only one window, create a new vsplit
+          vim.api.nvim_command('vsplit')
+          local new_win = vim.api.nvim_get_current_win()
+          vim.api.nvim_win_set_buf(new_win, terminal_buf)
+        else
+          -- Multiple windows, use the first non-active window
+          for _, win in ipairs(windows) do
+            if win ~= current_win then
+              vim.api.nvim_win_set_buf(win, terminal_buf)
+              vim.api.nvim_set_current_win(win)
+              break
+            end
+          end
+        end
+        vim.cmd.startinsert()
+      end
+      '';
     #   colorscheme = "monokai_pro";
   };
 }
