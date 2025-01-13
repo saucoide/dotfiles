@@ -1,4 +1,8 @@
-{ inputs, pkgs, ... }: {
+{
+  inputs,
+  pkgs,
+  ...
+}: {
   programs.nixvim = {
     enable = true;
     # defaultEditor = true;
@@ -34,27 +38,20 @@
       completeopt = ["menu" "menuone" "noselect"];
     };
     userCommands = {
-        Q.command = "q";
-        Q.bang = true;
-        Wq.command = "wq";
-        Wq.bang = true;
-        WQ.command = "wq";
-        WQ.bang = true;
-        W.command = "w";
-        W.bang = true;
+      Q.command = "q";
+      Q.bang = true;
+      Wq.command = "wq";
+      Wq.bang = true;
+      WQ.command = "wq";
+      WQ.bang = true;
+      W.command = "w";
+      W.bang = true;
     };
     keymaps = [
       # TODO execute lines evaluate stuff
       # lua: <cmd>.lua<CR>
       # lua: <cmd>source %<CR>
 
-      # Commentss
-      {
-        mode = "n";
-        key = "<C-/>";
-        action = ":normal gcc<CR>";
-        options.desc = "Toggle comment";
-      }
       # Terminal
       {
         mode = "t";
@@ -82,13 +79,13 @@
         action = "<C-w>q";
         options.desc = "Close window";
       }
-# TODO rotate layouts
-#       {
-#         mode = "n";
-#         key = "<leader>w<leader>";
-#         action = "<C-w>";
-#         options.desc = "Rotate window layouts";
-#       }
+      # TODO rotate layouts
+      #       {
+      #         mode = "n";
+      #         key = "<leader>w<leader>";
+      #         action = "<C-w>";
+      #         options.desc = "Rotate window layouts";
+      #       }
       {
         mode = "n";
         key = "<leader>w=";
@@ -150,49 +147,48 @@
         mode = "n";
         key = "<leader>w<left>";
         action = "<C-w>H";
-	options.desc = "Move window to the LEFT";
+        options.desc = "Move window to the LEFT";
       }
       {
         mode = "n";
         key = "<leader>w<right>";
         action = "<C-w>L";
-	options.desc = "Move window to the RIGHT";
+        options.desc = "Move window to the RIGHT";
       }
-
 
       # Leader Maps
 
       # Buffers
       {
-      # TODO list project buffers
+        # TODO list project buffers
         mode = "n";
         key = "<leader>bb";
         action = "<cmd>Telescope buffers<CR>";
-	options.desc = "TOOD List relevant Buffers";
+        options.desc = "TOOD List relevant Buffers";
       }
       {
         mode = "n";
         key = "<leader>bB";
         action = "<cmd>Telescope buffers<CR>";
-	options.desc = "List all Buffers";
+        options.desc = "List all Buffers";
       }
       {
         mode = "n";
         key = "<leader><BS>";
         action = "<cmd>b#<CR>";
-	options.desc = "Alternate Buffer";
+        options.desc = "Alternate Buffer";
       }
       {
         mode = "n";
         key = "<leader>bp";
         action = "<cmd>bp<CR>";
-	options.desc = "Previous Buffer";
+        options.desc = "Previous Buffer";
       }
       {
         mode = "n";
         key = "<leader>bn";
         action = "<cmd>bn<CR>";
-	options.desc = "Next Buffer";
+        options.desc = "Next Buffer";
       }
       {
         mode = "n";
@@ -220,13 +216,13 @@
             end
           end
         '';
-	options.desc = "Kill Buffer";
+        options.desc = "Kill Buffer";
       }
       {
         mode = "n";
         key = "<leader>bK";
         action = "<cmd>%bd<CR>";
-	options.desc = "Kill All Buffers";
+        options.desc = "Kill All Buffers";
       }
 
       # Basics
@@ -234,13 +230,19 @@
         mode = "n";
         key = "<leader><leader>";
         action = "<cmd>Telescope find_files<CR>";
-	options.desc = "Find file"; # TODO maybe files + buffers in project
+        options.desc = "Find file"; # TODO maybe files + buffers in project
       }
       {
         mode = "n";
         key = "<leader>d";
         action = "<cmd>Oil<CR>";
         options.desc = "open [d]irectory listing (oil)";
+      }
+      {
+        mode = "n";
+        key = "<leader>gg";
+        action = "<cmd>Neogit<CR>";
+        options.desc = "open [g]it";
       }
 
       # Files
@@ -257,7 +259,33 @@
         options.desc = "Find [r]ecent files";
       }
 
+      # vim.keymap.set("n", "<leader>/", function() require'hop'.hint_patterns({direction = require'hop.hint'.HintDirection.AFTER_CURSOR}) end)
+
       # Search & Grepping
+      {
+        mode = "n";
+        key = "S";
+        action.__raw = ''
+          function()
+            require'hop'.hint_patterns(
+              {direction = require'hop.hint'.HintDirection.BEFORE_CURSOR}
+            )
+          end
+        '';
+        options.desc = "Hop backwards in buffer";
+      }
+      {
+        mode = "n";
+        key = "s";
+        action.__raw = ''
+          function()
+            require'hop'.hint_patterns(
+              {direction = require'hop.hint'.HintDirection.AFTER_CURSOR}
+            )
+          end
+        '';
+        options.desc = "Hop forwards in buffer";
+      }
       {
         mode = "n";
         key = "/";
@@ -300,9 +328,9 @@
         mode = "n";
         key = "<leader>c<CR>";
         action.__raw = ''
-        function()
-          vim.lsp.buf.code_action()
-        end
+          function()
+            vim.lsp.buf.code_action()
+          end
         '';
         options.desc = "code actions";
       }
@@ -348,19 +376,17 @@
       }
     ];
 
-
     # https://nix-community.github.io/nixvim/NeovimOptions/autoGroups/index.html
     autoGroups = {
- #     neovim-startup = { clear = true; };
-      kickstart-highlight-yank = { clear = true; }; 
-#      customize-term-open = { clear = true; }; 
+      #     neovim-startup = { clear = true; };
+      kickstart-highlight-yank = {clear = true;};
+      #      customize-term-open = { clear = true; };
     };
 
     # [[ Basic Autocommands ]]
     #  See `:help lua-guide-autocommands`
     # https://nix-community.github.io/nixvim/NeovimOptions/autoCmd/index.html
     autoCmd = [
-
       # Highlight-Yank
       {
         event = ["TextYankPost"];
@@ -379,62 +405,83 @@
     plugins = {
       lualine = {
         enable = true;
-        settings.extensions = [ "oil" ];
+        settings.extensions = ["oil"];
       };
       web-devicons.enable = true;
       sleuth.enable = true;
-      # TODO NEXT completions!!!
-      # TODO autoformatter
-      # TODO magit
-      # TODO org-mode
-      # TODO org-roam
-     # toggleterm = {
-        # enable = true;
-        # settings = {
-        #   open_mapping = "[[<leader>tt]]";
-        #   direction = "vertical";
-        #   size = ''
-        #     function(term)
-        #       if term.direction == "horizontal" then
-        #         return vim.o.rows * 0.3
-        #       elseif term.direction == "vertical" then
-        #         return vim.o.columns * 0.5
-        #       end
-        #     end'';
-        #   autochdir = true;
-        #   shade = false;
-        # };
+      # leap.enable = true;
+      hop.enable = true;
+
+      # TODO org-mode -> obsidian.nvim + markdown.nvim |OR| orgmode.nvim, need to see if tags are nicely supported
+      # TODO looks like orgmove.nvim is the better option for me at the moment
+      # toggleterm = {
+      # enable = true;
+      # settings = {
+      #   open_mapping = "[[<leader>tt]]";
+      #   direction = "vertical";
+      #   size = ''
+      #     function(term)
+      #       if term.direction == "horizontal" then
+      #         return vim.o.rows * 0.3
+      #       elseif term.direction == "vertical" then
+      #         return vim.o.columns * 0.5
+      #       end
+      #     end'';
+      #   autochdir = true;
+      #   shade = false;
+      # };
       # };
       which-key = {
         enable = true;
         settings = {
           delay = 500;
-          sort = [ "alphanum" ];
+          sort = ["alphanum"];
           spec = [
-            { __unkeyed-1 = "<leader>b"; desc = "[b]uffer";}
-            { __unkeyed-1 = "<leader>c"; desc = "[c]ode";}
-            { __unkeyed-1 = "<leader>d"; desc = "[d]irectory";}
-            { __unkeyed-1 = "<leader>f"; desc = "[f]ile";}
-            { __unkeyed-1 = "<leader>s"; desc = "[s]earch";}
-            { __unkeyed-1 = "<leader>w"; desc = "[w]indow";}
+            {
+              __unkeyed-1 = "<leader>b";
+              desc = "[b]uffer";
+            }
+            {
+              __unkeyed-1 = "<leader>c";
+              desc = "[c]ode";
+            }
+            {
+              __unkeyed-1 = "<leader>d";
+              desc = "[d]irectory";
+            }
+            {
+              __unkeyed-1 = "<leader>f";
+              desc = "[f]ile";
+            }
+            {
+              __unkeyed-1 = "<leader>s";
+              desc = "[s]earch";
+            }
+            {
+              __unkeyed-1 = "<leader>w";
+              desc = "[w]indow";
+            }
           ];
         };
       };
       telescope = {
-          enable = true;
-          extensions = {
-            ui-select.enable = true;
-            fzf-native.enable = true;
-            project = {
-              enable = true;
-              settings = { 
-                base_dirs = [
-                  "~/projects"
-                  "~/dotfiles"
-                ];
-              };
+        enable = true;
+        settings = {
+          pickers.buffers.mappings.i = {"<C-d>" = "delete_buffer";};
+        };
+        extensions = {
+          ui-select.enable = true;
+          fzf-native.enable = true;
+          project = {
+            enable = true;
+            settings = {
+              base_dirs = [
+                "~/projects"
+                "~/dotfiles"
+              ];
             };
           };
+        };
       };
       oil = {
         enable = true;
@@ -443,10 +490,13 @@
           columns = [
             "permissions"
             "size"
-            {__unkeyed-1 = "mtime"; format = "%Y-%m-%d %H:%M";}
-            "icon" 
+            {
+              __unkeyed-1 = "mtime";
+              format = "%Y-%m-%d %H:%M";
+            }
+            "icon"
           ];
-          buf_options = { buflisted = true; };
+          buf_options = {buflisted = true;};
           win_options = {
             wrap = false;
             signcolumn = "no";
@@ -478,10 +528,10 @@
           };
           view_options = {
             show_hidden = false;
-           # highlight_filename.__raw = ''
-           #   function(entry, is_hidden, is_link_target, is_link_orphan)
-           #     return "Special"
-           #   end'';
+            # highlight_filename.__raw = ''
+            #   function(entry, is_hidden, is_link_target, is_link_orphan)
+            #     return "Special"
+            #   end'';
           };
         };
       };
@@ -489,21 +539,21 @@
       treesitter = {
         enable = true;
         settings = {
-          highlight = { 
+          highlight = {
             additional_vim_regex_highlighting = false;
-            enable = true; 
+            enable = true;
             # can disbale individual grammars
             # disable = [ rust ];
           };
           indent.enable = true;
           incremental_selection.enable = false;
-        }; 
+        };
         # languageRegister = { cpp = "onelab"; python = [ "foo" "bar" ]; };  # if you want to map individual filetypes to a given grammar
       };
 
       lsp = {
         enable = true;
-          servers = {
+        servers = {
           lua_ls.enable = true;
           nixd.enable = true;
           ruff.enable = true;
@@ -516,9 +566,9 @@
         autoEnableSources = true;
         settings = {
           sources = [
-            { name = "nvim_lsp";}
-            { name = "path";}
-            { name = "buffer";}
+            {name = "nvim_lsp";}
+            {name = "path";}
+            {name = "buffer";}
           ];
           mapping = {
             "<C-Space>" = "cmp.mapping.complete()";
@@ -531,28 +581,62 @@
           };
         };
       };
+
       neogit = {
         enable = true;
+        settings = {
+          graph_style = "ascii";
+          mappings = {
+            popup = {
+              F = "PullPopup";
+              p = "PushPopup";
+            };
+          };
+        };
+      };
+
+      orgmode = {
+        enable = true;
+        settings = {
+          org_agenda_files = "~/notes/agenda/**/*";
+          org_default_notes_file = "~/notes/todo.org";
+        };
       };
     };
 
     colorschemes.monokai-pro = {
       enable = true;
       settings = {
-       devicons = true;
-       terminal_colors = true;
-       filter = "pro";
+        devicons = true;
+        terminal_colors = true;
+        filter = "pro";
         #inc_search = "";
-#        background_clear = [
+        #        background_clear = [
         #    "toggleterm"
         #    "telescope"
         #    "renamer"
         #    "notify"
-#            "oil"
-#        ];
+        #            "oil"
+        #        ];
       };
     };
-#    extraPlugins = [ pkgs.vimPlugins.vim-monokai-pro ];
- #   colorscheme = "monokai_pro";
+
+    # TODO eventually move this to nixvim proper - not supported atm
+    extraPlugins = [pkgs.vimPlugins.formatter-nvim];
+    extraConfigLua = ''
+      require("formatter").setup {
+        logging = true,
+        filetype = {
+          lua = { require("formatter.filetypes.lua").stylua },
+          nix = { require("formatter.filetypes.nix").alejandra },
+          python = { require("formatter.filetypes.python").ruff },
+          terraform = { require("formatter.filetypes.terraform").terraformfmt },
+          toml = { require("formatter.filetypes.toml").taplo },
+          yaml = { require("formatter.filetypes.yaml").yamlfmt },
+          json = { require("formatter.filetypes.json").jq },
+          ["*"] = { require("formatter.filetypes.any").remove_trailing_whitespace, }
+        }
+      }'';
+    #   colorscheme = "monokai_pro";
   };
 }

@@ -40,7 +40,6 @@ in
     ./modules/alacritty.nix 
     ./modules/starship.nix 
     ./modules/fish.nix 
-    # ./modules/neovim.nix 
     ./modules/nixvim.nix 
   ];
 
@@ -73,9 +72,11 @@ in
     pyslp
 
     # Formatters
-    pkgs.nodePackages.prettier
-    pkgs.yamlfmt
-    pkgs.taplo
+    # pkgs.efm-langserver            # langserver to integrate formatters and other cli's
+    pkgs.nodePackages.prettier     #
+    pkgs.yamlfmt                   # yaml
+    pkgs.taplo                     # toml
+    pkgs.alejandra                 # nix
 
     # Network
     pkgs.mtr

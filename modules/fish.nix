@@ -11,6 +11,9 @@
       # nix 
       hms = "darwin-rebuild switch --flake ~/dotfiles";
 
+      # vim
+      v = "nvim .";
+
       # lsd
       ls = "lsd --long --group-dirs=first --date '+%Y-%m-%d %H:%M'";
       lsa = "lsd --long --group-dirs=first --almost-all --date '+%Y-%m-%d %H:%M'";
