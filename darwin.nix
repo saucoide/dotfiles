@@ -175,7 +175,7 @@
        # Other key bindings
        cmd-q = "close --quit-if-last-window";
        ctrl-alt-t = "exec-and-forget open --new -a alacritty";
-       # ctrl-alt-n = "exec-and-forget open "; # TODO emacsclient
+       # ctrl-alt-n = "exec-and-forget open --new -a alacritty --args -e nvim";
        # TODO - flameshot?
      };
     };

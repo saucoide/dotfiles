@@ -15,6 +15,7 @@
     opts = {
       number = true;
       relativenumber = false;
+      wrap = false;
       mouse = "a";
       showmode = false;
       clipboard = "unnamedplus";
@@ -33,6 +34,9 @@
       cursorline = true;
       scrolloff = 10;
       hlsearch = true;
+      incsearch = true;
+      termguicolors = true;
+      # colorcolumn = "88";
       shell = "fish";
       # Complete behavior
       completeopt = ["menu" "menuone" "noselect"];
@@ -51,6 +55,16 @@
       # TODO execute lines evaluate stuff
       # lua: <cmd>.lua<CR>
       # lua: <cmd>source %<CR>
+
+      # TODO other keymaps
+      # - shift visual lines up and down
+      # - PROJECT SWITHCER - I REALLY NEED SOMETHING
+      # - what is the quick fix list?
+      # - YASSNIPPET for =+begin_src etc
+      # - Make telescope / search and s hop jump emit a search afterwards so i can n n n n n
+      # - :help diffget   check how to resolve conflicts in neogit
+      # - to remove lsp diagnostics when editing https://github.com/neovim/neovim/issues/13324#issuecomment-1592038788
+      #  - or maybe - check how to get them to be less obnoxious
 
       # Quitting
       {
@@ -243,8 +257,8 @@
       {
         mode = "n";
         key = "<leader><leader>";
-        action = "<cmd>Telescope find_files<CR>";
-        options.desc = "Find file"; # TODO maybe files + buffers in project
+        action = "<cmd>Telescope git_files<CR>";
+        options.desc = "find git files"; # TODO maybe files + buffers in project
       }
       {
         mode = "n";
@@ -270,6 +284,19 @@
         mode = "n";
         key = "<leader>fr";
         action = "<cmd>Telescope oldfiles<CR>";
+        options.desc = "Find [r]ecent files";
+      }
+      # Project
+      {
+        mode = "n";
+        key = "<leader>pp";
+        action = "<cmd>Telescope project<CR>";
+        options.desc = "Switch [p]roject";
+      }
+      {
+        mode = "n";
+        key = "<leader>pf";
+        action = "<cmd>Telescope git_files<CR>";
         options.desc = "Find [r]ecent files";
       }
 
@@ -347,11 +374,7 @@
       {
         mode = "n";
         key = "<leader>c<CR>";
-        action.__raw = ''
-          function()
-            vim.lsp.buf.code_action()
-          end
-        '';
+        action.__raw = "function() vim.lsp.buf.code_action() end";
         options.desc = "code actions";
       }
       {
@@ -366,19 +389,31 @@
         action = "<cmd>Telescope lsp_references<CR>";
         options.desc = "goto [r]eferences";
       }
-
-      # Terminal
       {
         mode = "n";
-        key = "<leader>ot";
+        key = "<leader>cR";
+        action.__raw = "function() vim.lsp.buf.rename() end";
+        options.desc = "goto [r]eferences";
+      }
+      {
+        mode = "i";
+        key = "<C-h>";
+        action.__raw = "function() vim.lsp.buf.signature_help() end";
+        options.desc = "Show signature help";
+      }
+
+      # [T]erminal
+      {
+        mode = "n";
+        key = "<leader>to";
         action.__raw = "function() ToggleTerminal() end";
         options.desc = "Toggle [t]erminal";
       }
       {
         mode = "n";
-        key = "<leader>oT";
-        action.__raw = ''function() 
-          local terminal = CreateTerminal() 
+        key = "<leader>tO";
+        action.__raw = ''function()
+          local terminal = CreateTerminal()
           local window = vim.api.nvim_get_current_win()
           vim.api.nvim_win_set_buf(window, terminal)
           vim.cmd.startinsert()
@@ -387,7 +422,7 @@
       }
       {
         mode = "n";
-        key = "<leader>lt";
+        key = "<leader>tl";
         action.__raw = "function() ListTerminals() end";
         options.desc = "[l]ist terminals";
       }
@@ -398,6 +433,18 @@
         key = "G";
         action = "Gzz";
         options.desc = "Center when scrolling to the end of file";
+      }
+      {
+        mode = "n";
+        key = "J";
+        action = "mzJ`z";
+        options.desc = "Keep cursor inplace when [J]oining below";
+      }
+      {
+        mode = "x";
+        key = "p";
+        action = "P";
+        options.desc = "Do not loose the yank when pasting over a selection";
       }
       {
         mode = "n";
@@ -451,6 +498,7 @@
       };
       web-devicons.enable = true;
       sleuth.enable = true;
+      nvim-surround.enable = true;
       # leap.enable = true;
       hop.enable = true;
 
@@ -503,15 +551,35 @@
               __unkeyed-1 = "<leader>w";
               desc = "[w]indow";
             }
+            {
+              __unkeyed-1 = "<leader>t";
+              desc = "[t]erminal";
+            }
+            {
+              __unkeyed-1 = "<leader>o";
+              desc = "[o]rgmode";
+            }
           ];
         };
       };
+
+      # Telescope
       telescope = {
         enable = true;
         settings = {
+          defaults = {
+            mappings.i = { "<CR>" = { __raw = "require('telescope.actions').select_default + require('telescope.actions').center";};};
+            mappings.n = { "<CR>" = { __raw = "require('telescope.actions').select_default + require('telescope.actions').center";};};
+          };
           pickers = {
             buffers.mappings.i = {"<C-d>" = "delete_buffer";};
             find_files.hidden = true;
+            live_grep.hidden = true;
+            current_buffer_fuzzy_find = {
+              previewer = false;
+              mappings.i = { "<CR>" = { __raw = "require('telescope.actions').select_default + require('telescope.actions').center";};};
+              mappings.n = { "<CR>" = { __raw = "require('telescope.actions').select_default + require('telescope.actions').center";};};
+            };
           };
         };
         extensions = {
@@ -520,14 +588,25 @@
           project = {
             enable = true;
             settings = {
+              # cd_scope = {__unkeyed-1 = "global";}
               base_dirs = [
-                "~/projects"
-                "~/dotfiles"
+                  "~/dotfiles"
+                  { path = "~/projects"; max_depth=8;}
               ];
+              # on_project_select = {
+              #   __raw = ''
+              #     function(prompt_bufnr)
+              #       require("telescope._extensions.project.actions").change_working_directory(prompt_bufnr, false)
+              #       require("harpoon.ui").nav_file(1)
+              #     end
+              #   '';
+              # };
             };
           };
         };
       };
+
+      # Oil
       oil = {
         enable = true;
         settings = {
@@ -581,6 +660,7 @@
         };
       };
 
+      # Treesitter
       treesitter = {
         enable = true;
         settings = {
@@ -596,6 +676,7 @@
         # languageRegister = { cpp = "onelab"; python = [ "foo" "bar" ]; };  # if you want to map individual filetypes to a given grammar
       };
 
+      # LSP
       lsp = {
         enable = true;
         servers = {
@@ -606,6 +687,7 @@
         };
       };
 
+      # Completions
       cmp = {
         enable = true;
         autoEnableSources = true;
@@ -614,6 +696,7 @@
             {name = "nvim_lsp";}
             {name = "path";}
             {name = "buffer";}
+            {name = "orgmode";}
           ];
           mapping = {
             "<C-Space>" = "cmp.mapping.complete()";
@@ -627,6 +710,7 @@
         };
       };
 
+      # Neogit / Magit
       neogit = {
         enable = true;
         settings = {
@@ -641,16 +725,73 @@
         };
       };
 
+      # TODO continue from https://github.com/nvim-orgmode/orgmode/blob/master/DOCS.md#mappings
+      # Org-Mode
       orgmode = {
         enable = true;
         settings = {
           org_agenda_files = "~/notes/agenda/**/*";
-          org_default_notes_file = "~/notes/todo.org";
+          org_default_notes_file = "~/notes/agenda/todo.org";
+          org_archive_location = "~/notes/agenda/.archived.org";
+          org_hide_leading_stars = true;
+          org_hide_emphasis_markers = true;
+          org_startup_indented = true; # TODO check
           org_todo_keywords = ["TODO" "WIP" "DONE"];
-          # TODO continue  https://github.com/nvim-orgmode/orgmode/blob/master/lua/orgmode/config/defaults.lua
+          org_capture_templates = {
+            t = { description = "todo"; template = "* TODO %?\n %u";};  # target = "~/notes/somethng.org"
+          };
+          org_startup_folded = "overview";
+          mappings = {
+            prefix = "<leader>o";
+            global = {
+              org_agenda = "<prefix>a";
+              org_capture = "<prefix>c";
+            };
+            agenda = { org_agenda_show_help = "?"; };
+            capture = {
+              org_capture_kill = "<leader>bk";
+              org_capture_show_help = "?";
+            };
+            note = { org_note_kill = "<leader>bk"; };
+            org = {
+              org_refile = "<prefix>r";
+              org_timestamp_up_day = false;
+              org_timestamp_down_day = false;
+              org_change_date = "<prefix>dc";
+              org_todo = "<S-RIGHT>";
+              org_todo_prev = "<S-LEFT>";
+              org_toggle_checkbox = "<C-Space>";
+              toggle_heading = false;
+              open_at_point = "<prefix>o";
+              org_add_note = "<prefix>na";
+              org_cycle = "<TAB>";
+              org_global_cycle = "<S-TAB>";
+              org_archive_subtree = "<prefix>$";
+              org_set_tags_command = "<prefix>t";
+              org_do_promote = "<M-LEFT>";
+              org_do_demote = "<M-RIGHT>";
+              org_do_promote_subtree = "<M-S-LEFT>";
+              org_do_demote_subtree = "<M-S-RIGHT>";
+              org_move_subtree_up = "<M-S-UP>";
+              org_move_subtree_down = "<M-S-DOWN>";
+              org_meta_return = "<leader><CR>";
+              org_return = "<CR>";
+              org_insert_heading_respect_content = "<prefix>ih";
+              org_insert_todo_heading = false;
+              org_insert_todo_heading_respect_content = false;
+              org_export = "<prefix>e";
+              org_deadline = "<prefix>id";
+              org_schedule =  "<prefix>it";
+              org_insert_link = "<prefix>li";
+              org_store_link = "<prefix>ls";
+              org_babel_table = "<prefix>bt";
+              org_show_help = "<prefix>?";
+            };
+          };
         };
       };
 
+      # Dashbooard
       startup = {
         enable = true;
         mappings = {
