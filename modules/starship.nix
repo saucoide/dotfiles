@@ -14,6 +14,11 @@
 
       python.symbol = " ";
 
+      kubernetes = {
+        disabled = false;
+        style = "#0189f8 bold";
+      };
+
       # Disable the package module, hiding it from the prompt completely
       package.disabled = true;
 
@@ -22,10 +27,6 @@
       battery.disabled = true;
       buf.disabled = true;
       gcloud.disabled = true;
-      kubernetes = {
-        disabled = true;
-        style = "#0189f8 bold";
-      };
     };
   };
 }

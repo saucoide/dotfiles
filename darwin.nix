@@ -199,7 +199,11 @@
 
   # FISH
   programs.fish = {
-    enable = true;
+   enable = true;
+   vendor = {
+     completions.enable = true;
+     config.enable = true;
+   };
   };
 
   # Homebrew (if needed for anything)

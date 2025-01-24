@@ -1,32 +1,35 @@
 # Home Manager configuration
-{ inputs, config, pkgs, lib, ... }: 
-let
-  gdk = pkgs.google-cloud-sdk.withExtraComponents(
-    [pkgs.google-cloud-sdk.components.gke-gcloud-auth-plugin]
-  );
-  pyslp = pkgs.python312.withPackages(
-    p: with p; [
-      python-lsp-server
-      pylsp-mypy
-    ]
+{
+  inputs,
+  config,
+  pkgs,
+  lib,
+  ...
+}: let
+  gdk = pkgs.google-cloud-sdk.withExtraComponents [pkgs.google-cloud-sdk.components.gke-gcloud-auth-plugin];
+  pyslp = pkgs.python312.withPackages (
+    p:
+      with p; [
+        python-lsp-server
+        pylsp-mypy
+      ]
   );
   # emacs-overlay = import ( fetchTarBall {
   #   url = ;
   #   sha256 = ;
   # });
- # customEmacs = pkgs.emacs30.override {
- #   withNativeCompilation = true;
- #   withSQLite3 = true;
- #   withTreeSitter = true;
- #   withImageMagick = true;
- # };
-in
- {
-
+  # customEmacs = pkgs.emacs30.override {
+  #   withNativeCompilation = true;
+  #   withSQLite3 = true;
+  #   withTreeSitter = true;
+  #   withImageMagick = true;
+  # };
+in {
   home.stateVersion = "24.11";
   home.username = "sauco.navarro";
   home.homeDirectory = "/Users/sauco.navarro";
   home.sessionVariables = {
+    SHELL = "fish";
     EDITOR = "nvim";
     PYTHONBREAKPOINT = "pdb.set_trace";
     PYTHONSTARTUP = "$HOME/dotfiles/config/python/.pythonrc.py";
@@ -34,16 +37,29 @@ in
     # Maybe rye path
   };
 
+  targets.darwin.keybindings = {
+    # Home/End keys behavior
+    "\UF729" = "moveToBeginningOfLine:"; # Home
+    "\UF72B" = "moveToEndOfLine:"; # End
+    "$\UF729" = "moveToBeginningOfLineAndModifySelection:"; # Shift + Home
+    "$\UF72B" = "moveToEndOfLineAndModifySelection:"; # Shift + End
+    "^\UF729" = "moveToBeginningOfDocument:"; # Ctrl + Home
+    "^\UF72B" = "moveToEndOfDocument:"; # Ctrl + End
+    "$^\UF729" = "moveToBeginningOfDocumentAndModifySelection:"; # Shift + Ctrl + Home
+    "$^\UF72B" = "moveToEndOfDocumentAndModifySelection:"; # Shift + Ctrl + End
+  };
+
   # My Modules
-  imports  = [
+  imports = [
     inputs.nixvim.homeManagerModules.nixvim
-    ./modules/alacritty.nix 
-    ./modules/starship.nix 
-    ./modules/fish.nix 
-    ./modules/nixvim.nix 
+    ./modules/alacritty.nix
+    ./modules/starship.nix
+    ./modules/fish.nix
+    ./modules/nixvim.nix
   ];
 
   home.packages = [
+
     # Compilers & general build tools
     pkgs.gcc
     pkgs.cmake
@@ -73,15 +89,15 @@ in
 
     # Formatters
     # pkgs.efm-langserver            # langserver to integrate formatters and other cli's
-    pkgs.nodePackages.prettier     #
-    pkgs.yamlfmt                   # yaml
-    pkgs.taplo                     # toml
-    pkgs.alejandra                 # nix
+    pkgs.nodePackages.prettier #
+    pkgs.yamlfmt # yaml
+    pkgs.taplo # toml
+    pkgs.alejandra # nix
 
     # Network
     pkgs.mtr
     pkgs.nmap
-    
+
     # Infra
     gdk
     pkgs.kubectl
@@ -103,20 +119,20 @@ in
     pkgs.raycast
   ];
 
-
   # SSH
   programs.ssh = {
     enable = true;
     addKeysToAgent = "yes";
-    #extraConfig = ''
-    #  UseKeychain yes
-    #  IdentityFile ~/.ssh/id_ed25519
-    #'';
+    extraConfig = ''
+     UseKeychain yes
+     IdentityFile ~/.ssh/id_ed25519
+    '';
   };
+
   programs.gpg.enable = true;
   programs.password-store = {
     enable = true;
-    settings = { 
+    settings = {
       PASSWORD_STORE_DIR = "${config.home.homeDirectory}/.password-store";
     };
   };
@@ -128,23 +144,21 @@ in
     nix-direnv.enable = true;
   };
 
-
- #  programs.emacs = {
- #    enable = true;
- #    package = pkgs.emacs30;
- #  };
- #  xdg.configFile.emacs.source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/emacs";
+  #  programs.emacs = {
+  #    enable = true;
+  #    package = pkgs.emacs30;
+  #  };
+  #  xdg.configFile.emacs.source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/emacs";
   # home.file.".config/emacs" = {
   #   source = ./config/emacs;
   # };
-
 
   programs.git = {
     enable = true;
     userEmail = "sauco.navarro@team.wrike.com";
     userName = "sauco";
     extraConfig = {
-      fetch = { prune = true; };
+      fetch = {prune = true;};
     };
   };
 
@@ -162,7 +176,13 @@ in
     recursive = true;
   };
 
+  # TODO experiment
+  programs.tmux = {
+    enable = true;
+    shell = "fish";
+  };
+
   # Need to pull the whole config as a whole, no symlinks until this is fixed: https://github.com/FelixKratz/SketchyBar/issues/553
   # config = pkgs.lib.fileContents ./config/sketchybar/sketchybarrc;
   xdg.configFile.sketchybar.source = ./config/sketchybar;
-  }
+}
