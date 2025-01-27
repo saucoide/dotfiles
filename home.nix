@@ -3,7 +3,6 @@
   inputs,
   config,
   pkgs,
-  lib,
   ...
 }: let
   gdk = pkgs.google-cloud-sdk.withExtraComponents [pkgs.google-cloud-sdk.components.gke-gcloud-auth-plugin];
@@ -59,7 +58,6 @@ in {
   ];
 
   home.packages = [
-
     # Compilers & general build tools
     pkgs.gcc
     pkgs.cmake
@@ -124,8 +122,8 @@ in {
     enable = true;
     addKeysToAgent = "yes";
     extraConfig = ''
-     UseKeychain yes
-     IdentityFile ~/.ssh/id_ed25519
+      UseKeychain yes
+      IdentityFile ~/.ssh/id_ed25519
     '';
   };
 

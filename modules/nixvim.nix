@@ -1,8 +1,4 @@
-{
-  inputs,
-  pkgs,
-  ...
-}: {
+{pkgs, ...}: {
   programs.nixvim = {
     enable = true;
     # defaultEditor = true;
@@ -52,29 +48,22 @@
       W.bang = true;
     };
 
+    # colorschemes = {
+    #   monokai-pro = {
+    #     enable = true;
+    #     lazyLoad.enable = true;
+    #     settings = {
+    #       devicons = true;
+    #       terminal_colors = true;
+    #       filter = "pro";
+    #     };
+    #   };
     colorscheme = "monokai-pro";
-    colorschemes.monokai-pro = {
-      enable = true;
-      lazyLoad.enable = true;
-      settings = {
-        devicons = true;
-        terminal_colors = true;
-        filter = "pro";
-      };
-    };
 
     keymaps = [
-      # TODO execute lines evaluate stuff
-      # lua: <cmd>.lua<CR>
-      # lua: <cmd>source %<CR>
-
       # TODO
       # leader h-f for built-in help via telescope and stuff like i had in emacs
       # TODO other keymaps
-      # - Lazy load some extensions, telescope-project seems to be slow?
-      # - shift visual lines up and down
-      # - PROJECT SWITHCER - I REALLY NEED SOMETHING
-      # - what is the quick fix list?
       # - YASSNIPPET for =+begin_src etc
       # - Make telescope / search and s hop jump emit a search afterwards so i can n n n n n
       # - :help diffget   check how to resolve conflicts in neogit
@@ -82,47 +71,153 @@
       #  - or maybe - check how to get them to be less obnoxious
 
       # Quitting
-      { mode = "n"; key = "<leader>qq"; action = "<cmd>qall<CR>"; options.desc = "[q]uit neovim"; }
-      { mode = "n"; key = "<leader>qQ"; action = "<cmd>qall!<CR>"; options.desc = "[Q]uit neovim - discard unsaved"; }
+      {
+        mode = "n";
+        key = "<leader>qq";
+        action = "<cmd>qall<CR>";
+        options.desc = "[q]uit neovim";
+      }
+      {
+        mode = "n";
+        key = "<leader>qQ";
+        action = "<cmd>qall!<CR>";
+        options.desc = "[Q]uit neovim - discard unsaved";
+      }
 
       # Terminal
-      { mode = "t"; key = "<esc>"; action = "<c-\\><c-n>"; options.desc = "Exit terminal mode"; }
+      {
+        mode = "t";
+        key = "<esc>";
+        action = "<c-\\><c-n>";
+        options.desc = "Exit terminal mode";
+      }
 
       # Window spliting
-      { mode = "n"; key = "<leader>wv"; action = "<C-w>v"; options.desc = "Split window vertically"; }
-      { mode = "n"; key = "<leader>ws"; action = "<C-w>s"; options.desc = "Split window horizontally"; }
-      { mode = "n"; key = "<leader>wc"; action = "<C-w>q"; options.desc = "Close window"; }
-      # TODO rotate layouts
-      #       {
-      #         mode = "n";
-      #         key = "<leader>w<leader>";
-      #         action = "<C-w>";
-      #         options.desc = "Rotate window layouts";
-      #       }
-      { mode = "n"; key = "<leader>w="; action = "<C-w>="; options.desc = "Equalize window sizes"; }
+      {
+        mode = "n";
+        key = "<leader>wv";
+        action = "<C-w>v";
+        options.desc = "Split window vertically";
+      }
+      {
+        mode = "n";
+        key = "<leader>ws";
+        action = "<C-w>s";
+        options.desc = "Split window horizontally";
+      }
+      {
+        mode = "n";
+        key = "<leader>wc";
+        action = "<C-w>q";
+        options.desc = "Close window";
+      }
+      {
+        mode = "n";
+        key = "<leader>w=";
+        action = "<C-w>=";
+        options.desc = "Equalize window sizes";
+      }
       # Window focus
-      { mode = "n"; key = "<leader><up>"; action = "<C-w><up>"; options.desc = "Move FOCUS to the UPPER WINDOW"; }
-      { mode = "n"; key = "<leader><down>"; action = "<C-w><down>"; options.desc = "Move FOCUS to the LOWER WINDOW"; }
-      { mode = "n"; key = "<leader><left>"; action = "<C-w><left>"; options.desc = "Move FOCUS to the LEFT WINDOW"; }
-      { mode = "n"; key = "<leader><right>"; action = "<C-w><right>"; options.desc = "Move FOCUS to the RIGHT WINDOW"; }
+      {
+        mode = "n";
+        key = "<leader><up>";
+        action = "<C-w><up>";
+        options.desc = "Move FOCUS to the UPPER WINDOW";
+      }
+      {
+        mode = "n";
+        key = "<leader><down>";
+        action = "<C-w><down>";
+        options.desc = "Move FOCUS to the LOWER WINDOW";
+      }
+      {
+        mode = "n";
+        key = "<leader><left>";
+        action = "<C-w><left>";
+        options.desc = "Move FOCUS to the LEFT WINDOW";
+      }
+      {
+        mode = "n";
+        key = "<leader><right>";
+        action = "<C-w><right>";
+        options.desc = "Move FOCUS to the RIGHT WINDOW";
+      }
 
       # Window moving
-      { mode = "n"; key = "<leader>ww"; action = "<C-w>r"; options.desc = "Rotate windows clockwise"; }
-      { mode = "n"; key = "<leader>wW"; action = "<C-w>R"; options.desc = "Rotate windows anticlockwise"; }
-      { mode = "n"; key = "<leader>w<up>"; action = "<C-w>K"; options.desc = "Move window to the TOP"; }
-      { mode = "n"; key = "<leader>w<down>"; action = "<C-w>J"; options.desc = "Move window to the BOTTOM"; }
-      { mode = "n"; key = "<leader>w<left>"; action = "<C-w>H"; options.desc = "Move window to the LEFT"; }
-      { mode = "n"; key = "<leader>w<right>"; action = "<C-w>L"; options.desc = "Move window to the RIGHT"; }
+      {
+        mode = "n";
+        key = "<leader>ww";
+        action = "<C-w>r";
+        options.desc = "Rotate windows clockwise";
+      }
+      {
+        mode = "n";
+        key = "<leader>wW";
+        action = "<C-w>R";
+        options.desc = "Rotate windows anticlockwise";
+      }
+      {
+        mode = "n";
+        key = "<leader>w<up>";
+        action = "<C-w>K";
+        options.desc = "Move window to the TOP";
+      }
+      {
+        mode = "n";
+        key = "<leader>w<down>";
+        action = "<C-w>J";
+        options.desc = "Move window to the BOTTOM";
+      }
+      {
+        mode = "n";
+        key = "<leader>w<left>";
+        action = "<C-w>H";
+        options.desc = "Move window to the LEFT";
+      }
+      {
+        mode = "n";
+        key = "<leader>w<right>";
+        action = "<C-w>L";
+        options.desc = "Move window to the RIGHT";
+      }
 
       # Leader Maps
 
       # Buffers
-      { mode = "n"; key = "<leader>bb"; action = "<cmd>Telescope buffers<CR>"; options.desc = "TOOD List relevant Buffers"; }
-      { mode = "n"; key = "<leader>bB"; action = "<cmd>Telescope buffers<CR>"; options.desc = "List all Buffers"; }
-      { mode = "n"; key = "<leader><BS>"; action = "<cmd>b#<CR>"; options.desc = "Alternate Buffer"; }
-      { mode = "n"; key = "<leader>bp"; action = "<cmd>bp<CR>"; options.desc = "Previous Buffer"; }
-      { mode = "n"; key = "<leader>bn"; action = "<cmd>bn<CR>"; options.desc = "Next Buffer"; }
-      { mode = "n"; key = "<leader>bN"; action.__raw = ''
+      {
+        mode = "n";
+        key = "<leader>bb";
+        action = "<cmd>Telescope buffers<CR>";
+        options.desc = "TOOD List relevant Buffers";
+      }
+      {
+        mode = "n";
+        key = "<leader>bB";
+        action = "<cmd>Telescope buffers<CR>";
+        options.desc = "List all Buffers";
+      }
+      {
+        mode = "n";
+        key = "<leader><BS>";
+        action = "<cmd>b#<CR>";
+        options.desc = "Alternate Buffer";
+      }
+      {
+        mode = "n";
+        key = "<leader>bp";
+        action = "<cmd>bp<CR>";
+        options.desc = "Previous Buffer";
+      }
+      {
+        mode = "n";
+        key = "<leader>bn";
+        action = "<cmd>bn<CR>";
+        options.desc = "Next Buffer";
+      }
+      {
+        mode = "n";
+        key = "<leader>bN";
+        action.__raw = ''
           function()
             local new_buff = vim.api.nvim_create_buf({listed=true}, {scratch=false})
             local curr_win = vim.api.nvim_get_current_win()
@@ -131,7 +226,10 @@
         '';
         options.desc = "Create [N]ew buffer";
       }
-      { mode = "n"; key = "<leader>bk"; action.__raw = ''
+      {
+        mode = "n";
+        key = "<leader>bk";
+        action.__raw = ''
           function()
             local is_term = vim.bo.filetype == "terminal"
             local buff = vim.api.nvim_get_current_buf()
@@ -144,24 +242,67 @@
         '';
         options.desc = "Kill Buffer";
       }
-      { mode = "n"; key = "<leader>bK"; action = "<cmd>%bd<CR>"; options.desc = "Kill All Buffers"; }
+      {
+        mode = "n";
+        key = "<leader>bK";
+        action = "<cmd>%bd<CR>";
+        options.desc = "Kill All Buffers";
+      }
 
       # Basics
-      { mode = "n"; key = "<leader><leader>"; action = "<cmd>Telescope git_files<CR>"; options.desc = "find git files"; } # TODO maybe files + buffers in project
-      { mode = "n"; key = "<leader>d"; action = "<cmd>Oil<CR>"; options.desc = "open [d]irectory listing (oil)"; }
-      { mode = "n"; key = "<leader>gg"; action = "<cmd>Neogit<CR>"; options.desc = "open [g]it"; }
+      {
+        mode = "n";
+        key = "<leader><leader>";
+        action = "<cmd>Telescope git_files<CR>";
+        options.desc = "find git files";
+      } # TODO maybe files + buffers in project
+      {
+        mode = "n";
+        key = "<leader>d";
+        action = "<cmd>Oil<CR>";
+        options.desc = "open [d]irectory listing (oil)";
+      }
+      {
+        mode = "n";
+        key = "<leader>gg";
+        action = "<cmd>Neogit<CR>";
+        options.desc = "open [g]it";
+      }
 
       # Files
-      { mode = "n"; key = "<leader>ff"; action = "<cmd>Telescope find_files<CR>"; options.desc = "Find [f]iles"; }
-      { mode = "n"; key = "<leader>fr"; action = "<cmd>Telescope oldfiles<CR>"; options.desc = "Find [r]ecent files"; }
+      {
+        mode = "n";
+        key = "<leader>ff";
+        action = "<cmd>Telescope find_files<CR>";
+        options.desc = "Find [f]iles";
+      }
+      {
+        mode = "n";
+        key = "<leader>fr";
+        action = "<cmd>Telescope oldfiles<CR>";
+        options.desc = "Find [r]ecent files";
+      }
       # Project
-      { mode = "n"; key = "<leader>pp"; action = "<cmd>Telescope projects<CR>"; options.desc = "Switch [p]roject"; }
-      { mode = "n"; key = "<leader>pf"; action = "<cmd>Telescope git_files<CR>"; options.desc = "Find [r]ecent files"; }
+      {
+        mode = "n";
+        key = "<leader>pp";
+        action = "<cmd>Telescope projects<CR>";
+        options.desc = "Switch [p]roject";
+      }
+      {
+        mode = "n";
+        key = "<leader>pf";
+        action = "<cmd>Telescope git_files<CR>";
+        options.desc = "Find [r]ecent files";
+      }
 
       # vim.keymap.set("n", "<leader>/", function() require'hop'.hint_patterns({direction = require'hop.hint'.HintDirection.AFTER_CURSOR}) end)
 
       # Search & Grepping
-      { mode = "n"; key = "S"; action.__raw = ''
+      {
+        mode = "n";
+        key = "S";
+        action.__raw = ''
           function()
             require'hop'.hint_patterns(
               {direction = require'hop.hint'.HintDirection.BEFORE_CURSOR}
@@ -170,7 +311,10 @@
         '';
         options.desc = "Hop backwards in buffer";
       }
-      { mode = "n"; key = "s"; action.__raw = ''
+      {
+        mode = "n";
+        key = "s";
+        action.__raw = ''
           function()
             require'hop'.hint_patterns(
               {direction = require'hop.hint'.HintDirection.AFTER_CURSOR}
@@ -179,24 +323,92 @@
         '';
         options.desc = "Hop forwards in buffer";
       }
-      { mode = "n"; key = "/"; action = "<cmd>Telescope current_buffer_fuzzy_find<CR>"; options.desc = "Find in buffer"; }
-      { mode = "n"; key = "<leader>sr"; action = "<cmd>Telescope grep_string<CR>"; options.desc = "grep for [r]eferences to the string under cursor"; }
-      { mode = "n"; key = "<leader>ss"; action = "<cmd>Telescope live_grep<CR>"; options.desc = "live grep in current dir"; }
+      {
+        mode = "n";
+        key = "/";
+        action = "<cmd>Telescope current_buffer_fuzzy_find<CR>";
+        options.desc = "Find in buffer";
+      }
+      {
+        mode = "n";
+        key = "<leader>sr";
+        action = "<cmd>Telescope grep_string<CR>";
+        options.desc = "grep for [r]eferences to the string under cursor";
+      }
+      {
+        mode = "n";
+        key = "<leader>ss";
+        action = "<cmd>Telescope live_grep<CR>";
+        options.desc = "live grep in current dir";
+      }
 
       # Code / Lsp
-      { mode = "n"; key = "<leader>cf"; action = "<cmd>Format<CR>"; options.desc = "[f]ormat buffer"; }
-      { mode = "n"; key = "<leader>cl"; action = "<cmd>Telescope diagnostics<CR>"; options.desc = "[l]ist lsp diagnostics"; }
-      { mode = "n"; key = "<leader>cn"; action = "<cmd>lua vim.diagnostic.goto_next()<CR>"; options.desc = "[n]ext diagnostic"; }
-      { mode = "n"; key = "<leader>cp"; action = "<cmd>lua vim.diagnostic.goto_prev()<CR>"; options.desc = "[p]revious diagnostic"; }
-      { mode = "n"; key = "<leader>c<CR>"; action.__raw = "function() vim.lsp.buf.code_action() end"; options.desc = "code actions"; }
-      { mode = "n"; key = "<leader>cd"; action = "<cmd>Telescope lsp_definitions<CR>"; options.desc = "goto [d]efinitions"; }
-      { mode = "n"; key = "<leader>cr"; action = "<cmd>Telescope lsp_references<CR>"; options.desc = "goto [r]eferences"; }
-      { mode = "n"; key = "<leader>cR"; action.__raw = "function() vim.lsp.buf.rename() end"; options.desc = "goto [r]eferences"; }
-      { mode = "i"; key = "<C-h>"; action.__raw = "function() vim.lsp.buf.signature_help() end"; options.desc = "Show signature help"; }
+      {
+        mode = "n";
+        key = "<leader>cf";
+        action = "<cmd>Format<CR>";
+        options.desc = "[f]ormat buffer";
+      }
+      {
+        mode = "n";
+        key = "<leader>cl";
+        action = "<cmd>Telescope diagnostics<CR>";
+        options.desc = "[l]ist lsp diagnostics";
+      }
+      {
+        mode = "n";
+        key = "<leader>cn";
+        action = "<cmd>lua vim.diagnostic.goto_next()<CR>";
+        options.desc = "[n]ext diagnostic";
+      }
+      {
+        mode = "n";
+        key = "<leader>cp";
+        action = "<cmd>lua vim.diagnostic.goto_prev()<CR>";
+        options.desc = "[p]revious diagnostic";
+      }
+      {
+        mode = "n";
+        key = "<leader>c<CR>";
+        action.__raw = "function() vim.lsp.buf.code_action() end";
+        options.desc = "code actions";
+      }
+      {
+        mode = "n";
+        key = "<leader>cd";
+        action = "<cmd>Telescope lsp_definitions<CR>";
+        options.desc = "goto [d]efinitions";
+      }
+      {
+        mode = "n";
+        key = "<leader>cr";
+        action = "<cmd>Telescope lsp_references<CR>";
+        options.desc = "goto [r]eferences";
+      }
+      {
+        mode = "n";
+        key = "<leader>cR";
+        action.__raw = "function() vim.lsp.buf.rename() end";
+        options.desc = "goto [r]eferences";
+      }
+      {
+        mode = "i";
+        key = "<C-h>";
+        action.__raw = "function() vim.lsp.buf.signature_help() end";
+        options.desc = "Show signature help";
+      }
 
       # [T]erminal
-      { mode = "n"; key = "<leader>tt"; action.__raw = "function() ToggleTerminal() end"; options.desc = "Toggle [t]erminal"; }
-      { mode = "n"; key = "<leader>tT"; action.__raw = ''
+      {
+        mode = "n";
+        key = "<leader>tt";
+        action.__raw = "function() ToggleTerminal() end";
+        options.desc = "Toggle [t]erminal";
+      }
+      {
+        mode = "n";
+        key = "<leader>tT";
+        action.__raw = ''
           function()
             local terminal = CreateTerminal()
             local window = vim.api.nvim_get_current_win()
@@ -205,20 +417,65 @@
           end'';
         options.desc = "Open new [T]erminal";
       }
-      { mode = "n"; key = "<leader>tl"; action.__raw = "function() ListTerminals() end"; options.desc = "[l]ist terminals"; }
+      {
+        mode = "n";
+        key = "<leader>tl";
+        action.__raw = "function() ListTerminals() end";
+        options.desc = "[l]ist terminals";
+      }
 
       # Quickfix
-      { mode = "n"; key = "<C-down>"; action = "<cmd>cnext<CR>"; options.desc = "next quickfix"; }
-      { mode = "n"; key = "<C-up>"; action = "<cmd>cprevious<CR>"; options.desc = "previous quickfix"; }
+      {
+        mode = "n";
+        key = "<C-down>";
+        action = "<cmd>cnext<CR>";
+        options.desc = "next quickfix";
+      }
+      {
+        mode = "n";
+        key = "<C-up>";
+        action = "<cmd>cprevious<CR>";
+        options.desc = "previous quickfix";
+      }
 
       # Other
-      { mode = "n"; key = "G"; action = "Gzz"; options.desc = "Center when scrolling to the end of file"; }
-      { mode = "n"; key = "J"; action = "mzJ`z"; options.desc = "Keep cursor inplace when [J]oining below"; }
-      { mode = "x"; key = "p"; action = "P"; options.desc = "Do not loose the yank when pasting over a selection"; }
-      { mode = "n"; key = "<Esc>"; action = "<cmd>nohlsearch<CR>"; options.desc = "Clear highlights on search when pressing <Esc> in normal mode"; }
-      { mode = "v"; key = "<M-Up>"; action = ":m '<-2<CR>gv=gv"; options.desc = "Shift selection UP"; }
-      { mode = "v"; key = "<M-Down>"; action = ":m '>+1<CR>gv=gv'"; options.desc = "Shift selection DOWN"; }
-  ];
+      {
+        mode = "n";
+        key = "G";
+        action = "Gzz";
+        options.desc = "Center when scrolling to the end of file";
+      }
+      {
+        mode = "n";
+        key = "J";
+        action = "mzJ`z";
+        options.desc = "Keep cursor inplace when [J]oining below";
+      }
+      {
+        mode = "x";
+        key = "p";
+        action = "P";
+        options.desc = "Do not loose the yank when pasting over a selection";
+      }
+      {
+        mode = "n";
+        key = "<Esc>";
+        action = "<cmd>nohlsearch<CR>";
+        options.desc = "Clear highlights on search when pressing <Esc> in normal mode";
+      }
+      {
+        mode = "v";
+        key = "<M-Up>";
+        action = ":m '<-2<CR>gv=gv";
+        options.desc = "Shift selection UP";
+      }
+      {
+        mode = "v";
+        key = "<M-Down>";
+        action = ":m '>+1<CR>gv=gv'";
+        options.desc = "Shift selection DOWN";
+      }
+    ];
 
     # https://nix-community.github.io/nixvim/NeovimOptions/autoGroups/index.html
     autoGroups = {
@@ -266,6 +523,10 @@
       web-devicons.enable = true;
       sleuth.enable = true;
       nvim-surround.enable = true;
+      colorizer = {
+        enable = true;
+        lazyLoad.settings.cmd = "ColorizerToggle";
+      };
       hop = {
         enable = true;
         lazyLoad.settings.event = "DeferredUIEnter";
@@ -357,7 +618,7 @@
       harpoon = {
         enable = true;
         enableTelescope = true;
-        lazyLoad.settings.event = "DeferredUIEnter";
+        # lazyLoad.settings.event = "DeferredUIEnter";
         keymaps = {
           addFile = "<leader>a";
           cmdToggleQuickMenu = "<leader>hc";
@@ -521,6 +782,7 @@
         # keys = ["<leader>o" ];
         # };
         settings = {
+          # ui = {};
           org_agenda_files = "~/notes/agenda/todo.org";
           org_default_notes_file = "~/notes/agenda/todo.org";
           org_archive_location = "~/notes/agenda/todo.org_archive";
@@ -530,8 +792,8 @@
           org_todo_keywords = ["TODO" "WIP" "DONE"];
           org_capture_templates = {
             t = {
-              description = "todo";
-              template = "* TODO %?\n %u";
+              description = "new TODO entry";
+              template = "* TODO %?\n  %u\n  DEADLINE: %^t\n  FROM: %a";
             }; # target = "~/notes/somethng.org"  # TODO add deadline
           };
           org_startup_folded = "overview";

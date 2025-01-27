@@ -1,4 +1,8 @@
-{ inputs, pkgs, ... }: {
+{
+  inputs,
+  pkgs,
+  ...
+}: {
   programs.starship = {
     enable = true;
     enableFishIntegration = true;
@@ -12,11 +16,14 @@
         vicmd_symbol = "[N](bold blue)";
       };
 
+      directory.style = "bold blue";
+
       python.symbol = " ";
+      nix.format = "via [$symbol]";
 
       kubernetes = {
         disabled = false;
-        style = "#0189f8 bold";
+        style = "#5795e6 bold";
       };
 
       # Disable the package module, hiding it from the prompt completely
