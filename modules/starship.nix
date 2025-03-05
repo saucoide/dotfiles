@@ -18,8 +18,8 @@
 
       directory.style = "bold blue";
 
-      python.symbol = " ";
-      nix.format = "via [$symbol]";
+      python.symbol = " ";
+      nix_shell.format = "via [$symbol]($style) ";
 
       kubernetes = {
         disabled = false;

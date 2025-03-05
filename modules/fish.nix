@@ -38,6 +38,7 @@
       # gcloud
       gcp = "gcloud_change_project";
       gc = "gcloud";
+      gcs = "gcloud storage";
 
       # others
       "cd.." = "cd ..";

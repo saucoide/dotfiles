@@ -15,6 +15,7 @@
       mouse = "a";
       showmode = false;
       clipboard = "unnamedplus";
+      conceallevel = 2;
       breakindent = true;
       undofile = true;
       ignorecase = true;
@@ -36,6 +37,7 @@
       shell = "fish";
       # Complete behavior
       completeopt = ["menu" "menuone" "noselect"];
+      swapfile = false;
     };
     userCommands = {
       Q.command = "q";
@@ -231,13 +233,14 @@
         key = "<leader>bk";
         action.__raw = ''
           function()
-            local is_term = vim.bo.filetype == "terminal"
+            local force_close = vim.bo.filetype == "terminal"
             local buff = vim.api.nvim_get_current_buf()
-            if is_term then
-              vim.api.nvim_buf_delete(buff, {force = true})
-            else
-              vim.api.nvim_buf_delete(buff, {})
+
+            local ok, _ = pcall(vim.cmd, "buffer #")
+            if not ok then
+              vim.cmd("enew")
             end
+            vim.api.nvim_buf_delete(buff, {force = force_close})
           end
         '';
         options.desc = "Kill Buffer";
@@ -441,6 +444,12 @@
       # Other
       {
         mode = "n";
+        key = "<leader>ot";
+        action = "<cmd>edit ~/notes/agenda/todo.org<CR>";
+        options.desc = "open [t]odo.org";
+      }
+      {
+        mode = "n";
         key = "G";
         action = "Gzz";
         options.desc = "Center when scrolling to the end of file";
@@ -575,24 +584,34 @@
           ];
         };
       };
-
+      #
       # Telescope
       telescope = {
         enable = true;
-        lazyLoad.settings.cmd = "Telescope";
+        # lazyLoad.settings.event = "DeferredUIEnter";
         settings = {
           defaults = {
-            mappings.i = {"<CR>" = {__raw = "require('telescope.actions').select_default + require('telescope.actions').center";};};
-            mappings.n = {"<CR>" = {__raw = "require('telescope.actions').select_default + require('telescope.actions').center";};};
+            mappings.i = {
+              "<CR>" = {__raw = "require('telescope.actions').select_default + require('telescope.actions').center";};
+              "<C-CR>" = {__raw = "require('telescope.actions').select_vertical";};
+            };
+            mappings.n = {
+              "<CR>" = {__raw = "require('telescope.actions').select_default + require('telescope.actions').center";};
+              "<C-CR>" = {__raw = "require('telescope.actions').select_vertical";};
+            };
           };
           pickers = {
             buffers.mappings.i = {"<C-d>" = "delete_buffer";};
-            find_files.hidden = true;
+            find_files = {
+              hidden = true;
+              # mappings.i = {"<C-c>" =  {__raw = "require('telescope.actions').select_default";};};  # TODO - these are not taking effect at all - compare with the generate lua
+              # mappings.n = {"<C-c>" = "select_vsplit";};
+            };
             live_grep.hidden = true;
             current_buffer_fuzzy_find = {
               previewer = false;
-              mappings.i = {"<CR>" = {__raw = "require('telescope.actions').select_default + require('telescope.actions').center";};};
-              mappings.n = {"<CR>" = {__raw = "require('telescope.actions').select_default + require('telescope.actions').center";};};
+              # mappings.i = {"<CR>" = {__raw = "require('telescope.actions').select_default + require('telescope.actions').center";};};
+              # mappings.n = {"<CR>" = {__raw = "require('telescope.actions').select_default + require('telescope.actions').center";};};
             };
           };
         };
@@ -605,7 +624,7 @@
       project-nvim = {
         enable = true;
         enableTelescope = true;
-        lazyLoad.settings.event = "DeferredUIEnter";
+        # lazyLoad.settings.event = "DeferredUIEnter";
         settings.patterns = [
           ".git"
           "pyproject.toml"
@@ -770,7 +789,6 @@
         };
       };
 
-      # TODO continue from https://github.com/nvim-orgmode/orgmode/blob/master/DOCS.md#mappings
       # Org-Mode
       orgmode = {
         enable = true;
@@ -786,7 +804,7 @@
           org_agenda_files = "~/notes/agenda/todo.org";
           org_default_notes_file = "~/notes/agenda/todo.org";
           org_archive_location = "~/notes/agenda/todo.org_archive";
-          org_hide_leading_stars = true;
+          org_hide_leading_stars = false;
           org_hide_emphasis_markers = true;
           org_startup_indented = true; # TODO check
           org_todo_keywords = ["TODO" "WIP" "DONE"];
@@ -796,7 +814,7 @@
               template = "* TODO %?\n  %u\n  DEADLINE: %^t\n  FROM: %a";
             }; # target = "~/notes/somethng.org"  # TODO add deadline
           };
-          org_startup_folded = "overview";
+          org_startup_folded = "content";
           mappings = {
             prefix = "<leader>o";
             global = {
@@ -824,17 +842,17 @@
               org_global_cycle = "<S-TAB>";
               org_archive_subtree = "<prefix>$";
               org_set_tags_command = "<prefix>t";
-              org_do_promote = "<M-LEFT>";
-              org_do_demote = "<M-RIGHT>";
-              org_do_promote_subtree = "<M-S-LEFT>";
-              org_do_demote_subtree = "<M-S-RIGHT>";
+              org_do_promote = false;
+              org_do_demote = false;
+              org_do_promote_subtree = "<M-LEFT>";
+              org_do_demote_subtree = "<M-RIGHT>";
               org_move_subtree_up = "<M-S-UP>";
               org_move_subtree_down = "<M-S-DOWN>";
               org_meta_return = "<leader><CR>";
               org_return = "<CR>";
               org_insert_heading_respect_content = "<prefix>ih";
               org_insert_todo_heading = false;
-              org_insert_todo_heading_respect_content = false;
+              org_insert_todo_heading_respect_content = "<C-CR>";
               org_export = "<prefix>e";
               org_deadline = "<prefix>id";
               org_schedule = "<prefix>it";
@@ -848,15 +866,34 @@
       };
     };
 
-    # TODO eventually move this to nixvim proper - not supported atm
-    extraPlugins = [pkgs.vimPlugins.formatter-nvim];
+    extraPlugins = [
+      # TODO eventually move this to nixvim proper - not supported atm
+      pkgs.vimPlugins.formatter-nvim
+      # org-roam
+      # (pkgs.vimUtils.buildVimPlugin {
+      #   name = "org-roam.nvim";
+      #   src = pkgs.fetchFromGitHub {
+      #     owner = "chipsenkbeil";
+      #     repo = "org-roam.nvim";
+      #     rev = "c32aa470a9f9c2aa9e63c91859b0425e45cb3d1d";
+      #     hash = "sha256-I6Cz1d+7RJ5BJS5DhCqpUpKJIGI9B5McTWxcu06R7ag=";
+      #   };
+      # })
+    ];
     extraConfigLua = ''
         require("formatter").setup {
           logging = true,
           filetype = {
             lua = { require("formatter.filetypes.lua").stylua },
             nix = { require("formatter.filetypes.nix").alejandra },
-            python = { require("formatter.filetypes.python").ruff },
+            python = { function()
+                return {
+                  exe = "ruff",
+                  args = {"format", "-q", "-"},
+                  stdin = true,
+                }
+              end
+            };
             terraform = { require("formatter.filetypes.terraform").terraformfmt },
             toml = { require("formatter.filetypes.toml").taplo },
             yaml = {

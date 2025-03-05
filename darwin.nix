@@ -171,7 +171,7 @@
         # Other key bindings
         cmd-q = "close --quit-if-last-window";
         ctrl-alt-t = "exec-and-forget open --new -a alacritty";
-        ctrl-alt-n = "exec-and-forget open -na alacritty --args --command /etc/profiles/per-user/sauco.navarro/bin/nvim";
+        ctrl-alt-n = "exec-and-forget open --new -a alacritty --args --command /etc/profiles/per-user/sauco.navarro/bin/fish --command nvim";
         # TODO - flameshot?
       };
     };
@@ -202,15 +202,20 @@
   };
 
   # Homebrew (if needed for anything)
-  #   homebrew = {
-  #     enable = true;
-  #     taps = [ "d12frosted/emacs-plus" ];
-  #     brews = [ "coreutils" ];
-  #     casks = [];
-  #    extraConfig =''
-  #       brew "emacs-plus@31", args:["with-ctags", "with-no-frame-refocus", "with-native-comp", "with-imagemagick"]
-  #    '';
-  #   };
+  # homebrew = {
+    # enable = true;
+    # onActivation = {
+    #   autoUpdate = true;
+    #   cleanup = "uninstall";
+    #   upgrade = true;
+    # };
+    # taps = [ "d12frosted/emacs-plus" ];
+    # brews = [""];
+    # casks = [];
+    # extraConfig = ''
+    #   brew "emacs-plus@31", args:["with-ctags", "with-no-frame-refocus", "with-native-comp", "with-imagemagick"]
+    # '';
+  # };
 
   # environment.systemPackages =
   #  [ pkgs.home-manager

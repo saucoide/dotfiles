@@ -5,8 +5,17 @@
   pkgs,
   ...
 }: let
-  gdk = pkgs.google-cloud-sdk.withExtraComponents [pkgs.google-cloud-sdk.components.gke-gcloud-auth-plugin];
-  pyslp = pkgs.python312.withPackages (
+  system = pkgs.system;
+  # TODO move everything from pkgs to pkgs-unstable
+  nixpkgs = import inputs.nixpkgs {inherit system;};
+  nixpkgs-stable = import inputs.nixpkgs-stable {
+    inherit system;
+    config.allowUnfree = true;
+  };
+  nixpkgs-podman522 = import inputs.nixpkgs-podman522 {inherit system;};
+  # nixpkgs/268bb5090a3c6ac5e1615b38542a868b52ef8088#podman  podman 5.2.2 works
+  gdk = nixpkgs.google-cloud-sdk.withExtraComponents [pkgs.google-cloud-sdk.components.gke-gcloud-auth-plugin];
+  pyslp = nixpkgs.python312.withPackages (
     p:
       with p; [
         python-lsp-server
@@ -59,62 +68,64 @@ in {
 
   home.packages = [
     # Compilers & general build tools
-    pkgs.gcc
-    pkgs.cmake
+    nixpkgs-stable.gcc
+    nixpkgs-stable.cmake
 
     # Tooling
-    pkgs.bat
-    pkgs.fd
-    pkgs.fzf
-    pkgs.jq
-    pkgs.just
-    pkgs.lsd
-    pkgs.neofetch
-    pkgs.magic-wormhole
-    pkgs.pandoc
-    pkgs.parallel
-    pkgs.pass
-    pkgs.ripgrep
-    pkgs.trash-cli
-    pkgs.sipcalc
-    pkgs.watch
+    nixpkgs-stable.bat
+    nixpkgs-stable.fd
+    nixpkgs-stable.fzf
+    nixpkgs-stable.jq
+    nixpkgs-stable.just
+    nixpkgs-stable.lsd
+    nixpkgs-stable.neofetch
+    nixpkgs-stable.magic-wormhole
+    nixpkgs-stable.pandoc
+    nixpkgs-stable.parallel
+    # nixpkgs-stable.pass
+    nixpkgs-stable.ripgrep
+    nixpkgs-stable.trash-cli
+    nixpkgs-stable.sipcalc
+    nixpkgs-stable.watch
 
     # Python
-    pkgs.uv
-    pkgs.ruff
-    pkgs.ruff-lsp
+    nixpkgs.uv
+    nixpkgs.ruff
+    nixpkgs.ruff-lsp
     pyslp
 
     # Formatters
     # pkgs.efm-langserver            # langserver to integrate formatters and other cli's
-    pkgs.nodePackages.prettier #
-    pkgs.yamlfmt # yaml
-    pkgs.taplo # toml
-    pkgs.alejandra # nix
+    nixpkgs-stable.nodePackages.prettier #
+    nixpkgs-stable.yamlfmt # yaml
+    nixpkgs-stable.taplo # toml
+    nixpkgs-stable.alejandra # nix
 
     # Network
-    pkgs.mtr
-    pkgs.nmap
+    nixpkgs-stable.mtr
+    nixpkgs-stable.nmap
 
     # Infra
     gdk
-    pkgs.kubectl
-    pkgs.podman
-    pkgs.podman-compose
-    pkgs.terraform
-    pkgs.vault-bin
+    nixpkgs-stable.kubectl
+    # pkgs.podman-desktop
+    # pkgs-stable.podman
+    nixpkgs-podman522.podman
+    nixpkgs-podman522.podman-compose
+    nixpkgs-stable.terraform
+    nixpkgs-stable.vault-bin
 
     # TUIs
-    pkgs.htop
-    pkgs.pgcli
-    pkgs.litecli
-    pkgs.sqlite
+    nixpkgs-stable.htop
+    nixpkgs-stable.pgcli
+    nixpkgs-stable.litecli
+    nixpkgs-stable.sqlite
 
     # GUIs
-    pkgs.slack
+    nixpkgs-stable.slack
 
     # MacOS
-    pkgs.raycast
+    nixpkgs-stable.raycast
   ];
 
   # SSH
@@ -172,12 +183,6 @@ in {
   xdg.configFile."k9s/skins/" = {
     source = ./config/k9s/skins;
     recursive = true;
-  };
-
-  # TODO experiment
-  programs.tmux = {
-    enable = true;
-    shell = "fish";
   };
 
   # Need to pull the whole config as a whole, no symlinks until this is fixed: https://github.com/FelixKratz/SketchyBar/issues/553
