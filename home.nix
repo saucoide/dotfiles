@@ -192,6 +192,8 @@ in {
     recursive = true;
   };
 
+  home.file.".pdbrc.py" = { source = ./.pdbrc.py; };
+
   # Need to pull the whole config as a whole, no symlinks until this is fixed: https://github.com/FelixKratz/SketchyBar/issues/553
   # config = pkgs.lib.fileContents ./config/sketchybar/sketchybarrc;
   xdg.configFile.sketchybar.source = ./config/sketchybar;
