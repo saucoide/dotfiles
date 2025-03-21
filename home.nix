@@ -167,7 +167,14 @@ in {
     userEmail = "sauco.navarro@team.wrike.com";
     userName = "sauco";
     extraConfig = {
-      fetch = {prune = true;};
+      fetch = { prune = true; pruneTags = true; all = true;};
+      branch = { sort = "-comitterdate";};
+      column = { ui = "auto";};
+      tag = { sort = "version:refname";};
+      diff = { algorithm = "histogram"; colorMoved = "plain"; renames = true;};
+      push = { autoSetupRemote = true; followTags = true;};
+      rerere = {enabled = true; autoupdate = true;};
+      pull = {rebase = true;};
     };
   };
 

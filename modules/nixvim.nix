@@ -870,15 +870,15 @@
       # TODO eventually move this to nixvim proper - not supported atm
       pkgs.vimPlugins.formatter-nvim
       # org-roam
-      # (pkgs.vimUtils.buildVimPlugin {
-      #   name = "org-roam.nvim";
-      #   src = pkgs.fetchFromGitHub {
-      #     owner = "chipsenkbeil";
-      #     repo = "org-roam.nvim";
-      #     rev = "c32aa470a9f9c2aa9e63c91859b0425e45cb3d1d";
-      #     hash = "sha256-I6Cz1d+7RJ5BJS5DhCqpUpKJIGI9B5McTWxcu06R7ag=";
-      #   };
-      # })
+      (pkgs.vimUtils.buildVimPlugin {
+        name = "org-roam.nvim";
+        src = pkgs.fetchFromGitHub {
+          owner = "chipsenkbeil";
+          repo = "org-roam.nvim";
+          rev = "c32aa470a9f9c2aa9e63c91859b0425e45cb3d1d";
+          hash = "sha256-I6Cz1d+7RJ5BJS5DhCqpUpKJIGI9B5McTWxcu06R7ag=";
+        };
+      })
     ];
     extraConfigLua = ''
         require("formatter").setup {
@@ -1020,6 +1020,12 @@
       end
       vim.api.nvim_create_user_command("Flake", goto_project_flake, {})
 
+      --- TODO package this for nixpkgs
+      require("org-roam").setup({
+          directory="~/notes/roam/"
+        })
+
     '';
   };
 }
+
