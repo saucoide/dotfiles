@@ -511,12 +511,12 @@
       # Terminal customiization
       {
         event = ["TermOpen"];
-        desc = " yanking (copying) text";
+        desc = "Customize terminal buffers on Open";
         group = "customize-term-open";
         callback.__raw = ''
           function()
-            vim.opt.number = false
-            vim.opt.relativenumber = false
+            vim.opt_local.number = false
+            vim.opt_local.relativenumber = false
             vim.bo.filetype = "terminal"
           end
         '';
