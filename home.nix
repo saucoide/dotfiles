@@ -60,7 +60,6 @@ in {
   # My Modules
   imports = [
     inputs.nixvim.homeManagerModules.nixvim
-    ./modules/alacritty.nix
     ./modules/wezterm.nix
     ./modules/starship.nix
     ./modules/fish.nix
