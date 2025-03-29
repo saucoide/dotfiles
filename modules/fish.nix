@@ -44,6 +44,7 @@
       "cd.." = "cd ..";
       vim = "nvim";
       cat = "bat";
+      imgcat = "wezterm imgcat";
       grep = "grep --color=auto";
       df = "df -H";
       # free = "free -mt";

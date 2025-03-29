@@ -286,12 +286,12 @@
         options.desc = "Find [r]ecent files";
       }
       # Project
-      {
-        mode = "n";
-        key = "<leader>pp";
-        action = "<cmd>Telescope projects<CR>";
-        options.desc = "Switch [p]roject";
-      }
+      # {
+      #   mode = "n";
+      #   key = "<leader>pp";
+      #   action = "<cmd>Telescope projects<CR>";
+      #   options.desc = "Switch [p]roject";
+      # }
       {
         mode = "n";
         key = "<leader>pf";
@@ -593,11 +593,11 @@
           defaults = {
             mappings.i = {
               "<CR>" = {__raw = "require('telescope.actions').select_default + require('telescope.actions').center";};
-              "<C-CR>" = {__raw = "require('telescope.actions').select_vertical";};
+              "<S-CR>" = {__raw = "require('telescope.actions').select_vertical";};
             };
             mappings.n = {
               "<CR>" = {__raw = "require('telescope.actions').select_default + require('telescope.actions').center";};
-              "<C-CR>" = {__raw = "require('telescope.actions').select_vertical";};
+              "<S-CR>" = {__raw = "require('telescope.actions').select_vertical";};
             };
           };
           pickers = {
@@ -621,18 +621,18 @@
         };
       };
 
-      project-nvim = {
-        enable = true;
-        enableTelescope = true;
-        # lazyLoad.settings.event = "DeferredUIEnter";
-        settings.patterns = [
-          ".git"
-          "pyproject.toml"
-          ".project_root"
-          "Makefile"
-          "package.json"
-        ];
-      };
+      # project-nvim = {
+      #   enable = true;
+      #   enableTelescope = true;
+      #   # lazyLoad.settings.event = "DeferredUIEnter";
+      #   settings.patterns = [
+      #     ".git"
+      #     "pyproject.toml"
+      #     ".project_root"
+      #     "Makefile"
+      #     "package.json"
+      #   ];
+      # };
 
       harpoon = {
         enable = true;
@@ -697,7 +697,7 @@
             "<right>" = "actions.select";
             "l" = "actions.select";
             "<CR>" = "actions.select";
-            "<C-CR>" = "actions.select_vsplit";
+            "<S-CR>" = "actions.select_vsplit";
             "q" = "actions.close";
             "gr" = "actions.refresh";
             "H" = "actions.toggle_hidden";
@@ -852,7 +852,7 @@
               org_return = "<CR>";
               org_insert_heading_respect_content = "<prefix>ih";
               org_insert_todo_heading = false;
-              org_insert_todo_heading_respect_content = "<C-CR>";
+              org_insert_todo_heading_respect_content = "<S-CR>";
               org_export = "<prefix>e";
               org_deadline = "<prefix>id";
               org_schedule = "<prefix>it";

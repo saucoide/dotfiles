@@ -61,6 +61,7 @@ in {
   imports = [
     inputs.nixvim.homeManagerModules.nixvim
     ./modules/alacritty.nix
+    ./modules/wezterm.nix
     ./modules/starship.nix
     ./modules/fish.nix
     ./modules/nixvim.nix

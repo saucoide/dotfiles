@@ -170,8 +170,8 @@
 
         # Other key bindings
         cmd-q = "close --quit-if-last-window";
-        ctrl-alt-t = "exec-and-forget open --new -a alacritty";
-        ctrl-alt-n = "exec-and-forget open --new -a alacritty --args --command /etc/profiles/per-user/sauco.navarro/bin/fish --command nvim";
+        ctrl-alt-t = "exec-and-forget open --new -a wezterm --args start --always-new-process";
+        ctrl-alt-n = "exec-and-forget open --new -a alacritty";
         # TODO - flameshot?
       };
     };
