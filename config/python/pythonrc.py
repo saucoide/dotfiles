@@ -1,29 +1,25 @@
 # Generated from ~/dotfiles/system.org
-import importlib
 from functools import partial
 import json
 import itertools
 
 try:
     from rich import inspect, pretty, print, traceback
+
     rich_enabled = True
 except ImportError:
     rich_enabled = False
 
-try:
-    from wat import wat
-except ImportError:
-    pass
-    
+
 def setup_rich():
     if rich_enabled:
         help = partial(inspect, help=True)
         pretty.install()
         traceback.install()
-    
-    
+
+
 def setup_ipython():
-    if not (hasattr(__builtins__, '__IPYTHON__') and rich_enabled):
+    if not (hasattr(__builtins__, "__IPYTHON__") and rich_enabled):
         return
     from IPython import get_ipython
     from IPython.core.magic import (

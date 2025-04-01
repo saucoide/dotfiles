@@ -38,7 +38,7 @@ in {
     SHELL = "fish";
     EDITOR = "nvim";
     PYTHONBREAKPOINT = "pdb.set_trace";
-    PYTHONSTARTUP = "$HOME/dotfiles/config/python/.pythonrc.py";
+    PYTHONSTARTUP = "$HOME/.config/python/pythonrc.py";
     USE_GKE_CLOUD_AUTH_PLUGIN = "True";
     # Maybe rye path
   };
@@ -174,6 +174,19 @@ in {
       rerere = {enabled = true; autoupdate = true;};
       pull = {rebase = true;};
     };
+    ignores = [
+      ".venv"
+      ".DS_Store"
+      "*.pyc"
+      ".nox" 
+      ".idea"
+      ".vscode"
+      ".pytest_cache"
+      ".ruff_cache"
+      ".mypy_cache"
+      "__pycache__"
+      ".direnv"
+    ];
   };
 
   programs.poetry = {
@@ -191,6 +204,7 @@ in {
   };
 
   home.file.".pdbrc.py" = { source = ./.pdbrc.py; };
+  xdg.configFile."python/pythonrc.py" = { source = ./config/python/pythonrc.py; };
 
   # Need to pull the whole config as a whole, no symlinks until this is fixed: https://github.com/FelixKratz/SketchyBar/issues/553
   # config = pkgs.lib.fileContents ./config/sketchybar/sketchybarrc;

@@ -1,3 +1,5 @@
+"""This is pdbpp's configuration file"""
+
 import pdb
 
 class Config(pdb.DefaultConfig):
@@ -9,5 +11,7 @@ class Config(pdb.DefaultConfig):
 
     def setup(self, pdb):
         """Called during Pdb init"""
+        # TODO - alias pl to print locals
+        # pdb equivalent is `alias pl p_ locals() local:`
         pass
 

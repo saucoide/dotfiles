@@ -28,12 +28,13 @@
       docker = "podman";
       docker-compose = "podman-compose";
       podmansh = "podman run --tty --interactive --entrypoint='/bin/sh'";
+      podmanbash = "podman run --tty --interactive --entrypoint='/bin/bash'";
 
       # kubectl
       k = "kubectl";
       kc = "kube_context";
       kn = "kube_namespace";
-      kinto = "kube_shell_into_pod";
+      kshell = "kube_shell_into_pod";
 
       # gcloud
       gcp = "gcloud_change_project";
@@ -46,14 +47,13 @@
       cat = "bat";
       imgcat = "wezterm imgcat";
       grep = "grep --color=auto";
-      df = "df -H";
+      df = "df --human-readable";
       # free = "free -mt";
       wget = "wget -c";
       userlist = "cut -d: -f1 /etc/passwd";
       cal = "cal -y";
     };
 
-    # TODO bring all my fish functions
     functions = {
       fish_user_key_bindings = ''
         fish_vi_key_bindings
