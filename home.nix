@@ -12,8 +12,6 @@
     inherit system;
     config.allowUnfree = true;
   };
-  nixpkgs-podman522 = import inputs.nixpkgs-podman522 {inherit system;};
-  # nixpkgs/268bb5090a3c6ac5e1615b38542a868b52ef8088#podman  podman 5.2.2 works
   gdk = nixpkgs.google-cloud-sdk.withExtraComponents [pkgs.google-cloud-sdk.components.gke-gcloud-auth-plugin];
   pyslp = nixpkgs.python312.withPackages (
     p:
@@ -110,8 +108,8 @@ in {
     nixpkgs-stable.kubectl
     # pkgs.podman-desktop
     # pkgs-stable.podman
-    nixpkgs-podman522.podman
-    nixpkgs-podman522.podman-compose
+    nixpkgs.podman
+    nixpkgs.podman-compose
     nixpkgs-stable.terraform
     nixpkgs-stable.vault-bin
 

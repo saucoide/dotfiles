@@ -33,7 +33,8 @@ M.toggle = function(window, pane)
     os.getenv("HOME") .. "/projects",
     os.getenv("HOME") .. "/projects/analytics/gke-jobs",
     os.getenv("HOME") .. "/dotfiles",
-    os.getenv("HOME") .. "/.config"
+    os.getenv("HOME") .. "/.config",
+    os.getenv("HOME") .. "/notes"
 
   })
   if not success then

@@ -68,7 +68,7 @@
   power.sleep.computer = 15;
 
   # Use TouchID for sudo
-  security.pam.enableSudoTouchIdAuth = true;
+  security.pam.services.sudo_local.touchIdAuth = true;
 
   # Fonts
   # fonts.packages = [pkgs.nerdfonts.override {fonts = ["JetBrainsMono"];}];

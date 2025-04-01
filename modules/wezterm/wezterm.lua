@@ -12,6 +12,13 @@ config.window_close_confirmation = "NeverPrompt"
 config.font = wezterm.font('JetBrainsMono Nerd Font', { weight = "Bold" })
 config.font_size = 12.0
 
+-- config.unix_domains = {
+--   {
+--     name = 'unix',
+--   },
+-- }
+-- config.default_gui_startup_args = { 'connect', 'unix' }
+
 config.leader = {
   key = 'p',
   mods = 'CTRL',
@@ -22,7 +29,7 @@ config.keys = {
   { key = "p", mods = "LEADER", action = wezterm.action_callback(sessionizer.toggle)},
   { key = "k", mods = "LEADER", action = wezterm.action.CloseCurrentTab { confirm = true } },
   { key = "n", mods = "CTRL", action = wezterm.action_callback(function(window, pane)
-    pane:send_text("nvim\r")
+    pane:send_text("i\bnvim\r")
   end) },
 }
 
