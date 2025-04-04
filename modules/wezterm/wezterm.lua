@@ -27,6 +27,7 @@ config.leader = {
 
 config.keys = {
   { key = "p", mods = "LEADER", action = wezterm.action_callback(sessionizer.toggle)},
+  { key = "Backspace", mods = "LEADER", action = wezterm.action_callback(sessionizer.last)},
   { key = "k", mods = "LEADER", action = wezterm.action.CloseCurrentTab { confirm = true } },
   { key = "n", mods = "CTRL", action = wezterm.action_callback(function(window, pane)
     pane:send_text("i\bnvim\r")

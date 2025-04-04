@@ -20,7 +20,7 @@ end
 M.toggle = function(window, pane)
   local projects = {}
   local seen_projects = {}
-
+  local current_workspace = window:active_workspace()
   local project_markers = { "^.git$", "^pyproject.toml$", "^.project_root$" }
   local regex_pattern = "^(" .. table.concat(project_markers, "|") .. ")$"
 
@@ -77,6 +77,7 @@ M.toggle = function(window, pane)
             act.SwitchToWorkspace({ name = id, spawn = { cwd = id } }),
             pane
           )
+          wezterm.GLOBAL.previous_workspace = current_workspace
         end
       end),
       fuzzy = true,
@@ -89,6 +90,21 @@ M.toggle = function(window, pane)
     }),
     pane
   )
+end
+
+M.switch_workspace = function(window, pane, target_workspace)
+  local current_workspace = window:active_workspace()
+  window:perform_action(act.SwitchToWorkspace({ name = target_workspace }), pane)
+  wezterm.GLOBAL.previous_workspace = current_workspace
+end
+
+M.last = function(window, pane)
+  local current_workspace = window:active_workspace()
+  local previous_workspace = wezterm.GLOBAL.previous_workspace
+  if current_workspace == previous_workspace or previous_workspace  == nil then
+    return
+  end
+  M.switch_workspace(window, pane, previous_workspace)
 end
 
 
