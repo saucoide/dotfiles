@@ -5,7 +5,6 @@ local act = wezterm.action
 local M = {}
 
 local fd = "/etc/profiles/per-user/" .. os.getenv("USER") .."/bin/fd"
-local fish = "/etc/profiles/per-user/" .. os.getenv("USER") .."/bin/fish"
 
 local get_parent_directory = function(path)
   path = path:gsub("/$", "") -- remove trailing /
@@ -92,9 +91,18 @@ M.toggle = function(window, pane)
   )
 end
 
-M.switch_workspace = function(window, pane, target_workspace)
+
+M.switch_workspace = function(window, pane, target_workspace, cd)
   local current_workspace = window:active_workspace()
-  window:perform_action(act.SwitchToWorkspace({ name = target_workspace }), pane)
+  wezterm.log_info("Switching to Workspace: " .. target_workspace)
+  if cd  == true then
+    window:perform_action(
+      act.SwitchToWorkspace({ name = target_workspace , spawn = {cwd = target_workspace }}),
+      pane
+    )
+  else
+    window:perform_action(act.SwitchToWorkspace({ name = target_workspace }), pane)
+  end
   wezterm.GLOBAL.previous_workspace = current_workspace
 end
 
@@ -104,8 +112,12 @@ M.last = function(window, pane)
   if current_workspace == previous_workspace or previous_workspace  == nil then
     return
   end
-  M.switch_workspace(window, pane, previous_workspace)
+  M.switch_workspace(window, pane, previous_workspace, false)
 end
 
+M.flakes = function(window, pane)
+  local flakes_project = os.getenv("HOME") .. "/projects/flakes"
+  M.switch_workspace(window, pane, flakes_project, true)
+end
 
 return M

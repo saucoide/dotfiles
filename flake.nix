@@ -3,6 +3,11 @@
   inputs = {
     nixpkgs = {url = "github:NixOS/nixpkgs/nixpkgs-unstable";};
     nixpkgs-stable = {url = "github:NixOS/nixpkgs/nixos-24.11";};
+
+    # TODO on 25.05 swap unstable & stable and pin nixvim, home manager &darwin to the same version
+    # url = "github:LnL7/nix-darwin/nix-darwin-24.11";
+    # url = "github:nix-community/home-manager/release-24.11";
+
     nix-darwin = {
       url = "github:LnL7/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -30,14 +35,16 @@
       nix.settings.experimental-features = "nix-command flakes";
       nix.settings.substituters = [
         "https://cache.nixos.org/"
-        "https://devenv.cachix.org"
-        "https://nix-community.cachix.org"
+        "https://nix-community.cachix.org/"
       ];
       nix.settings.trusted-substituters = [
         "https://cache.nixos.org/"
-        "https://devenv.cachix.org"
-        "https://nix-community.cachix.org"
+        "https://nix-community.cachix.org/"
       ];
+      nix.settings.trusted-public-keys = [
+          "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+          "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+        ];
       nix.settings.trusted-users = ["sauco.navarro"];
 
       # Set Git commit hash for darwin-version.

@@ -92,6 +92,7 @@ in {
     nixpkgs.ruff-lsp
     pyslp
 
+    nixpkgs-unstable.claude-code
     # Formatters
     # pkgs.efm-langserver            # langserver to integrate formatters and other cli's
     nixpkgs-stable.nodePackages.prettier #
@@ -121,6 +122,7 @@ in {
 
     # GUIs
     nixpkgs-stable.slack
+    nixpkgs.vscode
 
     # MacOS
     nixpkgs-stable.raycast
