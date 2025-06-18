@@ -621,43 +621,35 @@
         };
       };
 
-      # project-nvim = {
+
+      # harpoon = {
       #   enable = true;
+      #    settings = {
+      #      save_on_toggle = true;
+      #      sync_on_ui_close = false;
+      # };
       #   enableTelescope = true;
       #   # lazyLoad.settings.event = "DeferredUIEnter";
-      #   settings.patterns = [
-      #     ".git"
-      #     "pyproject.toml"
-      #     ".project_root"
-      #     "Makefile"
-      #     "package.json"
-      #   ];
+      #   keymaps = {
+      #     addFile = "<leader>a";
+      #     cmdToggleQuickMenu = "<leader>hc";
+      #     toggleQuickMenu = "<leader>hh";
+      #     gotoTerminal = {
+      #       "1" = "<leader>t1";
+      #       "2" = "<leader>t2";
+      #       "3" = "<leader>t3";
+      #       "4" = "<leader>t4";
+      #     };
+      #     navFile = {
+      #       "1" = "<leader>1";
+      #       "2" = "<leader>2";
+      #       "3" = "<leader>3";
+      #       "4" = "<leader>4";
+      #       "5" = "<leader>5";
+      #       "6" = "<leader>6";
+      #     };
+      #   };
       # };
-
-      harpoon = {
-        enable = true;
-        enableTelescope = true;
-        # lazyLoad.settings.event = "DeferredUIEnter";
-        keymaps = {
-          addFile = "<leader>a";
-          cmdToggleQuickMenu = "<leader>hc";
-          toggleQuickMenu = "<leader>hh";
-          gotoTerminal = {
-            "1" = "<leader>t1";
-            "2" = "<leader>t2";
-            "3" = "<leader>t3";
-            "4" = "<leader>t4";
-          };
-          navFile = {
-            "1" = "<leader>1";
-            "2" = "<leader>2";
-            "3" = "<leader>3";
-            "4" = "<leader>4";
-            "5" = "<leader>5";
-            "6" = "<leader>6";
-          };
-        };
-      };
 
       # Oil
       oil = {
@@ -1000,32 +992,47 @@
           vim.cmd.startinsert()
         end
 
-
-      -- Go to project's NIX FLAKE
-      function goto_project_flake()
-        local project_root = require('project_nvim.project').get_project_root()
-        if project_root then
-          local project_name = vim.fn.fnamemodify(project_root, ":t")
-          local flake_project = vim.fn.expand("~/projects/flakes/" .. project_name)
-          local flake_file = flake_project .. "/flake.nix"
-          if vim.fn.isdirectory(flake_project) == 0 then
-            vim.fn.mkdir(flake_project, "p")
-            print("Created directory: " .. flake_project)
-          end
-          vim.cmd("edit " .. vim.fn.fnameescape(flake_file))
-          -- if vim.fn.filereadable(flake_file) == 1 then
-        else
-          print("Not in a project.")
-        end
-      end
-      vim.api.nvim_create_user_command("Flake", goto_project_flake, {})
-
       --- TODO package this for nixpkgs
       require("org-roam").setup({
           directory="~/notes/roam/"
         })
 
+        harpoon.setup({ 
+          settings = {
+            save_on_toggle = true,
+          },
+          ["terms"] = require("harpoon.terms"):new()
+        })
+        local harpoon_mark = require("harpoon.mark")
+        local harpoon_ui = require("harpoon.ui")
+        local harpoon_term = require("harpoon.term")
+
+        -- Buffers
+        vim.keymap.set( "n", "<leader>a", function() harpoon:list():add() end, { desc = "Harpoon: Add file" })
+        vim.keymap.set( "n", "<leader>hh", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end, { desc = "Harpoon: Toggle quick menu" })
+        -- Buffers: Navigation
+        vim.keymap.set( "n", "<leader>1", function() harpoon:list():select(1) end, { desc = "Harpoon: Go to file 1" })
+        vim.keymap.set( "n", "<leader>2", function() harpoon:list():select(2) end, { desc = "Harpoon: Go to file 2" })
+        vim.keymap.set( "n", "<leader>3", function() harpoon:list():select(3) end, { desc = "Harpoon: Go to file 3" })
+        vim.keymap.set( "n", "<leader>4", function() harpoon:list():select(4) end, { desc = "Harpoon: Go to file 4" })
+        vim.keymap.set( "n", "<leader>5", function() harpoon:list():select(5) end, { desc = "Harpoon: Go to file 5" })
+        vim.keymap.set( "n", "<leader>6", function() harpoon:list():select(6) end, { desc = "Harpoon: Go to file 6" })
+
+        -- Terminals
+        vim.keymap.set("n", "<leader>tt", function() harpoon.ui:toggle_quick_menu(harpoon:list("terms")) end, { desc = "Show harpoon terminal menu" })
+        -- Terminals: Commands
+        vim.keymap.set("n", "<leader>ts1", function() harpoon:list("terms"):send_command(1, "python -m pytest --stepwise") end)
+        vim.keymap.set({"n", "v"}, "<C-CR>1", function() harpoon:list("terms"):send_selection(1, true) end, { desc = "Harpoon: Current selection to Terminal 1" })
+        vim.keymap.set({"n", "v"}, "<C-CR>2", function() harpoon:list("terms"):send_selection(2, true) end, { desc = "Harpoon: Current selection to Terminal 2" })
+        vim.keymap.set({"n", "v"}, "<C-CR>3", function() harpoon:list("terms"):send_selection(3, true) end, { desc = "Harpoon: Current selection to Terminal 3" })
+        vim.keymap.set({"n", "v"}, "<C-CR>4", function() harpoon:list("terms"):send_selection(4, true) end, { desc = "Harpoon: Current selection to Terminal 4" })
+        vim.keymap.set({"n", "v"}, "<C-CR>5", function() harpoon:list("terms"):send_selection(5, true) end, { desc = "Harpoon: Current selection to Terminal 5" })
+        -- Terminals: Nagivation
+        vim.keymap.set("n", "<leader>t1", function() harpoon:list("terms"):select(1) end, { desc = "Harpoon: Go to Terminal 1" })
+        vim.keymap.set("n", "<leader>t2", function() harpoon:list("terms"):select(2) end, { desc = "Harpoon: Go to Terminal 2" })
+        vim.keymap.set("n", "<leader>t3", function() harpoon:list("terms"):select(3) end, { desc = "Harpoon: Go to Terminal 3" })
+        vim.keymap.set("n", "<leader>t4", function() harpoon:list("terms"):select(4) end, { desc = "Harpoon: Go to Terminal 4" })
+        vim.keymap.set("n", "<leader>t5", function() harpoon:list("terms"):select(5) end, { desc = "Harpoon: Go to Terminal 5" })
     '';
   };
 }
-

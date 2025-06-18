@@ -7,7 +7,10 @@
 }: let
   system = pkgs.system;
   # TODO move everything from pkgs to pkgs-unstable
-  nixpkgs = import inputs.nixpkgs {inherit system;};
+  nixpkgs = import inputs.nixpkgs {
+    inherit system;
+    config.allowUnfree = true;
+  };
   nixpkgs-stable = import inputs.nixpkgs-stable {
     inherit system;
     config.allowUnfree = true;
@@ -80,6 +83,7 @@ in {
     nixpkgs-stable.magic-wormhole
     nixpkgs-stable.pandoc
     nixpkgs-stable.parallel
+    nixpkgs-stable.dust # disk space
     # nixpkgs-stable.pass
     nixpkgs-stable.ripgrep
     nixpkgs-stable.trash-cli
@@ -92,7 +96,7 @@ in {
     nixpkgs.ruff-lsp
     pyslp
 
-    nixpkgs-unstable.claude-code
+    nixpkgs.claude-code
     # Formatters
     # pkgs.efm-langserver            # langserver to integrate formatters and other cli's
     nixpkgs-stable.nodePackages.prettier #
@@ -123,6 +127,7 @@ in {
     # GUIs
     nixpkgs-stable.slack
     nixpkgs.vscode
+    nixpkgs.iina
 
     # MacOS
     nixpkgs-stable.raycast
