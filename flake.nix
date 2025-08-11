@@ -2,7 +2,7 @@
   description = "Sauco's nix system definitions";
   inputs = {
     nixpkgs = {url = "github:NixOS/nixpkgs/nixpkgs-unstable";};
-    nixpkgs-stable = {url = "github:NixOS/nixpkgs/nixos-24.11";};
+    nixpkgs-stable = {url = "github:NixOS/nixpkgs/nixos-25.05";};
 
     # TODO on 25.05 swap unstable & stable and pin nixvim, home manager &darwin to the same version
     # url = "github:LnL7/nix-darwin/nix-darwin-24.11";

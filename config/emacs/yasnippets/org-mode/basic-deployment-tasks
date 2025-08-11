@@ -1,9 +1,0 @@
-# -*- mode: snippet -*-
-# name: basic-deployment-tasks
-# key: >tasks
-# --
-
-- [ ] Merged into acceptance
-- [ ] Working in acceptance
-- [ ] Merge into prod
-- [ ] Working in prod

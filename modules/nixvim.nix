@@ -12,6 +12,8 @@
       number = true;
       relativenumber = false;
       wrap = false;
+      shiftwidth = 4;
+      tabstop = 4;
       mouse = "a";
       showmode = false;
       clipboard = "unnamedplus";
@@ -270,6 +272,12 @@
         key = "<leader>gg";
         action = "<cmd>Neogit<CR>";
         options.desc = "open [g]it";
+      }
+      {
+        mode = "n";
+        key = "gr";
+        action = "<cmd>checktime<CR>";
+        options.desc = ":checktime to refresh buffer";
       }
 
       # Files
@@ -898,6 +906,7 @@
               end
             },
             json = { require("formatter.filetypes.json").jq },
+            c = { require("formatter.filetypes.c").clangformat },
             ["*"] = { require("formatter.filetypes.any").remove_trailing_whitespace, }
           }
         }
@@ -997,42 +1006,42 @@
           directory="~/notes/roam/"
         })
 
+        local harpoon = require('harpoon')
         harpoon.setup({ 
           settings = {
             save_on_toggle = true,
           },
           ["terms"] = require("harpoon.terms"):new()
         })
-        local harpoon_mark = require("harpoon.mark")
-        local harpoon_ui = require("harpoon.ui")
-        local harpoon_term = require("harpoon.term")
 
         -- Buffers
         vim.keymap.set( "n", "<leader>a", function() harpoon:list():add() end, { desc = "Harpoon: Add file" })
         vim.keymap.set( "n", "<leader>hh", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end, { desc = "Harpoon: Toggle quick menu" })
-        -- Buffers: Navigation
         vim.keymap.set( "n", "<leader>1", function() harpoon:list():select(1) end, { desc = "Harpoon: Go to file 1" })
         vim.keymap.set( "n", "<leader>2", function() harpoon:list():select(2) end, { desc = "Harpoon: Go to file 2" })
         vim.keymap.set( "n", "<leader>3", function() harpoon:list():select(3) end, { desc = "Harpoon: Go to file 3" })
         vim.keymap.set( "n", "<leader>4", function() harpoon:list():select(4) end, { desc = "Harpoon: Go to file 4" })
         vim.keymap.set( "n", "<leader>5", function() harpoon:list():select(5) end, { desc = "Harpoon: Go to file 5" })
-        vim.keymap.set( "n", "<leader>6", function() harpoon:list():select(6) end, { desc = "Harpoon: Go to file 6" })
 
-        -- Terminals
+        -- Terminals: Navigation
         vim.keymap.set("n", "<leader>tt", function() harpoon.ui:toggle_quick_menu(harpoon:list("terms")) end, { desc = "Show harpoon terminal menu" })
-        -- Terminals: Commands
-        vim.keymap.set("n", "<leader>ts1", function() harpoon:list("terms"):send_command(1, "python -m pytest --stepwise") end)
-        vim.keymap.set({"n", "v"}, "<C-CR>1", function() harpoon:list("terms"):send_selection(1, true) end, { desc = "Harpoon: Current selection to Terminal 1" })
-        vim.keymap.set({"n", "v"}, "<C-CR>2", function() harpoon:list("terms"):send_selection(2, true) end, { desc = "Harpoon: Current selection to Terminal 2" })
-        vim.keymap.set({"n", "v"}, "<C-CR>3", function() harpoon:list("terms"):send_selection(3, true) end, { desc = "Harpoon: Current selection to Terminal 3" })
-        vim.keymap.set({"n", "v"}, "<C-CR>4", function() harpoon:list("terms"):send_selection(4, true) end, { desc = "Harpoon: Current selection to Terminal 4" })
-        vim.keymap.set({"n", "v"}, "<C-CR>5", function() harpoon:list("terms"):send_selection(5, true) end, { desc = "Harpoon: Current selection to Terminal 5" })
-        -- Terminals: Nagivation
         vim.keymap.set("n", "<leader>t1", function() harpoon:list("terms"):select(1) end, { desc = "Harpoon: Go to Terminal 1" })
         vim.keymap.set("n", "<leader>t2", function() harpoon:list("terms"):select(2) end, { desc = "Harpoon: Go to Terminal 2" })
         vim.keymap.set("n", "<leader>t3", function() harpoon:list("terms"):select(3) end, { desc = "Harpoon: Go to Terminal 3" })
         vim.keymap.set("n", "<leader>t4", function() harpoon:list("terms"):select(4) end, { desc = "Harpoon: Go to Terminal 4" })
         vim.keymap.set("n", "<leader>t5", function() harpoon:list("terms"):select(5) end, { desc = "Harpoon: Go to Terminal 5" })
-    '';
+
+        -- Terminals: Commands
+        vim.keymap.set("n", "<C-l>1", function() harpoon:list("terms"):send_command(1, "clear") end, { desc = "Harpoon: Clear Terminal 1" })
+        vim.keymap.set("n", "<C-l>2", function() harpoon:list("terms"):send_command(2, "clear") end, { desc = "Harpoon: Clear Terminal 2" })
+        vim.keymap.set("n", "<C-l>3", function() harpoon:list("terms"):send_command(3, "clear") end, { desc = "Harpoon: Clear Terminal 3" })
+        vim.keymap.set("n", "<C-l>4", function() harpoon:list("terms"):send_command(4, "clear") end, { desc = "Harpoon: Clear Terminal 4" })
+        vim.keymap.set("n", "<C-l>5", function() harpoon:list("terms"):send_command(5, "clear") end, { desc = "Harpoon: Clear Terminal 5" })
+        vim.keymap.set({"n", "v"}, "<C-CR>1", function() harpoon:list("terms"):send_selection(1, true) end, { desc = "Harpoon: Current selection to Terminal 1" })
+        vim.keymap.set({"n", "v"}, "<C-CR>2", function() harpoon:list("terms"):send_selection(2, true) end, { desc = "Harpoon: Current selection to Terminal 2" })
+        vim.keymap.set({"n", "v"}, "<C-CR>3", function() harpoon:list("terms"):send_selection(3, true) end, { desc = "Harpoon: Current selection to Terminal 3" })
+        vim.keymap.set({"n", "v"}, "<C-CR>4", function() harpoon:list("terms"):send_selection(4, true) end, { desc = "Harpoon: Current selection to Terminal 4" })
+        vim.keymap.set({"n", "v"}, "<C-CR>5", function() harpoon:list("terms"):send_selection(5, true) end, { desc = "Harpoon: Current selection to Terminal 5" })
+        '';
   };
 }

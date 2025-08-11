@@ -79,6 +79,7 @@ in {
     nixpkgs-stable.jq
     nixpkgs-stable.just
     nixpkgs-stable.lsd
+    nixpkgs-stable.procs
     nixpkgs-stable.neofetch
     nixpkgs-stable.magic-wormhole
     nixpkgs-stable.pandoc
@@ -93,10 +94,10 @@ in {
     # Python
     nixpkgs.uv
     nixpkgs.ruff
-    nixpkgs.ruff-lsp
     pyslp
 
     nixpkgs.claude-code
+    nixpkgs.opencode
     # Formatters
     # pkgs.efm-langserver            # langserver to integrate formatters and other cli's
     nixpkgs-stable.nodePackages.prettier #
