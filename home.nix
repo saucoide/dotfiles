@@ -60,7 +60,7 @@ in {
 
   # My Modules
   imports = [
-    inputs.nixvim.homeManagerModules.nixvim
+    inputs.nixvim.homeModules.nixvim
     ./modules/wezterm.nix
     ./modules/starship.nix
     ./modules/fish.nix
@@ -159,10 +159,9 @@ in {
     nix-direnv.enable = true;
   };
 
-  #  programs.emacs = {
-  #    enable = true;
-  #    package = pkgs.emacs30;
-  #  };
+   programs.emacs = {
+     enable = true;
+   };
   #  xdg.configFile.emacs.source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/emacs";
   # home.file.".config/emacs" = {
   #   source = ./config/emacs;

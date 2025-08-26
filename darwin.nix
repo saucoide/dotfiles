@@ -2,6 +2,7 @@
   # System
   time.timeZone = "Europe/Warsaw";
   # time.timeZone = "Pacific/Auckland";
+  system.primaryUser = "sauco.navarro";
   system.startup.chime = false; # no thuuum!
   system.defaults.universalaccess.reduceMotion = true;
 
@@ -170,7 +171,9 @@
 
         # Other key bindings
         cmd-q = "close --quit-if-last-window";
-        ctrl-alt-t = "exec-and-forget open --new -a wezterm --args start --always-new-process";
+        # ctrl-alt-t = "exec-and-forget open --new -a wezterm";
+        # ctrl-alt-t = "exec-and-forget open --new -a wezterm --args start --always-new-process --domain unix";
+        ctrl-alt-t = "exec-and-forget open --new -a wezterm --args connect unix";
         ctrl-alt-n = "exec-and-forget open --new -a alacritty";
         # TODO - flameshot?
       };

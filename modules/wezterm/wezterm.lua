@@ -13,6 +13,7 @@ config.font = wezterm.font('JetBrainsMono Nerd Font', { weight = "Bold" })
 config.font_size = 12.0
 
 config.unix_domains = { { name = 'unix', }, }
+-- config.default_domain = "unix"
 
 config.leader = {
   key = 'p',

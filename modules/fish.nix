@@ -14,7 +14,7 @@
     '';
     shellAliases = {
       # nix
-      hms = "darwin-rebuild switch --flake ~/dotfiles";
+      hms = "sudo darwin-rebuild switch --flake ~/dotfiles";
 
       # vim
       v = "nvim";

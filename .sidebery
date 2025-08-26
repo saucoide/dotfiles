@@ -1,0 +1,14 @@
+### To copy into the style editor in sidebery!
+
+#root.root {--tabs-margin: 1px;}
+#root.root {--tabs-height: 32px;}
+#root.root {--tabs-lvl-opacity: 0.16;}
+#root.root {--nav-btn-active-shadow: inset 0 0 0 1px #2b2a33, 0 1px 3px 0 rgba(0,0,0,0);}
+#root.root {--nav-btn-fg: #eee;}
+#root.root {--toolbar-bg: #2b2a33;}
+#root.root {--tabs-pinned-height: 40px;}
+#root.root {--tabs-pinned-width: 75px;}
+#root.root {--tabs-activated-shadow: 0 0 2px 2px #50fa7b, 0 2px 16px 0 rgba(0,0,0,0.282);}
+#root.root {--frame-bg: #2b2a33;}
+#root.root {--general-margin: 1px;}
+#root.root {--general-border-radius: 0px;}
