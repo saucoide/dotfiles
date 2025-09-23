@@ -173,7 +173,7 @@
         cmd-q = "close --quit-if-last-window";
         # ctrl-alt-t = "exec-and-forget open --new -a wezterm";
         # ctrl-alt-t = "exec-and-forget open --new -a wezterm --args start --always-new-process --domain unix";
-        ctrl-alt-t = "exec-and-forget open --new -a wezterm --args connect unix";
+        ctrl-alt-t = "exec-and-forget open --new -a wezterm --args start --always-new-process";
         ctrl-alt-n = "exec-and-forget open --new -a alacritty";
         # TODO - flameshot?
       };

@@ -870,15 +870,16 @@
       # TODO eventually move this to nixvim proper - not supported atm
       pkgs.vimPlugins.formatter-nvim
       # org-roam
-      # (pkgs.vimUtils.buildVimPlugin {
-      #   name = "org-roam.nvim";
-      #   src = pkgs.fetchFromGitHub {
-      #     owner = "chipsenkbeil";
-      #     repo = "org-roam.nvim";
-      #     rev = "c32aa470a9f9c2aa9e63c91859b0425e45cb3d1d";
-      #     hash = "sha256-I6Cz1d+7RJ5BJS5DhCqpUpKJIGI9B5McTWxcu06R7ag=";
-      #   };
-      # })
+      (pkgs.vimUtils.buildVimPlugin {
+        doCheck = false;
+        name = "org-roam.nvim";
+        src = pkgs.fetchFromGitHub {
+          owner = "chipsenkbeil";
+          repo = "org-roam.nvim";
+          rev = "946c3289d8aa5a84b84458b8c9aa869c2a10f836";
+          hash = "sha256-PJiZU9tGNCv0ScnLFMPWYXIlCMr+NBBjWJNopRbd9Es=";
+        };
+      })
     ];
     extraConfigLua = ''
         require("formatter").setup {
@@ -1003,7 +1004,50 @@
 
       --- TODO package this for nixpkgs
       require("org-roam").setup({
-          directory="~/notes/roam/"
+          directory="~/notes/roam/",
+          ui = {
+            select = {
+              ---@type fun(node:org-roam.core.file.Node):org-roam.config.ui.SelectNodeItems
+              node_to_items = function(node)
+                ---@type string[]
+                local items = {}
+
+                local function make_item(label)
+                  if #node.tags == 0 then
+                    -- We can pass a string if the label and value
+                    -- are the same
+                    return label
+                  else
+                    local tags = table.concat(node.tags, ":")
+
+                    -- In the case that the label (displayed) and
+                    -- value (injected) are different, we can pass
+                    -- a table with `label` and `value` back
+                    return {
+                      label = ("[%s] %s"):format(tags, label),
+                      value = label,
+                    }
+                  end
+                end
+
+                -- For the node's title and its aliases, we want
+                -- to create an item where the title/alias is the
+                -- value and we show them alongside tags if they exist
+                --
+                -- This allows us to search tags, but not insert
+                -- tags as part of a link if selected
+                table.insert(items, make_item(node.title))
+                for _, alias in ipairs(node.aliases) do
+                  -- Avoid duplicating the title if the alias is the same
+                  if alias ~= node.title then
+                    table.insert(items, make_item(alias))
+                  end
+                end
+
+                return items
+              end,
+            },
+          },
         })
 
         local harpoon = require('harpoon')
