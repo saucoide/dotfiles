@@ -1,0 +1,65 @@
+return {
+	{
+		'nvim-orgmode/orgmode',
+		enabled = true,
+		event = "VeryLazy",
+		ft = { 'org' },
+		config = function()
+			-- Setup orgmode
+			require('orgmode').setup({
+				mappings = {
+					agenda = { org_agenda_show_help = "?" },
+					capture = { org_capture_kill = "<leader>bk", org_capture_show_help = "?" },
+					global = { org_agenda = "<prefix>a", org_capture = "<prefix>c" },
+					note = { org_note_kill = "<leader>bk" },
+					org = {
+						open_at_point = "<prefix>o",
+						org_add_note = "<prefix>na",
+						org_archive_subtree = "<prefix>$",
+						org_babel_table = "<prefix>bt",
+						org_change_date = "<prefix>dc",
+						org_cycle = "<TAB>",
+						org_deadline = "<prefix>id",
+						org_do_demote = false,
+						org_do_demote_subtree = "<M-RIGHT>",
+						org_do_promote = false,
+						org_do_promote_subtree = "<M-LEFT>",
+						org_export = "<prefix>e",
+						org_global_cycle = "<S-TAB>",
+						org_insert_heading_respect_content = "<prefix>ih",
+						org_insert_link = "<prefix>li",
+						org_insert_todo_heading = false,
+						org_insert_todo_heading_respect_content = "<S-CR>",
+						org_meta_return = "<leader><CR>",
+						org_move_subtree_down = "<M-S-DOWN>",
+						org_move_subtree_up = "<M-S-UP>",
+						org_refile = "<prefix>r",
+						org_return = "<CR>",
+						org_schedule = "<prefix>it",
+						org_set_tags_command = "<prefix>t",
+						org_show_help = "<prefix>?",
+						org_store_link = "<prefix>ls",
+						org_timestamp_down_day = false,
+						org_timestamp_up_day = false,
+						org_todo = "<S-RIGHT>",
+						org_todo_prev = "<S-LEFT>",
+						org_toggle_checkbox = "<C-Space>",
+						toggle_heading = false,
+					},
+					prefix = "<leader>o",
+				},
+				org_agenda_files = "~/notes/agenda/todo.org",
+				org_archive_location = "~/notes/agenda/todo.org_archive",
+				org_capture_templates = {
+					t = { description = "new TODO entry", template = "* TODO %?\n  %u\n  DEADLINE: %^t\n  FROM: %a" },
+				},
+				org_default_notes_file = "~/notes/agenda/todo.org",
+				org_hide_emphasis_markers = true,
+				org_hide_leading_stars = false,
+				org_startup_folded = "content",
+				org_startup_indented = true,
+				org_todo_keywords = { "TODO", "WIP", "DONE" },
+			})
+		end
+	}
+}

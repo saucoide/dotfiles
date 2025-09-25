@@ -64,7 +64,7 @@ in {
     ./modules/wezterm.nix
     ./modules/starship.nix
     ./modules/fish.nix
-    ./modules/nixvim.nix
+    ./modules/neovim.nix
   ];
 
   home.packages = [
@@ -95,6 +95,9 @@ in {
     nixpkgs.uv
     nixpkgs.ruff
     pyslp
+
+    # lua
+    nixpkgs.stylua
 
     nixpkgs.claude-code
     nixpkgs.opencode
@@ -159,9 +162,9 @@ in {
     nix-direnv.enable = true;
   };
 
-   programs.emacs = {
-     enable = true;
-   };
+  programs.emacs = {
+    enable = true;
+  };
   #  xdg.configFile.emacs.source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/config/emacs";
   # home.file.".config/emacs" = {
   #   source = ./config/emacs;
@@ -172,20 +175,34 @@ in {
     userEmail = "sauco.navarro@team.wrike.com";
     userName = "sauco";
     extraConfig = {
-      fetch = { prune = true; pruneTags = true; all = true;};
-      branch = { sort = "-comitterdate";};
-      column = { ui = "auto";};
-      tag = { sort = "version:refname";};
-      diff = { algorithm = "histogram"; colorMoved = "plain"; renames = true;};
-      push = { autoSetupRemote = true; followTags = true;};
-      rerere = {enabled = true; autoupdate = true;};
+      fetch = {
+        prune = true;
+        pruneTags = true;
+        all = true;
+      };
+      branch = {sort = "-comitterdate";};
+      column = {ui = "auto";};
+      tag = {sort = "version:refname";};
+      diff = {
+        algorithm = "histogram";
+        colorMoved = "plain";
+        renames = true;
+      };
+      push = {
+        autoSetupRemote = true;
+        followTags = true;
+      };
+      rerere = {
+        enabled = true;
+        autoupdate = true;
+      };
       pull = {rebase = true;};
     };
     ignores = [
       ".venv"
       ".DS_Store"
       "*.pyc"
-      ".nox" 
+      ".nox"
       ".idea"
       ".vscode"
       ".pytest_cache"
@@ -210,8 +227,8 @@ in {
     recursive = true;
   };
 
-  home.file.".pdbrc.py" = { source = ./.pdbrc.py; };
-  xdg.configFile."python/pythonrc.py" = { source = ./config/python/pythonrc.py; };
+  home.file.".pdbrc.py" = {source = ./.pdbrc.py;};
+  xdg.configFile."python/pythonrc.py" = {source = ./config/python/pythonrc.py;};
 
   # Need to pull the whole config as a whole, no symlinks until this is fixed: https://github.com/FelixKratz/SketchyBar/issues/553
   # config = pkgs.lib.fileContents ./config/sketchybar/sketchybarrc;
