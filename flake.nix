@@ -1,34 +1,24 @@
 {
   description = "Sauco's nix system definitions";
   inputs = {
-    nixpkgs = {url = "github:NixOS/nixpkgs/nixpkgs-unstable";};
-    nixpkgs-stable = {url = "github:NixOS/nixpkgs/nixos-25.05";};
-
-    # TODO on 25.05 swap unstable & stable and pin nixvim, home manager &darwin to the same version
-    # url = "github:LnL7/nix-darwin/nix-darwin-24.11";
-    # url = "github:nix-community/home-manager/release-24.11";
-
+    nixpkgs-unstable = {url = "github:NixOS/nixpkgs/nixpkgs-unstable";};
+    nixpkgs = {url = "github:NixOS/nixpkgs/nixos-25.05";};
     nix-darwin = {
-      url = "github:LnL7/nix-darwin";
+      url = "github:nix-darwin/nix-darwin/nix-darwin-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager = {
-      url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nixvim = {
-      url = "github:nix-community/nixvim";
+      url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
   outputs = inputs @ {
     self,
+    nixpkgs-unstable,
     nixpkgs,
-    nixpkgs-stable,
     nix-darwin,
     home-manager,
-    nixvim,
   }: let
     baseconfiguration = {...}: {
       nix.channel.enable = false;
@@ -87,8 +77,5 @@
       ];
       specialArgs = {inherit inputs;};
     };
-
-    # zima
-    # TODO
   };
 }

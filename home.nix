@@ -6,37 +6,29 @@
   ...
 }: let
   system = pkgs.system;
-  # TODO move everything from pkgs to pkgs-unstable
-  nixpkgs = import inputs.nixpkgs {
+  nixpkgs-unstable = import inputs.nixpkgs-unstable {
     inherit system;
     config.allowUnfree = true;
   };
-  nixpkgs-stable = import inputs.nixpkgs-stable {
+  nixpkgs = import inputs.nixpkgs{
     inherit system;
     config.allowUnfree = true;
   };
   gdk = nixpkgs.google-cloud-sdk.withExtraComponents [pkgs.google-cloud-sdk.components.gke-gcloud-auth-plugin];
-  pyslp = nixpkgs.python312.withPackages (
-    p:
-      with p; [
-        python-lsp-server
-        pylsp-mypy
-      ]
-  );
-  # emacs-overlay = import ( fetchTarBall {
-  #   url = ;
-  #   sha256 = ;
-  # });
-  # customEmacs = pkgs.emacs30.override {
-  #   withNativeCompilation = true;
-  #   withSQLite3 = true;
-  #   withTreeSitter = true;
-  #   withImageMagick = true;
-  # };
+  # pyslp = nixpkgs.python312.withPackages (
+  #   p:
+  #     with p; [
+  #       python-lsp-server
+  #       pylsp-mypy
+  #     ]
+  # );
 in {
-  home.stateVersion = "24.11";
+  home.stateVersion = "25.05";
   home.username = "sauco.navarro";
   home.homeDirectory = "/Users/sauco.navarro";
+  home.sessionPath = [
+   "$HOME/.local/bin"
+  ];
   home.sessionVariables = {
     SHELL = "fish";
     EDITOR = "nvim";
@@ -60,7 +52,6 @@ in {
 
   # My Modules
   imports = [
-    inputs.nixvim.homeModules.nixvim
     ./modules/wezterm.nix
     ./modules/starship.nix
     ./modules/fish.nix
@@ -69,72 +60,73 @@ in {
 
   home.packages = [
     # Compilers & general build tools
-    nixpkgs-stable.gcc
-    nixpkgs-stable.cmake
+    nixpkgs.gcc
+    nixpkgs.cmake
 
     # Tooling
-    nixpkgs-stable.bat
-    nixpkgs-stable.fd
-    nixpkgs-stable.fzf
-    nixpkgs-stable.jq
-    nixpkgs-stable.just
-    nixpkgs-stable.lsd
-    nixpkgs-stable.procs
-    nixpkgs-stable.neofetch
-    nixpkgs-stable.magic-wormhole
-    nixpkgs-stable.pandoc
-    nixpkgs-stable.parallel
-    nixpkgs-stable.dust # disk space
-    # nixpkgs-stable.pass
-    nixpkgs-stable.ripgrep
-    nixpkgs-stable.trash-cli
-    nixpkgs-stable.sipcalc
-    nixpkgs-stable.watch
+    nixpkgs.bat
+    nixpkgs.fd
+    nixpkgs.fzf
+    nixpkgs.jq
+    nixpkgs.yq-go
+    nixpkgs.just
+    nixpkgs.lsd
+    nixpkgs.procs
+    nixpkgs.neofetch
+    nixpkgs.magic-wormhole
+    nixpkgs.pandoc
+    nixpkgs.parallel
+    nixpkgs.dust # disk space
+    # nixpkgs.pass
+    nixpkgs.ripgrep
+    nixpkgs.trash-cli
+    nixpkgs.sipcalc
+    nixpkgs.watch
 
     # Python
-    nixpkgs.uv
-    nixpkgs.ruff
-    pyslp
+    nixpkgs-unstable.uv
+    nixpkgs-unstable.ruff
+    # pyslp
 
     # lua
     nixpkgs.stylua
 
-    nixpkgs.claude-code
-    nixpkgs.opencode
+    nixpkgs-unstable.claude-code
+    nixpkgs-unstable.opencode
     # Formatters
     # pkgs.efm-langserver            # langserver to integrate formatters and other cli's
-    nixpkgs-stable.nodePackages.prettier #
-    nixpkgs-stable.yamlfmt # yaml
-    nixpkgs-stable.taplo # toml
-    nixpkgs-stable.alejandra # nix
+    nixpkgs.nodePackages.prettier #
+    nixpkgs.yamlfmt # yaml
+    nixpkgs.taplo # toml
+    nixpkgs.alejandra # nix
 
     # Network
-    nixpkgs-stable.mtr
-    nixpkgs-stable.nmap
+    nixpkgs.mtr
+    nixpkgs.nmap
 
     # Infra
     gdk
-    nixpkgs-stable.kubectl
+    nixpkgs.kubectl
     # pkgs.podman-desktop
-    # pkgs-stable.podman
+    # pkgs.podman
     nixpkgs.podman
     nixpkgs.podman-compose
-    nixpkgs-stable.terraform
-    nixpkgs-stable.vault-bin
+    nixpkgs.terraform
+    nixpkgs.vault-bin
 
     # TUIs
-    nixpkgs-stable.htop
-    nixpkgs-stable.pgcli
-    nixpkgs-stable.litecli
-    nixpkgs-stable.sqlite
+    nixpkgs.htop
+    nixpkgs.pgcli
+    nixpkgs.litecli
+    nixpkgs.sqlite
 
     # GUIs
-    nixpkgs-stable.slack
+    nixpkgs.slack
     nixpkgs.vscode
     nixpkgs.iina
 
     # MacOS
-    nixpkgs-stable.raycast
+    nixpkgs.raycast
   ];
 
   # SSH

@@ -21,11 +21,12 @@ return {
 			{"<leader>5", function() require("harpoon"):list():select(5) end,  desc = "Harpoon: Go to file 5" },
 			-- Terminals
 			{"<leader>tt", function() require("harpoon").ui:toggle_quick_menu(require("harpoon"):list("terms")) end, desc="Show harpoon terminal menu" },
-			{"<leader>t1", function() require("harpoon"):list("terms"):select(1) end, desc="Harpoon: Go to Terminal 1" },
-			{"<leader>t2", function() require("harpoon"):list("terms"):select(2) end, desc="Harpoon: Go to Terminal 2" },
-			{"<leader>t3", function() require("harpoon"):list("terms"):select(3) end, desc="Harpoon: Go to Terminal 3" },
-			{"<leader>t4", function() require("harpoon"):list("terms"):select(4) end, desc="Harpoon: Go to Terminal 4" },
-			{"<leader>t5", function() require("harpoon"):list("terms"):select(5) end, desc="Harpoon: Go to Terminal 5" },
+			{"<leader><CR><CR>", function() require("harpoon"):list("terms"):select(1) end, desc="Harpoon: Go to Terminal 1" },
+			{"<leader><CR>1", function() require("harpoon"):list("terms"):select(1) end, desc="Harpoon: Go to Terminal 1" },
+			{"<leader><CR>2", function() require("harpoon"):list("terms"):select(2) end, desc="Harpoon: Go to Terminal 2" },
+			{"<leader><CR>3", function() require("harpoon"):list("terms"):select(3) end, desc="Harpoon: Go to Terminal 3" },
+			{"<leader><CR>4", function() require("harpoon"):list("terms"):select(4) end, desc="Harpoon: Go to Terminal 4" },
+			{"<leader><CR>5", function() require("harpoon"):list("terms"):select(5) end, desc="Harpoon: Go to Terminal 5" },
 			-- Terminal actions: clear
 			{"<C-l>1", function() require("harpoon"):list("terms"):send_command(1, "clear") end, desc="Harpoon: Clear Terminal 1" },
 			{"<C-l>2", function() require("harpoon"):list("terms"):send_command(2, "clear") end, desc="Harpoon: Clear Terminal 2" },
@@ -33,6 +34,7 @@ return {
 			{"<C-l>4", function() require("harpoon"):list("terms"):send_command(4, "clear") end, desc="Harpoon: Clear Terminal 4" },
 			{"<C-l>5", function() require("harpoon"):list("terms"):send_command(5, "clear") end, desc="Harpoon: Clear Terminal 5" },
 			-- Terminal actions: send command
+			{"<C-CR><CR>", function() require("harpoon"):list("terms"):send_selection(1, true) end, mode={"n", "v"}, desc="Harpoon: Current selection to Terminal 1" },
 			{"<C-CR>1", function() require("harpoon"):list("terms"):send_selection(1, true) end, mode={"n", "v"}, desc="Harpoon: Current selection to Terminal 1" },
 			{"<C-CR>2", function() require("harpoon"):list("terms"):send_selection(2, true) end, mode={"n", "v"}, desc="Harpoon: Current selection to Terminal 2" },
 			{"<C-CR>3", function() require("harpoon"):list("terms"):send_selection(3, true) end, mode={"n", "v"}, desc="Harpoon: Current selection to Terminal 3" },

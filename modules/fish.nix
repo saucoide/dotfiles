@@ -15,6 +15,7 @@
     shellAliases = {
       # nix
       hms = "sudo darwin-rebuild switch --flake ~/dotfiles";
+      hmsoff = "sudo darwin-rebuild switch --flake ~/dotfiles --offline --option substitute false";
 
       # vim
       v = "nvim";
@@ -57,9 +58,24 @@
     functions = {
       fish_user_key_bindings = ''
         fish_vi_key_bindings
+        # bind -M insert -m default ` force-repaint
       '';
 
       fish_greeting = "";
+
+      beepin = ''
+        set sleep_time 0
+        if test (count $argv) -ge 1
+            set sleep_time $argv[1]
+        end
+
+        sleep $sleep_time
+
+        for i in (seq 1 3)
+            echo -e "\a"
+            sleep 0.1
+        end
+      '';
 
       kube_namespace = {
         wraps = "kubectl get namespace";

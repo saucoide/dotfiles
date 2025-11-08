@@ -20,7 +20,7 @@
 			 })
 			 vim.lsp.enable(
 				 {
-					 "pylsp",
+					 "ty",
 					 "ruff",
 					 "lua_ls",
 					 "nixd",
