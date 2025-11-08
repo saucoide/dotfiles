@@ -48,7 +48,6 @@ vim.keymap.set("n", "<leader>bk",
 vim.keymap.set("n", "<leader>bK", "<cmd>%bd<CR>", { desc = "Kill All Buffers" })
 vim.keymap.set("n", "<leader><leader>", "<cmd>Telescope git_files<CR>", { desc = "find git files" })
 vim.keymap.set("n", "<leader>d", "<cmd>Oil<CR>", { desc = "open [d]irectory listing (oil)" })
-vim.keymap.set("n", "<leader>gg", "<cmd>Neogit<CR>", { desc = "open [g]it" })
 vim.keymap.set("n", "<leader>ff", "<cmd>Telescope find_files<CR>", { desc = "Find [f]iles" })
 vim.keymap.set("n", "<leader>fr", "<cmd>Telescope oldfiles<CR>", { desc = "Find [r]ecent files" })
 vim.keymap.set("n", "<leader>pf", "<cmd>Telescope git_files<CR>", { desc = "Find [r]ecent files" })

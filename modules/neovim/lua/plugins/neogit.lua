@@ -8,6 +8,9 @@ return {
 			-- Only one of these is needed.
 			"nvim-telescope/telescope.nvim", -- optional
 		},
+		keys = {
+			{"<leader>gg", "<cmd>Neogit<CR>", desc="open [g]it" }
+		},
 		opts = {
 			disable_insert_on_commit = true,
 			git_services = {

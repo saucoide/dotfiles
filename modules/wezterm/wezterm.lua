@@ -26,6 +26,7 @@ config.keys = {
   { key = 'd', mods = 'LEADER', action = wezterm.action.DetachDomain { DomainName = 'unix' }, },
   { key = "p", mods = "LEADER", action = wezterm.action_callback(sessionizer.toggle)},
   { key = "f", mods = "LEADER", action = wezterm.action_callback(sessionizer.flakes)},
+  { key = "l", mods = "LEADER", action = wezterm.action_callback(sessionizer.list)},
   { key = "Backspace", mods = "LEADER", action = wezterm.action_callback(sessionizer.last)},
   { key = "k", mods = "LEADER", action = wezterm.action.CloseCurrentTab { confirm = true } },
   { key = "n", mods = "CTRL", action = wezterm.action_callback(function(_, pane)
