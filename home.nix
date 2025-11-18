@@ -119,6 +119,7 @@ in {
     nixpkgs.pgcli
     nixpkgs.litecli
     nixpkgs.sqlite
+    nixpkgs.duckdb
 
     # GUIs
     nixpkgs.slack
