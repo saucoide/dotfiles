@@ -86,9 +86,13 @@ in {
     # Python
     nixpkgs-unstable.uv
     nixpkgs-unstable.ruff
-    # pyslp
 
-    # lua
+    # Rust
+    nixpkgs.rustup
+    # nixpkgs.rustfmt
+    # nixpkgs.rust-analyzer
+
+    # Lua
     nixpkgs.stylua
 
     nixpkgs-unstable.claude-code

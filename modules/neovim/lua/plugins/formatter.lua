@@ -29,6 +29,7 @@ return {
 						end
 					},
 					json = { require("formatter.filetypes.json").jq },
+					rust = { require("formatter.filetypes.rust").rustfmt },
 					c = { require("formatter.filetypes.c").clangformat },
 					["*"] = { require("formatter.filetypes.any").remove_trailing_whitespace }
 				}
