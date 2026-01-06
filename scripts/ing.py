@@ -1,0 +1,29 @@
+#!/usr/bin/env -S uv run --script
+
+from getpass import getpass
+
+
+def main():
+    pw = getpass("pw: ")
+
+    for _ in range(5):
+        numbers = input("numbers: ")
+        if numbers:
+            try:
+                numbers = [int(i) for i in numbers.strip().split(" ")]
+            except ValueError:
+                print("Invalid numbers input, quitting.")
+                break
+            if len(numbers) > 6:
+                print("Too many numbers, quitting.")
+                break
+            else:
+                print(" ".join([pw[n - 1] for n in numbers]))
+                print("---")
+        else:
+            print("No input, quitting.")
+            break
+
+
+if __name__ == "__main__":
+    main()
