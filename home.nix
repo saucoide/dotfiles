@@ -95,7 +95,10 @@ in {
     # Lua
     nixpkgs.stylua
 
+    # Other
+
     nixpkgs-unstable.claude-code
+    nixpkgs-unstable.claude-code-acp
     nixpkgs-unstable.opencode
     # Formatters
     # pkgs.efm-langserver            # langserver to integrate formatters and other cli's

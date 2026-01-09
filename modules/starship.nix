@@ -30,6 +30,7 @@
       package.disabled = true;
 
       # Disabled modules
+      nodejs.disabled = true;
       aws.disabled = true;
       battery.disabled = true;
       buf.disabled = true;
