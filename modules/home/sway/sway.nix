@@ -109,6 +109,10 @@
         "XF86AudioMute" = "exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
         "XF86AudioMicMute" = "exec wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle";
 
+        # brithgness
+        "XF86MonBrightnessup" = "exec brightnessctl set +5%";
+        "XF86MonBrightnessDown" = "exec brightnessctl set -5%";
+
         # Screenshots
         # "Print" = "exec grim -g \"$(slurp)\" ~/screenshots/$(date +%Y-%m-%d_%H-%M-%S).png";
         "Print" = "exec flameshot gui";
