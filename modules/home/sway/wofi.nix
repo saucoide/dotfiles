@@ -17,8 +17,8 @@
     style = ''
       window {
         margin: 0px;
-        border: 2px solid #5e81ac;
-        background-color: #2e3440;
+        border: 2px solid #5294e2;
+        background-color: #282A33;
         font-family: "JetBrainsMono Nerd Font";
         font-size: 16px;
       }
@@ -26,19 +26,22 @@
       #input {
         margin: 5px;
         border: none;
-        color: #eceff4;
-        background-color: #3b4252;
+        color: #e0e5eb;
+        background-color: #32343D;
+        outline: none;
       }
 
       #outer-box { padding: 15px; }
       #inner-box { margin: 5px; }
+      #scroll { margin: -2px 0px; }
       #img { margin-right: 15px; }
       #entry:selected {
-        background-color: #5e81ac;
+        background-color: #5294e2;
         border-radius: 2px;
+        outline: none;
       }
-      #text { color: #eceff4; }
-      #text:selected { color: #eceff4; }
+      #text { color: #e0e5eb; }
+      #text:selected { color: #e0e5eb; }
     '';
   };
 }
