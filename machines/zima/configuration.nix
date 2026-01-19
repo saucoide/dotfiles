@@ -63,24 +63,24 @@
   console = {
     earlySetup = true;
     useXkbConfig = true;
-    # Nord
+    # Monokai Pro Spectrum
     colors = [
-      "2e3440"
-      "bf616a"
-      "a3be8c"
-      "ebcb8b"
-      "81a1c1"
-      "b48ead"
-      "88c0d0"
-      "e5e9f0"
-      "4c566a"
-      "bf616a"
-      "a3be8c"
-      "ebcb8b"
-      "81a1c1"
-      "b48ead"
-      "8fbcbb"
-      "eceff4"
+      "222222"
+      "fc618d"
+      "7bd88f"
+      "fce566"
+      "5ad4e6"
+      "948ae3"
+      "5ad4e6"
+      "f7f1ff"
+      "69676c"
+      "fc618d"
+      "7bd88f"
+      "fce566"
+      "5ad4e6"
+      "948ae3"
+      "5ad4e6"
+      "ffffff"
     ];
   };
 

@@ -165,22 +165,22 @@ Cycles: {cycles}";
       }
 
       #battery.charging {
-          color: #a6da95;
+          color: #7bd88f;
       }
 
       #battery.warning {
-          color: #f5a97f;
+          color: #fce566;
       }
 
       #battery.critical {
-          color: #bf616a;
+          color: #fc618d;
       }
 
       #temperature.warning {
-          color: #ebcb8b;
+          color: #fce566;
       }
       #temperature.critical {
-          color: #bf616a;
+          color: #fc618d;
       }
     '';
   };

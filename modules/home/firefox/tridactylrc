@@ -150,6 +150,12 @@ unbindurl https://www.youtube.com j
 unbindurl https://www.youtube.com .
 unbindurl https://www.youtube.com ,
 unbindurl https://www.youtube.com <Space><Backspace>
+unbindurl https://www.inoreader.com l
+unbindurl https://www.inoreader.com k
+unbindurl https://www.inoreader.com j
+unbindurl https://www.inoreader.com .
+unbindurl https://www.inoreader.com ,
+unbindurl https://www.inoreader.com <Space><Backspace>
 unbindurl mail.google.com a
 unbindurl mail.google.com aa
 unbindurl mail.google.com q

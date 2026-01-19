@@ -110,8 +110,8 @@
         "XF86AudioMicMute" = "exec wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle";
 
         # brithgness
-        "XF86MonBrightnessup" = "exec brightnessctl set +5%";
-        "XF86MonBrightnessDown" = "exec brightnessctl set -5%";
+        "XF86MonBrightnessup" = "exec brightnessctl set 5%+";
+        "XF86MonBrightnessDown" = "exec brightnessctl set 5%-";
 
         # Screenshots
         # "Print" = "exec grim -g \"$(slurp)\" ~/screenshots/$(date +%Y-%m-%d_%H-%M-%S).png";
@@ -142,12 +142,12 @@
         smartBorders = "on";
       };
       colors = {
-        background = "#1e1e2e"; # Dark background for gaps
+        background = "#222222"; # Dark background for gaps
         focused = {
           background = "#282828";
-          border = "#47d674"; # Lime green
-          childBorder = "#47d674";
-          indicator = "#b48ead"; # where next split will happen
+          border = "#7bd88f"; # Spectrum green
+          childBorder = "#7bd88f";
+          indicator = "#948ae3"; # where next split will happen
           text = "#ffffff";
         };
         focusedInactive = {
@@ -166,9 +166,9 @@
         };
         urgent = {
           background = "#282828";
-          border = "#eb4d4b"; # Subtle red for alerts
-          childBorder = "#eb4d4b";
-          indicator = "#eb4d4b";
+          border = "#fc618d"; # Spectrum red for alerts
+          childBorder = "#fc618d";
+          indicator = "#fc618d";
           text = "#ffffff";
         };
       };

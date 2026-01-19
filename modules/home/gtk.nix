@@ -2,8 +2,8 @@
   gtk = {
     enable = true;
     theme = {
-      name = "Arc-Dark";
-      package = pkgs.arc-theme;
+      name = "Qogir-Dark";
+      package = pkgs.qogir-theme;
     };
     iconTheme = {
       name = "Papirus-Dark";
