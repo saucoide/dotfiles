@@ -125,7 +125,14 @@
         };
       };
       bars = [];
-      # floating = [];
+      floating = {
+        criteria = [
+          {
+            app_id = "thunar";
+            title = "^Rename .*";
+          }
+        ];
+      };
       window = {
         border = 2;
         titlebar = false;
