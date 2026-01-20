@@ -98,6 +98,7 @@
     pkgs.prusa-slicer
     pkgs.mpv
     pkgs.celluloid
+    pkgs.libreoffice
   ];
 
   services.udiskie.enable = true; # mounting usb drives (requires usdisks2 systemwide)
