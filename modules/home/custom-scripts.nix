@@ -7,6 +7,7 @@
     (pkgs.writeScriptBin "logout-menu" (builtins.readFile ../../scripts/logout-menu.sh))
     (pkgs.writeScriptBin "ing" (builtins.readFile ../../scripts/ing.py))
     (pkgs.writeScriptBin "battery-control" (builtins.readFile ../../scripts/battery-control.sh))
+    (pkgs.writeScriptBin "touchscreen" (builtins.readFile ../../scripts/toggle-touchscreen.sh))
     (pkgs.writeScriptBin "weather" (builtins.readFile ../../scripts/weather.sh))
     (pkgs.writeScriptBin "webcam" (builtins.readFile ../../scripts/webcam.sh))
 
@@ -33,6 +34,16 @@
     name = "Battery Control";
     exec = "battery-control";
     icon = "battery";
+    categories = ["System"];
+  };
+
+  xdg.desktopEntries."touchscreen-toggle" = {
+    name = "Toggle Touchscreen";
+    exec = "touchscreen";
+    icon = "input-touchscreen";
+    settings = {
+      Keywords = "touchscreen;devices;";
+    };
     categories = ["System"];
   };
 }
