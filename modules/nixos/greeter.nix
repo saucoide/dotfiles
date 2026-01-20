@@ -16,7 +16,7 @@
           + "--user-menu "
           + "--asterisks "
           + "--container-padding 2 "
-          + "--theme 'border=blue;text=cyan;prompt=green;time=white;action=blue;button=yellow;container=black;input=blue' "
+          + "--theme 'border=magenta;text=white;prompt=green;time=gray;action=magenta;button=yellow;container=black;input=cyan' "
           + "--cmd sway";
         user = "greeter";
       };
