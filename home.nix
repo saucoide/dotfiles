@@ -59,6 +59,9 @@ in {
   ];
 
   home.packages = [
+    # nix cli
+    nixpkgs.nh
+
     # Compilers & general build tools
     nixpkgs.gcc
     nixpkgs.cmake

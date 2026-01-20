@@ -81,8 +81,8 @@
   services.aerospace = {
     enable = true;
     settings = {
-      enable-normalization-flatten-containers = true;
-      enable-normalization-opposite-orientation-for-nested-containers = true;
+      enable-normalization-flatten-containers = false;
+      enable-normalization-opposite-orientation-for-nested-containers = false;
       accordion-padding = 0;
       default-root-container-layout = "tiles"; # tiles|accordion
       default-root-container-orientation = "auto";
@@ -158,6 +158,9 @@
         ctrl-shift-left = "join-with left";
         ctrl-shift-right = "join-with right";
 
+        # Splits
+        cmd-shift-h = "split horizontal";
+        cmd-shift-v = "split vertical";
         # Resize
         ctrl-cmd-up = "resize smart +75";
         ctrl-cmd-down = "resize smart -75";
