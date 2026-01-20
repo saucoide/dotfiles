@@ -18,6 +18,7 @@
 
   config = {
     home.packages = with pkgs; [
+      (pkgs.writeScriptBin "adaptative-resize" (builtins.readFile ./scripts/adaptative-resize.sh))
       libnotify # to send notifications
       mako # notificatons daemon ( to show them )
       grim # screenshots

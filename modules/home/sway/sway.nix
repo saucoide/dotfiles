@@ -89,10 +89,8 @@
         "${mod}+Shift+Right" = "move right";
 
         # Resize
-        "Ctrl+${mod}+Up" = "resize grow height 75px";
-        "Ctrl+${mod}+Down" = "resize shrink height 75px";
-        "Ctrl+${mod}+Left" = "resize shrink width 75px";
-        "Ctrl+${mod}+right" = "resize grow width 75px";
+        "Ctrl+${mod}+Up" = "exec adaptative-resize grow 75px";
+        "Ctrl+${mod}+Down" = "exec adaptative-resize shrink 75px";
 
         # Layouts
         "${mod}+m" = "fullscreen toggle";
