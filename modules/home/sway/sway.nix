@@ -16,6 +16,7 @@
         {command = "nm-applet --indicator";}
         {command = "blueman-applet";}
         {command = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";}
+        {command = "touchscreen disabled";}
       ];
       modifier = "Mod4";
       menu = "wofi --show drun";
