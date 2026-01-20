@@ -26,6 +26,7 @@
   };
 
   imports = [
+    ../../modules/home/profile.nix
     ../../modules/home/sway
     ../../modules/home/fish.nix
     ../../modules/home/starship.nix
@@ -39,7 +40,8 @@
   ];
 
   # enable/disable imported module options
-  modules.sway.kanshi.enable = true;
+  # modules.sway.kanshi.enable = true;
+  profiles.laptop = true;
 
   home.packages = [
     # TODO - group all this stuff into separate modules, they get merged anyway int the end

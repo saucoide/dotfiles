@@ -1,49 +1,53 @@
 {
   config,
   pkgs,
+  lib,
   ...
 }: {
-  home.packages = [
-    (pkgs.writeScriptBin "logout-menu" (builtins.readFile ../../scripts/logout-menu.sh))
-    (pkgs.writeScriptBin "ing" (builtins.readFile ../../scripts/ing.py))
-    (pkgs.writeScriptBin "battery-control" (builtins.readFile ../../scripts/battery-control.sh))
-    (pkgs.writeScriptBin "touchscreen" (builtins.readFile ../../scripts/toggle-touchscreen.sh))
-    (pkgs.writeScriptBin "weather" (builtins.readFile ../../scripts/weather.sh))
-    (pkgs.writeScriptBin "webcam" (builtins.readFile ../../scripts/webcam.sh))
-
-    # # You can also create simple shell scripts directly inside your
-    # # configuration. For example, this adds a command 'my-hello' to your
-    # # environment:
-    # (pkgs.writeShellScriptBin "my-hello" ''
-    #   echo "Hello, ${config.home.username}!"
-    # '')
-  ];
+  home.packages =
+    [
+      (pkgs.writeScriptBin "logout-menu" (builtins.readFile ../../scripts/logout-menu.sh))
+      (pkgs.writeScriptBin "ing" (builtins.readFile ../../scripts/ing.py))
+      (pkgs.writeScriptBin "weather" (builtins.readFile ../../scripts/weather.sh))
+      (pkgs.writeScriptBin "webcam" (builtins.readFile ../../scripts/webcam.sh))
+      # (pkgs.writeShellScriptBin "my-hello" '' echo "Hello, ${config.home.username}!" '')
+    ]
+    # Laptop-only scripts
+    ++ lib.optionals config.profiles.laptop [
+      (pkgs.writeScriptBin "battery-control" (builtins.readFile ../../scripts/battery-control.sh))
+      (pkgs.writeScriptBin "touchscreen" (builtins.readFile ../../scripts/toggle-touchscreen.sh))
+    ];
 
   # The xdk desktop entries are for things i want to show up in the wofi menu
-  xdg.desktopEntries."logout-menu" = {
-    name = "Exit Menu";
-    exec = "logout-menu";
-    icon = "system-log-out";
-    categories = ["System"];
-    settings = {
-      Keywords = "shutdown;reboot;restart;hibernate;logout;lock;suspend;";
+  xdg.desktopEntries =
+    {
+      logout-menu = {
+        name = "Exit Menu";
+        exec = "logout-menu";
+        icon = "system-log-out";
+        categories = ["System"];
+        settings = {
+          Keywords = "shutdown;reboot;restart;hibernate;logout;lock;suspend;";
+        };
+      };
+    }
+    # Laptop-only desktop entries
+    // lib.optionalAttrs
+    config.profiles.laptop {
+      battery-control = {
+        name = "Battery Control";
+        exec = "battery-control";
+        icon = "battery";
+        categories = ["System"];
+      };
+      touchscreen-toggle = {
+        name = "Toggle Touchscreen";
+        exec = "touchscreen";
+        icon = "input-touchscreen";
+        settings = {
+          Keywords = "touchscreen;devices;";
+        };
+        categories = ["System"];
+      };
     };
-  };
-
-  xdg.desktopEntries."battery-control" = {
-    name = "Battery Control";
-    exec = "battery-control";
-    icon = "battery";
-    categories = ["System"];
-  };
-
-  xdg.desktopEntries."touchscreen-toggle" = {
-    name = "Toggle Touchscreen";
-    exec = "touchscreen";
-    icon = "input-touchscreen";
-    settings = {
-      Keywords = "touchscreen;devices;";
-    };
-    categories = ["System"];
-  };
 }

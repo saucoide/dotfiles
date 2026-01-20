@@ -4,8 +4,6 @@
   lib,
   ...
 }: {
-  options.modules.sway.kanshi.enable = lib.mkEnableOption "kanshi for sway" // {default = true;};
-
   imports = [
     ./sway.nix
     ./waybar.nix
