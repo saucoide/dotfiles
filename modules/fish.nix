@@ -61,7 +61,11 @@
         # bind -M insert -m default ` force-repaint
       '';
 
-      fish_greeting = "";
+      fish_greeting = ''
+        set_color brblack
+        fortune ~/.config/fortune/nuggets | boxes --design ansi-rounded
+        set_color normal
+      '';
 
       beepin = ''
         set sleep_time 0

@@ -56,6 +56,7 @@ in {
     ./modules/starship.nix
     ./modules/fish.nix
     ./modules/neovim.nix
+    ./modules/fortune/fortune.nix
   ];
 
   home.packages = [
@@ -80,6 +81,11 @@ in {
     nixpkgs.pandoc
     nixpkgs.parallel
     nixpkgs.dust # disk space
+    nixpkgs.tlrc
+    nixpkgs.xh
+    nixpkgs.hyperfine
+    nixpkgs.presenterm
+    nixpkgs.duf
     # nixpkgs.pass
     nixpkgs.ripgrep
     nixpkgs.trash-cli
