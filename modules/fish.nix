@@ -67,6 +67,23 @@
         set_color normal
       '';
 
+      default = {
+        argumentNames = ["val" "default"];
+        description = "Default value if first argument is empty";
+        body = ''
+          if not test "$val" = ""
+              echo $val
+          else
+              echo $default
+          end'';
+      };
+
+      move-last-download = ''
+        set destination (default $argv[1] .)
+        set downloads (default $XDG_DOWNLOAD_DIR $HOME/Downloads)
+        mv $downloads/(lsd -t -A $downloads/ | head -1) $destination
+      '';
+
       beepin = ''
         set sleep_time 0
         if test (count $argv) -ge 1

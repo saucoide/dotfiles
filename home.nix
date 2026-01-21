@@ -10,7 +10,7 @@
     inherit system;
     config.allowUnfree = true;
   };
-  nixpkgs = import inputs.nixpkgs{
+  nixpkgs = import inputs.nixpkgs {
     inherit system;
     config.allowUnfree = true;
   };
@@ -27,7 +27,7 @@ in {
   home.username = "sauco.navarro";
   home.homeDirectory = "/Users/sauco.navarro";
   home.sessionPath = [
-   "$HOME/.local/bin"
+    "$HOME/.local/bin"
   ];
   home.sessionVariables = {
     SHELL = "fish";
@@ -35,6 +35,7 @@ in {
     PYTHONBREAKPOINT = "pdb.set_trace";
     PYTHONSTARTUP = "$HOME/.config/python/pythonrc.py";
     USE_GKE_CLOUD_AUTH_PLUGIN = "True";
+    MANPAGER = "bat -plman";
     # Maybe rye path
   };
 
@@ -70,7 +71,6 @@ in {
     # Tooling
     nixpkgs.bat
     nixpkgs.fd
-    nixpkgs.fzf
     nixpkgs.jq
     nixpkgs.yq-go
     nixpkgs.just
@@ -145,6 +145,11 @@ in {
     # MacOS
     nixpkgs.raycast
   ];
+
+  programs.fzf = {
+    enable = true;
+    enableFishIntegration = true;
+  };
 
   # SSH
   programs.ssh = {
