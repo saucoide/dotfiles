@@ -1,0 +1,39 @@
+Use *tldr* for a brief version of  *man*
+%
+*procs* is a better *ps*! use *--json* for easier filtering
+%
+*rg* for a better *grep*
+  *rg pattern* to find all files contaning the pattern
+  *-l* to list just the file name
+  *--invert-match*
+  *--files* list files that WOULD be searched
+%
+*fd* to find files! e.g *fd --extension jpg* and lots of other useful flags
+%
+get json (or yaml!) keys with *yq*
+yq keys file.json
+%
+filter json/yaml with *yq*
+cat file.json | yq '.[] | select((.key1=="value*") and (.key2 | tonumber >=  10))'
+%
+`yq` output in different formats
+yq '.[]' file.json --output-format json|yaml|csv
+yq '.[]' file.json -o json|yaml|csv
+%
+in neovim - do an action for the lines matching the pattern
+:g/pattern/norm!dd
+:v/pattern/norm!dd  # reverse match!
+%
+*dust* gives you a quick overview of disk usage, read bottom to top!
+%
+Use *duf* for getting disk usage information 
+%
+*xh* can replace *curl*
+xh get https://example.com header-name:header-value
+xh post https://example.com content-key=content-value
+echo {"something": true} | xh post https://httpbin.org/post
+xh get https://example.com --curl  # show curl equivalent
+%
+remmeber you have *hyperfine* for benchmarking!
+%
+*presenter* makes presentations out of md files
