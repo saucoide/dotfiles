@@ -10,6 +10,7 @@
     SHELL = "fish";
     EDITOR = "nvim";
     XDG_CURRENT_DESKTOP = "sway";
+    MANPAGER = "bat -plman";
   };
   xdg.userDirs = {
     enable = true;
@@ -34,6 +35,7 @@
     ../../modules/home/python/python.nix
     ../../modules/home/wezterm/wezterm.nix
     ../../modules/home/firefox/firefox.nix
+    ../../modules/home/fortune/fortune.nix
     # ../../modules/home/kubernetes/kubernetes.nix
     ../../modules/home/gtk.nix
     ../../modules/home/custom-scripts.nix
@@ -52,7 +54,6 @@
     # general tools
     pkgs.bat # cat replacement
     pkgs.fd # find replacement
-    pkgs.fzf # fuzzy finder
     pkgs.jq
     pkgs.yq-go # jq like
     pkgs.just # command runner
@@ -65,6 +66,11 @@
     pkgs.trash-cli
     pkgs.htop
     pkgs.bottom
+    pkgs.tlrc # man page
+    pkgs.xh # curl alternative
+    pkgs.hyperfine # benchmarking
+    pkgs.presenterm # mardown presentation
+    pkgs.duf # disks usage
 
     # network tools
     pkgs.mtr
@@ -102,6 +108,11 @@
     pkgs.celluloid
     pkgs.libreoffice
   ];
+
+  programs.fzf = {
+    enable = true;
+    enableFishIntegration = true;
+  };
 
   services.udiskie.enable = true; # mounting usb drives (requires usdisks2 systemwide)
 

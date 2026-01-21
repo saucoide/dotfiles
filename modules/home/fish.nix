@@ -66,7 +66,28 @@
         # bind -M insert -m default ` force-repaint
       '';
 
-      fish_greeting = "";
+      fish_greeting = ''
+        set_color brblack
+        fortune ~/.config/fortune/nuggets | boxes --design ansi-rounded
+        set_color normal
+      '';
+
+      default = {
+        argumentNames = ["val" "default"];
+        description = "Default value if first argument is empty";
+        body = ''
+          if not test "$val" = ""
+              echo $val
+          else
+              echo $default
+          end'';
+      };
+
+      move-last-download = ''
+        set destination (default $argv[1] .)
+        set downloads (default $XDG_DOWNLOAD_DIR $HOME/Downloads)
+        mv $downloads/(lsd -t -A $downloads/ | head -1) $destination
+      '';
 
       kube_namespace = {
         wraps = "kubectl get namespace";
