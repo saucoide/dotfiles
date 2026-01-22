@@ -34,4 +34,10 @@
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+
+  hardware.trackpoint = {
+    enable = true;
+    sensitivity = 128; # Value from 0 to 255 (default is 128)
+    speed = 80; # Value from 0 to 255 (default is 97)
+  };
 }

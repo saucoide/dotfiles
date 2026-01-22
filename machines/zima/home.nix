@@ -37,7 +37,7 @@
     ../../modules/home/firefox/firefox.nix
     ../../modules/home/fortune/fortune.nix
     # ../../modules/home/kubernetes/kubernetes.nix
-    ../../modules/home/gtk.nix
+    ../../modules/home/themes.nix
     ../../modules/home/custom-scripts.nix
   ];
 
@@ -102,6 +102,7 @@
     pkgs.snapshot # webcam
 
     # GUI Programs
+    pkgs.zeal
     pkgs.signal-desktop
     pkgs.prusa-slicer
     pkgs.mpv
