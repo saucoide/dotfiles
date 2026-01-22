@@ -20,7 +20,7 @@ main() {
     shutdown_cmd="systemctl poweroff"
     hibernate_cmd="systemctl hibernate"
 
-    choice=$(printf '%s\n' "${options[@]}" | wofi --dmenu -i  -p "Quit Menu:")
+    choice=$(printf '%s\n' "${options[@]}" | rofi -dmenu -i -p "Quit Menu:")
 
     case $choice in
         " Lock screen")
@@ -38,7 +38,7 @@ main() {
     esac
 
     if [[ ${cmd:-} ]]; then
-        confirmation=$(printf '%s\n' "Yes" "No" | wofi --dmenu -i -p "${choice}?")
+        confirmation=$(printf '%s\n' "Yes" "No" | rofi -dmenu -i -p "${choice}?")
         if [[ ${confirmation} == "Yes" ]]; then
             ${cmd}
         fi

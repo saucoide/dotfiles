@@ -19,7 +19,7 @@
         {command = "touchscreen disabled";}
       ];
       modifier = "Mod4";
-      menu = "wofi --show drun";
+      menu = "rofi -show drun";
       keybindings = let
         cfg = config.wayland.windowManager.sway;
         mod = cfg.config.modifier;

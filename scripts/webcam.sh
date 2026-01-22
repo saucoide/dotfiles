@@ -8,7 +8,7 @@ main() {
       if [ "$(cat "$d/index")" = "0" ]; then
           echo "$(basename "$d"): $(cat "$d/name")"
       fi
-  done | wofi --dmenu -i -p "Select Webcam" )
+  done | rofi -dmenu -i -p "Select Webcam" )
 
   if [ -z "$choice" ]; then
       exit 0

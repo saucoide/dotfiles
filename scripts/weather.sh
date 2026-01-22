@@ -10,7 +10,7 @@ main() {
   weather_location[Las Palmas]="Las+Palmas"
   weather_location[Moon]="Moon"
   
-  _pick="$(printf '%s\n' "${!weather_location[@]}" | wofi --dmenu "Where do you want to see the weather?")"
+  _pick="$(printf '%s\n' "${!weather_location[@]}" | rofi -dmenu -p "Where do you want to see the weather?")"
   if [[ ${weather_location[${_pick}]+_} ]]; then
     _location="${weather_location[${_pick}]}"
   else
