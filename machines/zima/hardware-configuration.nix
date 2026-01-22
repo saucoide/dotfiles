@@ -37,7 +37,7 @@
 
   hardware.trackpoint = {
     enable = true;
-    sensitivity = 128; # Value from 0 to 255 (default is 128)
-    speed = 80; # Value from 0 to 255 (default is 97)
+    sensitivity = 150; # Value from 0 to 255 (default is 128)
+    speed = 60; # Value from 0 to 255 (default is 97)
   };
 }

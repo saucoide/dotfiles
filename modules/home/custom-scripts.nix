@@ -18,7 +18,7 @@
       (pkgs.writeScriptBin "touchscreen" (builtins.readFile ../../scripts/toggle-touchscreen.sh))
     ];
 
-  # The xdk desktop entries are for things i want to show up in the wofi menu
+  # The xdk desktop entries are for things i want to show up in the rofi menu
   xdg.desktopEntries =
     {
       logout-menu = {

@@ -10,7 +10,7 @@ declare -a options=(
     " Status"
 )
 
-choice=$(printf '%s\n' "${options[@]}" | wofi --dmenu -i -p "Power Profile:")
+choice=$(printf '%s\n' "${options[@]}" | rofi -dmenu -i -p "Power Profile:")
 case $choice in
     " Performance")
         cmd="tlp performance";;

@@ -10,7 +10,7 @@
     ./swaylock.nix
     ./swayidle.nix
     ./kanshi.nix
-    ./wofi.nix
+    ./rofi.nix
     ./mako.nix
   ];
 
