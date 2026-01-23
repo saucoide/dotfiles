@@ -76,14 +76,7 @@ bind h scrollpx -50
 bind l scrollpx 50
 bind G scrollto 100
 bind gg scrollto 0
-bind <C-u> scrollpage -0.5
-bind <C-d> scrollpage 0.5
-bind <C-b> scrollpage -1
 bind <C-v> nmode ignore 1 mode normal
-bind $ scrollto 100 x
-bind ^ scrollto 0 x
-bind } scrollline 25
-bind { scrollline -25
 
 bind H back
 bind L forward
@@ -114,7 +107,7 @@ bind <Escape> composite mode normal ; hidecmdline | clearsearchhighlight
 
 bind <Space><Backspace> tab #
 
-# ex-mode bindings
+" ex-mode bindings
 bind --mode=ex <Space> ex.insert_space_or_completion
 bind --mode=ex <Enter> ex.accept_line
 bind --mode=ex <C-Enter> ex.execute_ex_on_completion
@@ -141,7 +134,7 @@ bind --mode=ex <S-Delete> ex.execute_ex_on_completion_args tabclose
 bind --mode=ex <C-o>t ex.execute_ex_on_completion_args tabopen -b
 bind --mode=ex <C-o>w ex.execute_ex_on_completion_args winopen
 
-# Blacklists
+" Blacklists
 blacklistadd http://localhost
 
 unbindurl https://www.youtube.com l
@@ -152,6 +145,7 @@ unbindurl https://www.youtube.com ,
 unbindurl https://www.youtube.com <Space><Backspace>
 unbindurl https://www.inoreader.com l
 unbindurl https://www.inoreader.com k
+unbindurl https://www.inoreader.com m
 unbindurl https://www.inoreader.com j
 unbindurl https://www.inoreader.com .
 unbindurl https://www.inoreader.com ,
@@ -160,6 +154,10 @@ unbindurl mail.google.com a
 unbindurl mail.google.com aa
 unbindurl mail.google.com q
 unbindurl mail.google.com qq
+unbindurl mail.google.com h
+unbindurl mail.google.com j
+unbindurl mail.google.com k
+unbindurl mail.google.com l
 
 bindurl www.google.com gi composite focusinput -l ; text.end_of_line
 
