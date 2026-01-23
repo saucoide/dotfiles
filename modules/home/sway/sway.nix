@@ -8,7 +8,7 @@
     wrapperFeatures.gtk = true;
     config = rec {
       startup = [
-        {command = "dbus-update-activation-environment --systemd WAYLAND_DISPLAY SWAYSOCK DISPLAY XDG_CURRENT_DESKTOP NO_AT_BRIDGE NIXOS_OZONE_WL PATH";}
+        {command = "dbus-update-activation-environment --systemd WAYLAND_DISPLAY SWAYSOCK DISPLAY XDG_CURRENT_DESKTOP NO_AT_BRIDGE NIXOS_OZONE_WL PATH QT_QPA_PLATFORMTHEME QT_STYLE_OVERRIDE";}
         {
           command = "systemctl --user restart waybar";
           always = true;
