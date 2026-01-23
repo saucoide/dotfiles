@@ -23,20 +23,16 @@
   };
 
   # Qt programs
-  qt = {
-    enable = true;
-    platformTheme.name = "kvantum";
-    style.name = "kvantum";
-  };
-
+  # QT_* variables set in sway.nix at the nixos module level
+  #  otherwise they are not picked up by sway
   xdg.configFile."Kvantum/kvantum.kvconfig".text = ''
     [General]
     theme=Qogir-dark
   '';
   home.packages = with pkgs; [
-    qogir-kde # The specific Qt/Kvantum assets for Qogir
+    qogir-kde # Qt/Kvantum assets for Qogir
     libsForQt5.qtstyleplugin-kvantum # Qt5 engine
-    kdePackages.qtstyleplugin-kvantum # Qt6 engine (crucial for modern apps)
+    kdePackages.qtstyleplugin-kvantum # Qt6 engine 
   ];
 
   # Cursor

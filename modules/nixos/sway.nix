@@ -26,5 +26,7 @@
     NO_AT_BRIDGE = "1";
     NIXOS_OZONE_WL = "1";
     XDG_CURRENT_DESKTOP = "sway";
+    QT_QPA_PLATFORMTHEME = "kvantum";
+    QT_STYLE_OVERRIDE = "kvantum";
   };
 }
