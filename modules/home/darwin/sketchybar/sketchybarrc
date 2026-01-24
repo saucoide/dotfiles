@@ -80,15 +80,15 @@ sketchybar --add item space_separator left                         \
 sketchybar --add item clock right                              \
            --set clock update_freq=10                          \
                        icon=                                  \
-                       script="$PLUGIN_DIR/clock.sh"           
+                       script="$PLUGIN_DIR/clock.sh"
 
 sketchybar --add item volume right                             \
            --set volume script="$PLUGIN_DIR/volume.sh"         \
            --subscribe volume volume_change
 
-sketchybar --add item wifi right                                    \
-           --set wifi script='sketchybar --set $NAME label="$INFO"' \
-           --subscribe wifi wifi_change                             \
+sketchybar --add item wifi right                              \
+           --set wifi update_freq=30                          \
+                      script="$PLUGIN_DIR/wifi.sh"            \
 
 sketchybar --add item battery right                            \
            --set battery update_freq=120                       \
