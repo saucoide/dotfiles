@@ -27,7 +27,8 @@
   };
 
   imports = [
-    ../../modules/home/profile.nix
+    ../../modules/home/custom-options.nix
+    ../../modules/home/clitools.nix
     ../../modules/home/sway
     ../../modules/home/fish.nix
     ../../modules/home/starship.nix
@@ -43,58 +44,9 @@
 
   # enable/disable imported module options
   # modules.sway.kanshi.enable = true;
-  profiles.laptop = true;
+  custom-options.laptop = true;
 
   home.packages = [
-    # TODO - group all this stuff into separate modules, they get merged anyway int the end
-    pkgs.gcc
-    pkgs.cmake
-    pkgs.gnumake
-
-    # general tools
-    pkgs.bat # cat replacement
-    pkgs.fd # find replacement
-    pkgs.jq
-    pkgs.yq-go # jq like
-    pkgs.just # command runner
-    pkgs.lsd # ls replacement
-    pkgs.procs # ps replacement
-    pkgs.magic-wormhole # send/receive
-    pkgs.pandoc # doc converter
-    pkgs.dust # disk space
-    pkgs.ripgrep # grep replacement
-    pkgs.trash-cli
-    pkgs.htop
-    pkgs.bottom
-    pkgs.tlrc # man page
-    pkgs.xh # curl alternative
-    pkgs.hyperfine # benchmarking
-    pkgs.presenterm # mardown presentation
-    pkgs.duf # disks usage
-
-    # network tools
-    pkgs.mtr
-    pkgs.nmap
-
-    # infrastructure tools
-    pkgs.podman
-
-    # database tools
-    # pkgs.sqlite
-    # pkgs.litecli
-    # pkgs.pgcli
-    # pkgs.duckdb
-
-    # other languages
-    pkgs.stylua
-    pkgs.yamlfmt
-    pkgs.taplo
-    pkgs.alejandra
-    pkgs.nodePackages.prettier
-
-    # Video
-    pkgs.ffmpeg
-
     # Images
     pkgs.loupe # basic image viewer
     pkgs.gthumb # basic image editor
@@ -198,7 +150,7 @@
 
   programs.direnv = {
     enable = true;
-    # enableFishIntegration = true;
+    enableFishIntegration = true;
     silent = false;
     nix-direnv.enable = true;
   };

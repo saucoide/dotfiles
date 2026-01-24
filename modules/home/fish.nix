@@ -8,8 +8,6 @@
     generateCompletions = true;
 
     interactiveShellInit = ''
-      # Get most envvars from .profile (requires oh-my-fish & fenv)
-      # fenv source $HOME/.profile   # TODO .profile
       source $HOME/dotfiles/.private_envvars
     '';
     shellAliases = {
