@@ -6,11 +6,11 @@ config.default_prog = { '@fish@/bin/fish', '-l' }
 
 
 config.enable_tab_bar = false
-config.window_decorations = "NONE"
+config.window_decorations = "RESIZE"  -- TODO its NONE on linux
 config.window_close_confirmation = "NeverPrompt"
 
 config.font = wezterm.font('JetBrainsMono Nerd Font', { weight = "Bold" })
-config.font_size = 10.0
+config.font_size = 12.0
 
 config.unix_domains = { { name = 'unix', }, }
 -- config.default_domain = "unix"

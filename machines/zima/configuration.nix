@@ -19,6 +19,13 @@
     inputs.home-manager.nixosModules.default
   ];
 
+  home-manager = {
+    extraSpecialArgs = {inherit inputs;};
+    users = {
+      "saucoide" = import ./home.nix;
+    };
+  };
+
   # Nix stuff
   nix.settings = {
     experimental-features = ["flakes" "nix-command"];
@@ -246,13 +253,6 @@
     extraGroups = ["networkmanager" "wheel" "lp" "scanner"];
     shell = pkgs.fish;
     packages = with pkgs; [];
-  };
-
-  home-manager = {
-    extraSpecialArgs = {inherit inputs;};
-    users = {
-      "saucoide" = import ./home.nix;
-    };
   };
 
   fonts.packages = with pkgs; [

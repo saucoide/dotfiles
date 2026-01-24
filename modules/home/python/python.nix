@@ -16,5 +16,5 @@
   ];
 
   home.file.".pdbrc.py" = {source = ./pdbrc.py;};
-  # xdg.configFile."python/pythonrc.py" = {source = ./config/python/pythonrc.py;};
+  xdg.configFile."python/pythonrc.py" = {source = ./pythonrc.py;};
 }

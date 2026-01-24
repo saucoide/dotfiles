@@ -4,7 +4,9 @@ local act = wezterm.action
 
 local M = {}
 
-local fd = "fd"
+-- local fd = "fd"
+-- TODO  macos uses the one below, linux above
+local fd = "/etc/profiles/per-user/" .. os.getenv("USER") .. "/bin/fd"
 
 local get_parent_directory = function(path)
 	path = path:gsub("/$", "") -- remove trailing /
