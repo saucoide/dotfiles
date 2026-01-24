@@ -1,11 +1,24 @@
 #!/usr/bin/env sh
 
-CURRENT_WIFI="$(/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I)"
-SSID="$(echo "$CURRENT_WIFI" | grep -o "SSID: .*" | sed 's/^SSID: //')"
-CURR_TX="$(echo "$CURRENT_WIFI" | grep -o "lastTxRate: .*" | sed 's/^lastTxRate: //')"
+# Get primary network interface from scutil
+PRIMARY=$(scutil --nwi 2>/dev/null | awk '/IPv4 network interface information/{found=1} found && /^ +[a-z]+[0-9]+ :/{print $1; exit}')
 
-if [ "$SSID" = "" ]; then
-  sketchybar --set $NAME label="Disconnected" icon=睊
-else
-  sketchybar --set $NAME label="$SSID (${CURR_TX}Mbps)" icon=直
+if [ -z "$PRIMARY" ]; then
+  sketchybar --set "$NAME" label="Offline" icon=󰖪
+  exit 0
 fi
+
+# Determine interface type
+TYPE=$(networksetup -listallhardwareports 2>/dev/null | grep -B1 "Device: $PRIMARY" | head -1 | sed 's/Hardware Port: //')
+
+case "$TYPE" in
+  Wi-Fi)
+    sketchybar --set "$NAME" label="WiFi" icon=󰖩
+    ;;
+  *Ethernet*|*LAN*|*Thunderbolt*|*USB*|*AX88179*)
+    sketchybar --set "$NAME" label="Wired" icon=󰈀
+    ;;
+  *)
+    sketchybar --set "$NAME" label="$TYPE" icon=󰖩
+    ;;
+esac
