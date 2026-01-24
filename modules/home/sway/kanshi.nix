@@ -3,7 +3,7 @@
   lib,
   ...
 }: {
-  services.kanshi = lib.mkIf config.profiles.laptop {
+  services.kanshi = lib.mkIf config.custom-options.laptop {
     enable = true;
     systemdTarget = "sway-session.target";
 

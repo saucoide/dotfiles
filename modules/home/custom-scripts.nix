@@ -4,6 +4,7 @@
   lib,
   ...
 }: {
+  # TODO future - enable options for each of them instead of "laptop" profile
   home.packages =
     [
       (pkgs.writeScriptBin "logout-menu" (builtins.readFile ../../scripts/logout-menu.sh))
@@ -13,7 +14,7 @@
       # (pkgs.writeShellScriptBin "my-hello" '' echo "Hello, ${config.home.username}!" '')
     ]
     # Laptop-only scripts
-    ++ lib.optionals config.profiles.laptop [
+    ++ lib.optionals config.custom-options.laptop [
       (pkgs.writeScriptBin "battery-control" (builtins.readFile ../../scripts/battery-control.sh))
       (pkgs.writeScriptBin "touchscreen" (builtins.readFile ../../scripts/toggle-touchscreen.sh))
     ];
@@ -33,7 +34,7 @@
     }
     # Laptop-only desktop entries
     // lib.optionalAttrs
-    config.profiles.laptop {
+    config.custom-options.laptop {
       battery-control = {
         name = "Battery Control";
         exec = "battery-control";

@@ -2,15 +2,15 @@ local wezterm = require("wezterm")
 local sessionizer = require("sessionizer")
 local config = wezterm.config_builder()
 
-config.default_prog = { '@fish@/bin/fish', '-l' }
+config.default_prog = { '@FISH@/bin/fish', '-l' }
 
 
 config.enable_tab_bar = false
-config.window_decorations = "RESIZE"  -- TODO its NONE on linux
+config.window_decorations = @WINDOW_DECORATIONS@
 config.window_close_confirmation = "NeverPrompt"
 
 config.font = wezterm.font('JetBrainsMono Nerd Font', { weight = "Bold" })
-config.font_size = 12.0
+config.font_size = @FONT_SIZE@
 
 config.unix_domains = { { name = 'unix', }, }
 -- config.default_domain = "unix"

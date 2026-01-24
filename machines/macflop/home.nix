@@ -37,6 +37,7 @@ in {
 
   # My Modules
   imports = [
+    ../../modules/home/clitools.nix
     ../../modules/home/wezterm/wezterm.nix
     ../../modules/home/starship.nix
     ../../modules/home/fish.nix
@@ -44,74 +45,28 @@ in {
     ../../modules/home/fortune/fortune.nix
     ../../modules/home/python/python.nix
     ../../modules/home/rust/rust.nix
+    ../../modules/home/kubernetes/kubernetes.nix
     ../../modules/home/darwin/sketchybar/sketchybar.nix
   ];
 
+  # on macflop wezterm has a bit different config
+  wezterm.font_size = 12;
+  wezterm.window_decorations = "RESIZE";
+  # google cloud
+  kubernetes.gcp.enable = true;
+
   home.packages = [
-    # nix cli
-    pkgs.nh
-
-    # Compilers & general build tools
-    pkgs.gcc
-    pkgs.cmake
-
-    # Tooling
-    pkgs.bat
-    pkgs.fd
-    pkgs.jq
-    pkgs.yq-go
-    pkgs.just
-    pkgs.lsd
-    pkgs.procs
-    pkgs.neofetch
-    pkgs.magic-wormhole
-    pkgs.pandoc
-    pkgs.parallel
-    pkgs.dust # disk space
-    pkgs.tlrc
-    pkgs.xh
-    pkgs.hyperfine
-    pkgs.presenterm
-    pkgs.duf
-    pkgs.ripgrep
-    pkgs.trash-cli
-    pkgs.sipcalc
-    pkgs.watch
-
-    # Lua
-
-    # Other
+    # slop
     pkgs.claude-code
     pkgs.opencode
 
-    # Formatters
-    pkgs.stylua
-    pkgs.nodePackages.prettier #
-    pkgs.yamlfmt # yaml
-    pkgs.taplo # toml
-    pkgs.alejandra # nix
-
-    # Network
-    pkgs.mtr
-    pkgs.nmap
-
-    # Infra
-    gdk
-    pkgs.kubectl
-    # pkgs.podman-desktop
-    pkgs.podman
+    # infra
     pkgs.podman-compose
     pkgs.terraform
     pkgs.vault-bin
 
-    # TUIs
-    pkgs.htop
-    pkgs.pgcli
-    pkgs.litecli
-    pkgs.sqlite
-    pkgs.duckdb
-
     # GUIs
+    pkgs.zeal
     pkgs.slack
     pkgs.vscode
     pkgs.iina
@@ -208,14 +163,4 @@ in {
   programs.poetry = {
     enable = true;
   };
-
-  programs.k9s = {
-    enable = true;
-    # aliases = { cj = "cronjobs"; };
-  };
-
-  # xdg.configFile."k9s/skins/" = {
-  #   source = ./config/k9s/skins;
-  #   recursive = true;
-  # };
 }
