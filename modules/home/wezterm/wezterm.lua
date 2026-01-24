@@ -6,7 +6,7 @@ config.default_prog = { '@FISH@/bin/fish', '-l' }
 
 
 config.enable_tab_bar = false
-config.window_decorations = @WINDOW_DECORATIONS@
+config.window_decorations = "@WINDOW_DECORATIONS@"
 config.window_close_confirmation = "NeverPrompt"
 
 config.font = wezterm.font('JetBrainsMono Nerd Font', { weight = "Bold" })
