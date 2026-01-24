@@ -28,7 +28,7 @@
         icon = "system-log-out";
         categories = ["System"];
         settings = {
-          Keywords = "shutdown;reboot;restart;hibernate;logout;lock;suspend;";
+          Keywords = "shutdown;poweroff,reboot;restart;hibernate;logout;lock;suspend;";
         };
       };
     }
