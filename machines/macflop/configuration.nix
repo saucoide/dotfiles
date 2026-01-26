@@ -25,26 +25,26 @@
   };
 
   # nix stuff
-  nix = {
-    channel.enable = false;
-    optimise.automatic = true;
-    settings = {
-      experimental-features = ["nix-command" "flakes"];
-      substituters = [
-        "https://cache.nixos.org/"
-        "https://nix-community.cachix.org/"
-      ];
-      trusted-users = ["sauco.navarro"];
-      trusted-substituters = [
-        "https://cache.nixos.org/"
-        "https://nix-community.cachix.org/"
-      ];
-      trusted-public-keys = [
-        "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-      ];
-    };
-  };
+  # nix = {
+  #   channel.enable = false;
+  #   optimise.automatic = true;
+  #   settings = {
+  #     experimental-features = ["nix-command" "flakes"];
+  #     substituters = [
+  #       "https://cache.nixos.org/"
+  #       "https://nix-community.cachix.org/"
+  #     ];
+  #     trusted-users = ["sauco.navarro"];
+  #     trusted-substituters = [
+  #       "https://cache.nixos.org/"
+  #       "https://nix-community.cachix.org/"
+  #     ];
+  #     trusted-public-keys = [
+  #       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+  #       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+  #     ];
+  #   };
+  # };
 
   # Set Git commit hash for darwin-version.
   # system.configurationRevision = self.rev or self.dirtyRev or null;
@@ -56,7 +56,7 @@
   # The platform the configuration will be used on.
   nixpkgs = {
     hostPlatform = "aarch64-darwin";
-    config.allowUnfree = true;
+    # config.allowUnfree = true;
   };
 
   # System

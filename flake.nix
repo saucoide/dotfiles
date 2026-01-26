@@ -21,12 +21,14 @@
     self,
     nixpkgs,
     ...
-  } @ inputs: {
-
+  } @ inputs: let
+    nix-config = ./modules/base-nix-config.nix;
+  in {
     # ORION
     nixosConfigurations.orion = nixpkgs.lib.nixosSystem {
       specialArgs = {inherit inputs;};
       modules = [
+        nix-config
         ./machines/orion/configuration.nix
         inputs.home-manager.nixosModules.default
       ];
@@ -35,6 +37,7 @@
     nixosConfigurations.zima = nixpkgs.lib.nixosSystem {
       specialArgs = {inherit inputs;};
       modules = [
+        nix-config
         ./machines/zima/configuration.nix
         inputs.home-manager.nixosModules.default
       ];
@@ -45,6 +48,7 @@
       specialArgs = {inherit inputs;};
       system = "aarch64-darwin";
       modules = [
+        nix-config
         ./machines/macflop/configuration.nix
         inputs.home-manager.darwinModules.home-manager
       ];
