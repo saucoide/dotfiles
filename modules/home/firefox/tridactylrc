@@ -65,7 +65,7 @@ bind ys clipboard yankshort
 bind ym clipboard yankmd
 bind yo clipboard yankorg
 bind yt clipboard yanktitle
-bind yq text2qr --timeout 5
+bind yq text2qr --timeout 30
 bind P clipboard tabopen
 
 bind j scrollline 10
@@ -164,6 +164,3 @@ bindurl www.google.com gi composite focusinput -l ; text.end_of_line
 " Autocmds
 autocmd DocStart localhost mode ignore
 autocmd TriStart .* source_quiet
-
-" For syntax highlighting see https://github.com/tridactyl/vim-tridactyl
-" vim: set filetype=tridactyl

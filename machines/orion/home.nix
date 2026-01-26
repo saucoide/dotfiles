@@ -1,0 +1,182 @@
+{
+  config,
+  pkgs,
+  ...
+}: {
+  home.username = "saucoide";
+  home.homeDirectory = "/home/saucoide";
+
+  home.sessionVariables = {
+    SHELL = "fish";
+    EDITOR = "nvim";
+    XDG_CURRENT_DESKTOP = "sway";
+    MANPAGER = "bat -plman";
+  };
+  xdg.userDirs = {
+    enable = true;
+    createDirectories = false;
+    desktop = "${config.home.homeDirectory}/desktop";
+    download = "${config.home.homeDirectory}/downloads";
+    documents = "${config.home.homeDirectory}/documents";
+    pictures = "${config.home.homeDirectory}/pictures";
+    videos = "${config.home.homeDirectory}/videos";
+    extraConfig = {
+      XDG_PROJECTS_DIR = "${config.home.homeDirectory}/projects";
+      XDG_SCREENSHOTS_DIR = "${config.home.homeDirectory}/screenshots";
+    };
+  };
+
+  imports = [
+    ../../modules/home/custom-options.nix
+    ../../modules/home/clitools.nix
+    ../../modules/home/sway
+    ../../modules/home/fish.nix
+    ../../modules/home/starship.nix
+    ../../modules/home/neovim/neovim.nix
+    ../../modules/home/python/python.nix
+    ../../modules/home/wezterm/wezterm.nix
+    ../../modules/home/firefox/firefox.nix
+    ../../modules/home/fortune/fortune.nix
+    # ../../modules/home/kubernetes/kubernetes.nix
+    ../../modules/home/themes.nix
+    ../../modules/home/custom-scripts.nix
+  ];
+
+  # enable/disable imported module options
+  # modules.sway.kanshi.enable = true;
+  custom-options.laptop = true;
+
+  home.packages = [
+    # Images
+    pkgs.loupe # basic image viewer
+    pkgs.gthumb # basic image editor
+    pkgs.gimp # advanced image editor
+    pkgs.snapshot # webcam
+
+    # GUI Programs
+    pkgs.zeal
+    pkgs.signal-desktop
+    pkgs.prusa-slicer
+    pkgs.mpv
+    pkgs.celluloid
+    pkgs.libreoffice
+  ];
+
+  programs.fzf = {
+    enable = true;
+    enableFishIntegration = true;
+  };
+
+  services.udiskie.enable = true; # mounting usb drives (requires usdisks2 systemwide)
+
+  programs.ssh = {
+    enable = true;
+    enableDefaultConfig = false;
+    matchBlocks."*" = {
+      forwardAgent = false;
+      addKeysToAgent = "yes";
+      compression = false;
+      serverAliveInterval = 0;
+      serverAliveCountMax = 3;
+      hashKnownHosts = false;
+      userKnownHostsFile = "~/.ssh/known_hosts";
+      controlMaster = "no";
+      controlPath = "~/.ssh/master-%r@%n:%p";
+      controlPersist = "no";
+    };
+    extraConfig = ''
+      IdentityFile ~/.ssh/id_ed25519
+    '';
+  };
+
+  services.ssh-agent = {
+    enable = true;
+    enableFishIntegration = true;
+    defaultMaximumIdentityLifetime = 600;
+  };
+
+  programs.gpg.enable = true;
+  programs.password-store = {
+    enable = true;
+    settings = {
+      PASSWORD_STORE_DIR = "${config.home.homeDirectory}/.password-store";
+    };
+  };
+
+  programs.git = {
+    enable = true;
+    settings = {
+      user = {
+        name = "saucoide";
+        email = "saucoide@gmail.com";
+      };
+      fetch = {
+        prune = true;
+        pruneTags = true;
+        all = true;
+      };
+      branch = {sort = "-comitterdate";};
+      column = {ui = "auto";};
+      tag = {sort = "version:refname";};
+      diff = {
+        algorithm = "histogram";
+        colorMoved = "plain";
+        renames = true;
+      };
+      push = {
+        autoSetupRemote = true;
+        followTags = true;
+      };
+      rerere = {
+        enabled = true;
+        autoupdate = true;
+      };
+      pull = {rebase = true;};
+    };
+    ignores = [
+      ".venv"
+      "*.pyc"
+      ".nox"
+      ".idea"
+      ".vscode"
+      ".pytest_cache"
+      ".ruff_cache"
+      ".mypy_cache"
+      "__pycache__"
+      ".direnv"
+      ".DS_Store"
+    ];
+  };
+
+  programs.direnv = {
+    enable = true;
+    enableFishIntegration = true;
+    silent = false;
+    nix-direnv.enable = true;
+  };
+
+  # Home Manager is pretty good at managing dotfiles. The primary way to manage
+  # plain files is through 'home.file'.
+  home.file = {
+    # # Building this configuration will create a copy of 'dotfiles/screenrc' in
+    # # the Nix store. Activating the configuration will then make '~/.screenrc' a
+    # # symlink to the Nix store copy.
+    # ".screenrc".source = dotfiles/screenrc;
+
+    # # You can also set the file content immediately.
+    # ".gradle/gradle.properties".text = ''
+    #   org.gradle.console=verbose
+    #   org.gradle.daemon.idletimeout=3600000
+    # '';
+  };
+
+  # This value determines the Home Manager release that your configuration is
+  # compatible with. This helps avoid breakage when a new Home Manager release
+  # introduces backwards incompatible changes.
+  #
+  # You should not change this value, even if you update Home Manager. If you do
+  # want to update the value, then make sure to first check the Home Manager
+  # release notes.
+  home.stateVersion = "25.11"; # Please read the comment before changing.
+  programs.home-manager.enable = true;
+}

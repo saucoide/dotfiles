@@ -52,6 +52,6 @@
 
     # build
     pkgs.gcc
-    pkgs.cmake
+    pkgs.gnumake
   ];
 }

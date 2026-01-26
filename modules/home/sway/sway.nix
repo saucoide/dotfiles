@@ -128,7 +128,19 @@
         criteria = [
           {
             app_id = "thunar";
+            title = "^File Operation Progress";
+          }
+          {
+            app_id = "thunar";
             title = "^Rename .*";
+          }
+          {
+            app_id = "thunar";
+            title = "^Confirm to.*";
+          }
+          {
+            app_id = "firefox";
+            title = "^Extension.*Bitwarden.*";
           }
         ];
       };
