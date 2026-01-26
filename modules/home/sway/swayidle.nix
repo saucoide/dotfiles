@@ -17,8 +17,8 @@
         command = "${pkgs.swaylock}/bin/swaylock --daemonize";
       }
       {
-        timeout = 1800;
-        command = "systemctl suspend";
+        timeout = 1200;
+        command = "systemctl suspend-then-hibernate";
       }
     ];
     events = {

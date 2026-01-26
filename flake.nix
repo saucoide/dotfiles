@@ -22,6 +22,15 @@
     nixpkgs,
     ...
   } @ inputs: {
+
+    # ORION
+    nixosConfigurations.orion = nixpkgs.lib.nixosSystem {
+      specialArgs = {inherit inputs;};
+      modules = [
+        ./machines/orion/configuration.nix
+        inputs.home-manager.nixosModules.default
+      ];
+    };
     # ZIMA
     nixosConfigurations.zima = nixpkgs.lib.nixosSystem {
       specialArgs = {inherit inputs;};
