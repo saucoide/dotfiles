@@ -33,6 +33,7 @@
         inputs.home-manager.nixosModules.default
       ];
     };
+
     # ZIMA
     nixosConfigurations.zima = nixpkgs.lib.nixosSystem {
       specialArgs = {inherit inputs;};
