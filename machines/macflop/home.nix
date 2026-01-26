@@ -20,7 +20,7 @@ in {
     PYTHONSTARTUP = "$HOME/.config/python/pythonrc.py";
     USE_GKE_CLOUD_AUTH_PLUGIN = "True";
     MANPAGER = "bat -plman";
-    # Maybe rye path
+    NIXPKGS_ALLOW_UNFREE = "1";
   };
 
   targets.darwin.keybindings = {
