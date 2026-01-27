@@ -37,3 +37,6 @@ xh get https://example.com --curl  # show curl equivalent
 remmeber you have *hyperfine* for benchmarking!
 %
 *presenter* makes presentations out of md files
+%
+`ssh -L [local_addr:port]:[remote_addr:port] user@host`
+the remote_addr can be the host's localhost *or* something else!
