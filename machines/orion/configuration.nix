@@ -101,12 +101,12 @@
 
   # internal ssd
   fileSystems."/home/saucoide/storage" = {
-    device = "/dev/disk/by-uuid/235C-5FBD";
-    fsType = "vfat";
+    device = "/dev/disk/by-uuid/9a06ab0b-a482-4611-b4f3-04f0afe3aff1";
+    fsType = "btrfs";
     options = [
-      "users"
-      "nofail"
-      # "exec"
+      "defaults"
+      "compress=zstd"
+      "noatime"
     ];
   };
 
@@ -206,6 +206,7 @@
     nixos-firewall-tool # to temporarily open ports
     usbutils
     powertop
+    gparted-full
   ];
   # Fix uv python ssl.SSLCertVerificationError
   environment.etc.certfile = {

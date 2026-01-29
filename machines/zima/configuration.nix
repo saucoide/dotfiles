@@ -260,6 +260,7 @@
     nixos-firewall-tool # temporarily open ports
     usbutils
     powertop
+    gparted
   ];
   # Fix uv python ssl.SSLCertVerificationError
   environment.etc.certfile = {
