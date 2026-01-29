@@ -40,3 +40,6 @@ remmeber you have *hyperfine* for benchmarking!
 %
 `ssh -L [local_addr:port]:[remote_addr:port] user@host`
 the remote_addr can be the host's localhost *or* something else!
+%
+*rmlint* is great for finding duplicates
+`rmlint -k dir1 // dir2` this just flags what's duplicated in dir1 vs dir2
