@@ -124,7 +124,7 @@
       terminal = "wezterm-gui start --always-new-process";
       output = {
         "*" = {
-          bg = "${../../../wallpapers/landscape-bird-gray.jpg} fill";
+          bg = "${../../../wallpapers/cat.jpg} fill";
         };
       };
       bars = [];

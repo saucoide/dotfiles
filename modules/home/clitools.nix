@@ -25,6 +25,7 @@
     pkgs.duf # disks usage
     pkgs.dust # disk space
     pkgs.rmlint # find duplicates etc
+    pkgs.imagemagick # img transformation
 
     # pkgs.mtr
     pkgs.nmap
