@@ -1,45 +1,62 @@
-Use *tldr* for a brief version of  *man*
+= Use *tldr* for a brief version of  *man* =
 %
-*procs* is a better *ps*! use *--json* for easier filtering
+= *procs* is a better *ps*! use *--json* for easier filtering =
 %
-*rg* for a better *grep*
-  *rg pattern* to find all files contaning the pattern
-  *-l* to list just the file name
-  *--invert-match*
-  *--files* list files that WOULD be searched
+= *rg* for a better *grep* =
+  `rg pattern` to find all files contaning the pattern
+  `-l` to list just the file name
+  `--invert-match`
+  `--files` list files that WOULD be searched
 %
-*fd* to find files! e.g *fd --extension jpg* and lots of other useful flags
+= *fd* to find files! =
+  `fd "^pattern|other` downloads/
+  `fd --extension jpg*`
+  `fd . --exclude "glob*"`
 %
-get json (or yaml!) keys with *yq*
-yq keys file.json
+= get json (or yaml!) keys with *yq* =
+  yq keys file.json
 %
-filter json/yaml with *yq*
-cat file.json | yq '.[] | select((.key1=="value*") and (.key2 | tonumber >=  10))'
+= filter json/yaml with *yq* =
+  cat file.json | yq '.[] | select((.key1=="value*") and (.key2 | tonumber >=  10))'
 %
-`yq` output in different formats
-yq '.[]' file.json --output-format json|yaml|csv
-yq '.[]' file.json -o json|yaml|csv
+= `yq` output in different formats =
+  yq '.[]' file.json --output-format json|yaml|csv
+  yq '.[]' file.json -o json|yaml|csv
 %
-in neovim - do an action for the lines matching the pattern
-:g/pattern/norm!dd
-:v/pattern/norm!dd  # reverse match!
+= neovim - do an action for the lines matching the pattern =
+  :g/pattern/norm!dd
+  :v/pattern/norm!dd  # reverse match!
 %
-*dust* gives you a quick overview of disk usage, read bottom to top!
+= *dust* gives you a quick overview of disk usage, read bottom to top! =
 %
-Use *duf* for getting disk usage information 
+= Use *duf* for getting disk usage information =
 %
-*xh* can replace *curl*
-xh get https://example.com header-name:header-value
-xh post https://example.com content-key=content-value
-echo {"something": true} | xh post https://httpbin.org/post
-xh get https://example.com --curl  # show curl equivalent
+= *xh* can replace *curl* =
+  xh get https://example.com header-name:header-value
+  xh post https://example.com content-key=content-value
+  echo {"something": true} | xh post https://httpbin.org/post
+  xh get https://example.com --curl  # show curl equivalent
 %
-remmeber you have *hyperfine* for benchmarking!
+= *hyperfine* for benchmarking! =
+  `hyperfine 'run this thing'
+  `hyperfine --prepare 'do-this-before-each-run' 'then run this'`
 %
-*presenter* makes presentations out of md files
+= *presenter* makes presentations out of md files =
 %
-`ssh -L [local_addr:port]:[remote_addr:port] user@host`
-the remote_addr can be the host's localhost *or* something else!
+= port forwarding =
+  `ssh -L [local_addr:port]:[remote_addr:port] user@host`
+  the remote_addr can be the host's localhost *or* something else!
 %
-*rmlint* is great for finding duplicates
-`rmlint -k dir1 // dir2` this just flags what's duplicated in dir1 vs dir2
+= *rmlint* is great for finding duplicates =
+  `rmlint -k dir1 // dir2`
+   this just flags what's duplicated in dir1 vs dir2
+%
+= *journalctl* show all logs for a given executable =
+  `journalctl path/to/executable`
+%
+= *journalctl* user/system logs since some time =
+  `journalctl --user --since "5 minutes ago" --until "1 minute ago"`
+  `journalctl --system --since "5 minutes ago" --until "1 minute ago"`
+%
+= *journalctl* for a given unit =
+  `journalctl --unit unit`
