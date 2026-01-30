@@ -13,12 +13,12 @@
         resumeCommand = "${pkgs.sway}/bin/swaymsg \"output * dpms on\"";
       }
       {
-        timeout = 900;
+        timeout = 660;
         command = "${pkgs.swaylock}/bin/swaylock --daemonize";
       }
       {
         timeout = 1200;
-        command = "systemctl suspend-then-hibernate";
+        command = "${pkgs.systemd}/bin/systemctl suspend-then-hibernate";
       }
     ];
     events = {

@@ -17,6 +17,7 @@
     ../../modules/nixos/sway.nix
     ../../modules/nixos/greeter.nix
     ../../modules/nixos/steam/steam.nix
+    ../../modules/nixos/tailscale.nix
     inputs.home-manager.nixosModules.default
   ];
 
@@ -89,10 +90,6 @@
 
   boot.resumeDevice = "/dev/sdb3"; # for hibernation - result of swapon -s
   powerManagement.enable = true;
-  # services.logind.settings.Login = {
-  #   IdleAction="suspend-then-hibernate";
-  #   IdleActionSec=1200;
-  # }; # TODO probably not needed, handled by swayidle
   systemd.sleep.extraConfig = ''
     HibernateDelaySec=10m
   '';
