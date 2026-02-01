@@ -60,6 +60,7 @@
     pkgs.mpv
     pkgs.celluloid
     pkgs.libreoffice
+    pkgs.transmission_4-gtk
   ];
 
   programs.fzf = {
