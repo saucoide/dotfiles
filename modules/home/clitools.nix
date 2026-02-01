@@ -46,7 +46,7 @@
     pkgs.stylua # lua
     pkgs.yamlfmt # yaml
     pkgs.taplo # toml
-    pkgs.alejandra # nix
+    pkgs.nixfmt # nix
     pkgs.nodePackages.prettier
 
     # Video

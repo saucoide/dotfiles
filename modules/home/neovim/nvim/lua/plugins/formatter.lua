@@ -8,7 +8,7 @@ return {
 				logging = true,
 				filetype = {
 					lua = { require("formatter.filetypes.lua").stylua },
-					nix = { require("formatter.filetypes.nix").alejandra },
+					nix = { require("formatter.filetypes.nix").nixfmt },
 					python = { function()
 						return {
 							exe = "ruff",
