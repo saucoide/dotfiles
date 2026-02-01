@@ -2,6 +2,12 @@ return {
 	{
 		"catgoose/nvim-colorizer.lua",
 		enabled = true,
-		cmd = "ColorizerToggle",
-	}
+		event = "BufReadPre",
+		opts = {
+			filetypes = { "css", "nix" },
+			user_default_options = {
+				names = false,
+			},
+		},
+	},
 }
