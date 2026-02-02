@@ -3,7 +3,8 @@
   pkgs,
   inputs,
   ...
-}: {
+}:
+{
   imports = [
     ../../modules/darwin/aerospace.nix
     ../../modules/darwin/sketchybar.nix
@@ -17,10 +18,17 @@
     home = "/Users/sauco.navarro";
   };
 
+  nix = {
+    # linux-builder = {
+    #   enable = true;
+    # };
+    settings.trusted-users = [ "sauco.navarro" ];
+  };
+
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
-    extraSpecialArgs = {inherit inputs;};
+    extraSpecialArgs = { inherit inputs; };
     users."sauco.navarro" = import ./home.nix;
   };
 
@@ -99,7 +107,7 @@
       "Wi-Fi"
       "Thunderbolt Bridge"
     ];
-    dns = ["8.8.8.8"];
+    dns = [ "8.8.8.8" ];
   };
 
   # Sleep

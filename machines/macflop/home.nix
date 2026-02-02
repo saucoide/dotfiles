@@ -59,6 +59,7 @@ in {
     # slop
     pkgs.claude-code
     pkgs.opencode
+    pkgs.gemini-cli
 
     # infra
     pkgs.podman-compose
