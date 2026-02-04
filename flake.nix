@@ -15,6 +15,10 @@
       url = "github:nix-community/NUR";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    microvm = {
+      url = "github:astro/microvm.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -52,6 +56,21 @@
         nix-config
         ./machines/macflop/configuration.nix
         inputs.home-manager.darwinModules.home-manager
+      ];
+    };
+
+    # MICROVMS
+    # micronix - ephemeral to mount arbitrary dirs
+    nixosConfigurations.micronix = nixpkgs.lib.nixosSystem {
+      system = "aarch64-linux";
+      specialArgs = {
+        inherit inputs;
+        # darwin pkgs for the VM runner (vfkit on macOS)
+        hostPkgs = nixpkgs.legacyPackages.aarch64-darwin;
+      };
+      modules = [
+        inputs.microvm.nixosModules.microvm
+        ./machines/microvms/micronix.nix
       ];
     };
   };

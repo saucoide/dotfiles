@@ -4,9 +4,13 @@
   config,
   pkgs,
   ...
-}: let
-  gdk = pkgs.google-cloud-sdk.withExtraComponents [pkgs.google-cloud-sdk.components.gke-gcloud-auth-plugin];
-in {
+}:
+let
+  gdk = pkgs.google-cloud-sdk.withExtraComponents [
+    pkgs.google-cloud-sdk.components.gke-gcloud-auth-plugin
+  ];
+in
+{
   home.stateVersion = "25.05";
   home.username = "sauco.navarro";
   home.homeDirectory = "/Users/sauco.navarro";
@@ -58,8 +62,11 @@ in {
   home.packages = [
     # slop
     pkgs.claude-code
+    pkgs.codex
     pkgs.opencode
     pkgs.gemini-cli
+
+    (pkgs.writeScriptBin "micronix" (builtins.readFile ../../scripts/micronix.fish))
 
     # infra
     pkgs.podman-compose
@@ -128,9 +135,15 @@ in {
         pruneTags = true;
         all = true;
       };
-      branch = {sort = "-comitterdate";};
-      column = {ui = "auto";};
-      tag = {sort = "version:refname";};
+      branch = {
+        sort = "-comitterdate";
+      };
+      column = {
+        ui = "auto";
+      };
+      tag = {
+        sort = "version:refname";
+      };
       diff = {
         algorithm = "histogram";
         colorMoved = "plain";
@@ -144,7 +157,9 @@ in {
         enabled = true;
         autoupdate = true;
       };
-      pull = {rebase = true;};
+      pull = {
+        rebase = true;
+      };
     };
     ignores = [
       ".venv"

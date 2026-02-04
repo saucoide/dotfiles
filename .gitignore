@@ -2,3 +2,5 @@
 __pycache__
 eln-cache
 .private*
+result
+.result

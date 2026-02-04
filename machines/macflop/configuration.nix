@@ -19,9 +19,7 @@
   };
 
   nix = {
-    # linux-builder = {
-    #   enable = true;
-    # };
+    linux-builder.enable = true;
     settings.trusted-users = [ "sauco.navarro" ];
   };
 
