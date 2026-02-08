@@ -87,6 +87,12 @@
         mv $downloads/(lsd -t -A $downloads/ | head -1) $destination
       '';
 
+      move-last-screenshot = ''
+        set destination (default $argv[1] .)
+        set screenshots (default $XDG_SCREENSHOTS_DIR $HOME/screenshots)
+        mv $screenshots/(lsd -t -A $screenshots/ | head -1) $destination
+      '';
+
       kube_namespace = {
         wraps = "kubectl get namespace";
         body = ''
