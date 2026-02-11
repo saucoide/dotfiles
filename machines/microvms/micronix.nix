@@ -21,11 +21,16 @@
   # Microvm settings
   microvm = {
     hypervisor = "vfkit";
-    mem = 4096; # 4GB RAM
-    vcpu = 4;
+    mem = 2024; # 2GB RAM
+    vcpu = 2;
+    optimize.enable = true;
 
     # darwin pkgs for the runner (vfkit binary)
     vmHostPackages = hostPkgs;
+
+    # preStart = ''
+    #   touch IWASHERE.BELIEVE
+    # '';
 
     # shared dirs with host
     shares = [
@@ -41,7 +46,24 @@
         mountPoint = "/home/saucoide/workspace";
         proto = "virtiofs";
       }
+      {
+        tag = "agent-config";
+        source = "/Users/sauco.navarro/.pi";
+        mountPoint = "/home/saucoide/.pi";
+        proto = "virtiofs";
+      }
+      {
+        tag = "env";
+        source = "/tmp/microvm-env";
+        mountPoint = "/run/host-env";
+        proto = "virtiofs";
+      }
     ];
+
+    # not supported by vfkit
+    # credentialFiles = {
+    #   TEST_THINGIE = "/home/sauco.navarro/test.py";
+    # };
 
     # Let vfkit use its default NAT networking
     interfaces = [
@@ -51,6 +73,13 @@
         mac = "02:00:00:00:00:01";
       }
     ];
+    # forwardPorts = [
+    #   {
+    #     from = "host"; # or guest
+    #     host.port = 8080;
+    #     guest.port = 8080;
+    #   }
+    # ];
   };
 
   # User configuration
@@ -63,7 +92,16 @@
   # Passwordless sudo
   security.sudo.wheelNeedsPassword = false;
   services.getty.autologinUser = "saucoide";
-  programs.fish.enable = true;
+  programs.fish = {
+    enable = true;
+    interactiveShellInit = ''
+      set -l env_file /run/host-env/env.fish
+      if test -f $env_file
+        source $env_file
+        rm -f $env_file
+      end
+    '';
+  };
 
   environment.systemPackages = with pkgs; [
     git
@@ -84,11 +122,14 @@
     gcc
     pkg-config
 
+    tmux
+    uv
+    just
     python3
     nodejs
 
-    claude-code
-    opencode
+    # claude-code
+    # opencode
   ];
 
   # Nix settings
