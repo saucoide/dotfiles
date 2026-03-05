@@ -65,6 +65,8 @@ in
     pkgs.codex
     pkgs.opencode
     pkgs.gemini-cli
+    pkgs.nodejs_25
+    pkgs.texliveTeTeX  # for pandoc
 
     (pkgs.writeScriptBin "micronix" (builtins.readFile ../../scripts/micronix.fish))
 

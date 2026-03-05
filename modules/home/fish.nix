@@ -37,6 +37,8 @@
       kc = "kube_context";
       kn = "kube_namespace";
       kshell = "kube_shell_into_pod";
+      # k9s
+      kk = "9s";
 
       # gcloud
       gcp = "gcloud_change_project";

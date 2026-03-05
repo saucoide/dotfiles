@@ -4,7 +4,6 @@
 # Usage: micronix.fish [options] [/path/to/project]
 #        micronix.fish                     (uses current directory)
 #        micronix.fish --env VAR=value     (pass env var to guest)
-#        micronix.fish --env VAR           (pass current value of VAR)
 
 set --local FLAKE_DIR (set --query FLAKE_DIR; and echo $FLAKE_DIR; or echo $HOME/dotfiles)
 set --local WORKSPACE_LINK /tmp/microvm-workspace
@@ -44,25 +43,20 @@ end
 echo "Mounting project: $PROJECT_PATH"
 
 # symlink the workspace
-rm --force $WORKSPACE_LINK
-ln --symbolic $PROJECT_PATH $WORKSPACE_LINK
+rm -f $WORKSPACE_LINK
+ln -s $PROJECT_PATH $WORKSPACE_LINK
 
 echo "Workspace linked: $WORKSPACE_LINK -> $PROJECT_PATH"
 
 # write environment variables to temp file (fish format)
-mkdir --parents $ENV_DIR
-rm --force $ENV_FILE
+mkdir -p $ENV_DIR
+rm -f $ENV_FILE
 if test (count $env_vars) -gt 0
     for var in $env_vars
         if string match --quiet "*=*" "$var"
             set --local name (string split --max 1 = "$var")[1]
             set --local val (string split --max 1 = "$var")[2]
             echo "set --global --export $name '$val'" >> $ENV_FILE
-        else
-            set --local val $$var
-            if test -n "$val"
-                echo "set --global --export $var '$val'" >> $ENV_FILE
-            end
         end
     end
     echo "Environment variables written to: $ENV_FILE"
