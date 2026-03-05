@@ -9,6 +9,7 @@
   home.packages = [
     (pkgs.writeScriptBin "logout-menu" (builtins.readFile ../../scripts/logout-menu.sh))
     (pkgs.writeScriptBin "ing" (builtins.readFile ../../scripts/ing.py))
+    (pkgs.writeScriptBin "beep" (builtins.readFile ../../scripts/beep.py))
     (pkgs.writeScriptBin "weather" (builtins.readFile ../../scripts/weather.fish))
     (pkgs.writeScriptBin "webcam" (builtins.readFile ../../scripts/webcam.sh))
     # (pkgs.writeShellScriptBin "my-hello" '' echo "Hello, ${config.home.username}!" '')

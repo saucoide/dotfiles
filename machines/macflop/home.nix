@@ -69,6 +69,7 @@ in
     pkgs.texliveTeTeX  # for pandoc
 
     (pkgs.writeScriptBin "micronix" (builtins.readFile ../../scripts/micronix.fish))
+    (pkgs.writeScriptBin "beep" (builtins.readFile ../../scripts/beep.py))
 
     # infra
     pkgs.podman-compose
