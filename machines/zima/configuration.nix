@@ -184,6 +184,12 @@
       # cups-browsed
     ];
   };
+  # autodiscovery of printers over usb
+  services.ipp-usb.enable = true;
+  # printer config
+  programs.system-config-printer.enable = true;
+
+
   # Uncomment to enable printers via the network
   # services.avahi = {
   #   enable = true;
