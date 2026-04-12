@@ -1,8 +1,10 @@
 {
   config,
   pkgs,
+  inputs,
   ...
-}: {
+}:
+{
   home.username = "saucoide";
   home.homeDirectory = "/home/saucoide";
 
@@ -27,6 +29,7 @@
   };
 
   imports = [
+    # inputs.autofirma-nix.homeManagerModules.default
     ../../modules/home/custom-options.nix
     ../../modules/home/clitools.nix
     ../../modules/home/sway
@@ -116,9 +119,15 @@
         pruneTags = true;
         all = true;
       };
-      branch = {sort = "-comitterdate";};
-      column = {ui = "auto";};
-      tag = {sort = "version:refname";};
+      branch = {
+        sort = "-comitterdate";
+      };
+      column = {
+        ui = "auto";
+      };
+      tag = {
+        sort = "version:refname";
+      };
       diff = {
         algorithm = "histogram";
         colorMoved = "plain";
@@ -132,7 +141,9 @@
         enabled = true;
         autoupdate = true;
       };
-      pull = {rebase = true;};
+      pull = {
+        rebase = true;
+      };
     };
     ignores = [
       ".venv"
@@ -155,6 +166,30 @@
     silent = false;
     nix-direnv.enable = true;
   };
+
+  # # Enable AutoFirma with Firefox integration
+  # programs.autofirma = {
+  #   enable = true;
+  #   firefoxIntegration.profiles = {
+  #     default = {
+  #       enable = true;
+  #     };
+  #   };
+  # };
+  # # DNIeRemote for using smartphone as DNIe reader
+  # programs.dnieremote = {
+  #   enable = false;
+  # };
+  #
+  # # FNMT certificate configurator
+  # programs.configuradorfnmt = {
+  #   enable = true;
+  #   firefoxIntegration.profiles = {
+  #     default = {
+  #       enable = true;
+  #     };
+  #   };
+  # };
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.

@@ -1,10 +1,15 @@
 {
   inputs,
   pkgs,
+  config,
+  lib,
   ...
-}: let
-  firefox-addons = inputs.nur.legacyPackages.${pkgs.stdenv.hostPlatform.system}.repos.rycee.firefox-addons;
-in {
+}:
+let
+  firefox-addons =
+    inputs.nur.legacyPackages.${pkgs.stdenv.hostPlatform.system}.repos.rycee.firefox-addons;
+in
+{
   programs.firefox = {
     enable = true;
     profiles = {
@@ -79,7 +84,7 @@ in {
                   ];
                 }
               ];
-              definedAliases = ["g"];
+              definedAliases = [ "g" ];
             };
             nix-packages = {
               name = "NixOS Search";
@@ -99,14 +104,14 @@ in {
                 }
               ];
               icon = "${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
-              definedAliases = ["np"];
+              definedAliases = [ "np" ];
             };
 
             nixos-wiki = {
               name = "NixOS Wiki";
-              urls = [{template = "https://wiki.nixos.org/w/index.php?search={searchTerms}";}];
+              urls = [ { template = "https://wiki.nixos.org/w/index.php?search={searchTerms}"; } ];
               iconMapObj."16" = "https://wiki.nixos.org/favicon.ico";
-              definedAliases = ["nw"];
+              definedAliases = [ "nw" ];
             };
             bing.metaData.hidden = true;
             ddg.metaData.alias = "ddg";
@@ -139,6 +144,14 @@ in {
         };
       };
     };
+
+    # policies = {
+    #   SecurityDevices = {
+    #     "OpenSC PKCS11" = "${pkgs.opensc}/lib/opensc-pkcs11.so";
+    #   } // lib.optionalAttrs (config.programs ? dnieremote) {
+    #     "DNIeRemote" = "${config.programs.dnieremote.finalPackage}/lib/libdnieremotepkcs11.so";
+    #   };
+    # };
   };
 
   xdg.configFile."tridactyl/tridactylrc" = {

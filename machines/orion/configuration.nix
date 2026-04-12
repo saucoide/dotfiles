@@ -6,7 +6,8 @@
   pkgs,
   inputs,
   ...
-}: {
+}:
+{
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
@@ -22,7 +23,7 @@
   ];
 
   home-manager = {
-    extraSpecialArgs = {inherit inputs;};
+    extraSpecialArgs = { inherit inputs; };
     users = {
       "saucoide" = import ./home.nix;
     };
@@ -47,7 +48,7 @@
       theme = "hexagon";
       themePackages = with pkgs; [
         (adi1090x-plymouth-themes.override {
-          selected_themes = ["hexagon"];
+          selected_themes = [ "hexagon" ];
         })
       ];
     };
@@ -90,9 +91,9 @@
 
   boot.resumeDevice = "/dev/sdb3"; # for hibernation - result of swapon -s
   powerManagement.enable = true;
-  systemd.sleep.extraConfig = ''
-    HibernateDelaySec=10m
-  '';
+  systemd.sleep.settings.Sleep = {
+    HibernateDelaySec = "10m";
+  };
 
   services.fstrim.enable = true; # fstrim is like a gc for the SSD
 
@@ -178,7 +179,12 @@
   users.users.saucoide = {
     isNormalUser = true;
     description = "saucoide";
-    extraGroups = ["networkmanager" "wheel" "lp" "scanner"];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "lp"
+      "scanner"
+    ];
     shell = pkgs.fish;
     packages = with pkgs; [
       prusa-slicer
