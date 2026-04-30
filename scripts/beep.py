@@ -8,8 +8,8 @@ import pathlib
 import time
 
 
-SHORT_BEEP = pathlib.Path(__file__).parent / "soundfiles" / "beep-short.wav"
-LONG_BEEP = pathlib.Path(__file__).parent / "soundfiles" / "beep-long.wav"
+SHORT_BEEP = pathlib.Path("@soundfiles@/beep-short.wav")
+LONG_BEEP = pathlib.Path("@soundfiles@/beep-long.wav")
 
 
 @dataclasses.dataclass
