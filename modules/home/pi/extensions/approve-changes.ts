@@ -182,13 +182,8 @@ function isSafeFdArgs(args: string[]): boolean {
 	return true;
 }
 
-function isSafeRgArgs(args: string[]): boolean {
-	// ripgrep is read-only by nature; deny nothing exotic, just path traversal.
-	for (const a of args) {
-		if (a.startsWith("/")) return false;
-		if (a === "~" || a.startsWith("~/")) return false;
-		if (a.split("/").includes("..")) return false;
-	}
+function isSafeRgArgs(_args: string[]): boolean {
+	// ripgrep is read-only; allow all arguments.
 	return true;
 }
 

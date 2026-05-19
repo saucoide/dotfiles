@@ -4,6 +4,7 @@
 # Usage: micronix.fish [options] [/path/to/project]
 #        micronix.fish                     (uses current directory)
 #        micronix.fish --env VAR=value     (pass env var to guest)
+#        micronix.fish --pi                (launch pi inside the VM)
 
 set --local FLAKE_DIR (set --query FLAKE_DIR; and echo $FLAKE_DIR; or echo $HOME/dotfiles)
 set --local WORKSPACE_LINK /tmp/microvm-workspace
@@ -13,6 +14,7 @@ set --local ENV_FILE $ENV_DIR/env.fish
 # parse arguments
 set --local env_vars
 set --local PROJECT_PATH ""
+set --local launch_pi 0
 
 set --local i 1
 while test $i -le (count $argv)
@@ -22,6 +24,8 @@ while test $i -le (count $argv)
         if test $i -le (count $argv)
             set --append env_vars $argv[$i]
         end
+    else if test "$arg" = "--pi"
+        set launch_pi 1
     else if test -z "$PROJECT_PATH"
         set PROJECT_PATH "$arg"
     end
@@ -60,6 +64,12 @@ if test (count $env_vars) -gt 0
         end
     end
     echo "Environment variables written to: $ENV_FILE"
+end
+
+# write pi launch flag
+if test $launch_pi -eq 1
+    echo "set --global --export MICRONIX_LAUNCH_PI 1" >> $ENV_FILE
+    echo "Pi will launch automatically inside the VM"
 end
 
 # rebuild if needed

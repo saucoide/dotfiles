@@ -92,16 +92,46 @@
   # Passwordless sudo
   security.sudo.wheelNeedsPassword = false;
   services.getty.autologinUser = "saucoide";
+
+  environment.variables.TERM = "xterm-256color";
+  environment.variables.COLORTERM = "truecolor";
   programs.fish = {
     enable = true;
+    vendor = {
+      completions.enable = true;
+      config.enable = true;
+      functions.enable = true;
+    };
     interactiveShellInit = ''
+      # source host environment variables
       set -l env_file /run/host-env/env.fish
       if test -f $env_file
         source $env_file
         rm -f $env_file
       end
+
+      # uv: store venvs separately from the host
+      set -gx UV_CACHE_DIR $HOME/.cache/uv-linux
+      set -gx UV_PROJECT_ENVIRONMENT $HOME/.venv-linux
+
+      # cd into workspace on login
+      if test -d $HOME/workspace
+        cd $HOME/workspace
+      end
+
+      # launch pi if MICRONIX_LAUNCH_PI is set
+      if set -q MICRONIX_LAUNCH_PI
+        set -e MICRONIX_LAUNCH_PI
+        pi
+      end
     '';
   };
+
+  programs.nix-ld.enable = true;
+  programs.nix-ld.libraries = with pkgs; [
+    # Add any missing dynamic libraries for unpackaged programs
+    # here, NOT in environment.systemPackages
+  ];
 
   environment.systemPackages = with pkgs; [
     git
