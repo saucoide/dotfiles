@@ -47,7 +47,7 @@
     pkgs.yamlfmt # yaml
     pkgs.taplo # toml
     pkgs.nixfmt # nix
-    pkgs.nodePackages.prettier
+    pkgs.prettier
 
     # Video
     pkgs.ffmpeg

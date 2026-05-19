@@ -40,7 +40,15 @@
     ...
   } @ inputs: let
     nix-config = ./modules/base-nix-config.nix;
+
+    overlays = [
+      (final: prev: {
+        teamcity-cli = final.callPackage ./pkgs/teamcity-cli.nix { };
+      })
+    ];
   in {
+    overlays.default = nixpkgs.lib.composeManyExtensions overlays;
+
     # ORION
     nixosConfigurations.orion = nixpkgs.lib.nixosSystem {
       specialArgs = {inherit inputs;};
@@ -67,6 +75,7 @@
       system = "aarch64-darwin";
       modules = [
         nix-config
+        ({ ... }: { nixpkgs.overlays = overlays; })
         ./machines/macflop/configuration.nix
         inputs.home-manager.darwinModules.home-manager
       ];

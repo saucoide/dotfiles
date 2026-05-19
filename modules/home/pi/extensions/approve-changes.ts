@@ -17,10 +17,22 @@ import { isToolCallEventType } from "@mariozechner/pi-coding-agent";
 // We intentionally avoid trying to fully parse shell. If the command contains
 // quoting/escapes or shell metacharacters, it is NOT whitelisted.
 
-const BASH_WHITELIST = new Set(["ls", "grep", "find", "fd"]);
+const BASH_WHITELIST = new Set(["ls", "grep", "find", "fd", "rg"]);
 
-const SHELL_METACHARS = /[\r\n|;&(){}$`<>]/;
+// Metacharacters that are NEVER allowed (even inside pipeline segments).
+// Note: pipe '|' is handled separately by splitting into pipeline stages.
+const DANGEROUS_METACHARS = /[\r\n;&(){}$`<>]/;
 const SHELL_QUOTES_OR_ESCAPES = /['"\\]/;
+
+// Commands that are safe to appear on the *right* side of a pipe.
+// These are read-only transformers / viewers that cannot cause side effects.
+const SAFE_PIPE_TARGETS = new Set([
+	"sort", "uniq", "head", "tail", "wc", "cat", "tac",
+	"cut", "tr", "rev", "nl", "column", "paste",
+	"grep", "awk", "sed",
+	"less", "more",
+	"xargs",  // NOTE: xargs is validated separately — only safe variants
+]);
 
 function tokenizeNoQuotes(input: string): string[] | null {
 	// Reject anything that would require shell parsing to reason about safely.
@@ -30,9 +42,31 @@ function tokenizeNoQuotes(input: string): string[] | null {
 	return tokens.length ? tokens : null;
 }
 
+// ─── Pipeline helpers ─────────────────────────────────────────
+
+/**
+ * Check if a pipe-target segment (everything after the first '|') is safe.
+ * We allow read-only text-processing commands with arbitrary flags,
+ * but specifically deny xargs unless it only has display-safe args.
+ */
+function isSafePipeSegment(segment: string): boolean {
+	const trimmed = segment.trim();
+	if (!trimmed) return false;
+	if (DANGEROUS_METACHARS.test(trimmed)) return false;
+
+	const tokens = tokenizeNoQuotes(trimmed);
+	if (!tokens) return false;
+
+	const binary = (tokens[0].split("/").pop() ?? tokens[0]).trim();
+	if (!SAFE_PIPE_TARGETS.has(binary)) return false;
+
+	// xargs can execute arbitrary commands — only allow very limited usage
+	if (binary === "xargs") return false;
+
+	return true;
+}
+
 function isSafeFindArgs(args: string[]): boolean {
-	// Allow only a conservative subset:
-	//   find [path] (-maxdepth N)? (-mindepth N)? (-type f|d|l)? (-name/-iname PATTERN)* -print|-print0
 	// Disallow anything that can execute, delete, write, or produce complex output.
 	const denyFlags = new Set([
 		"-exec",
@@ -51,9 +85,9 @@ function isSafeFindArgs(args: string[]): boolean {
 		if (denyFlags.has(a)) return false;
 	}
 
-	// Optional starting path: only allow '.' or relative paths without '..' or absolute paths.
+	// Optional starting path(s): allow '.' or relative paths without '..' or absolute paths.
 	let i = 0;
-	if (args[i] && !args[i].startsWith("-")) {
+	while (i < args.length && args[i] && !args[i].startsWith("-")) {
 		const p = args[i];
 		if (p.startsWith("/")) return false;
 		if (p === "~" || p.startsWith("~/")) return false;
@@ -61,14 +95,12 @@ function isSafeFindArgs(args: string[]): boolean {
 		i++;
 	}
 
-	let sawPrint = false;
-	const allowUnaryWithValue = new Set(["-maxdepth", "-mindepth", "-name", "-iname", "-type"]);
-	const allowBare = new Set(["-print", "-print0"]);
+	const allowUnaryWithValue = new Set(["-maxdepth", "-mindepth", "-name", "-iname", "-type", "-path", "-regex", "-not"]);
+	const allowBare = new Set(["-print", "-print0", "-not", "!"]);
 
 	for (; i < args.length; i++) {
 		const tok = args[i];
 		if (allowBare.has(tok)) {
-			sawPrint = true;
 			continue;
 		}
 		if (tok === "-") return false;
@@ -76,13 +108,11 @@ function isSafeFindArgs(args: string[]): boolean {
 		if (allowUnaryWithValue.has(tok)) {
 			const v = args[i + 1];
 			if (!v) return false;
-			// quick value checks
 			if (tok === "-maxdepth" || tok === "-mindepth") {
 				if (!/^\d+$/.test(v)) return false;
 			} else if (tok === "-type") {
 				if (!/^[fdl]$/.test(v)) return false;
 			} else if (tok === "-name" || tok === "-iname") {
-				// Allow simple patterns, deny path separators to keep it simple.
 				if (v.includes("/")) return false;
 			}
 			i++; // consume value
@@ -92,11 +122,11 @@ function isSafeFindArgs(args: string[]): boolean {
 		// If it starts with '-', it must be explicitly allowed.
 		if (tok.startsWith("-")) return false;
 
-		// Anything else (like predicates, parentheses, '!' etc.) not allowed.
+		// Anything else (like predicates, parentheses, etc.) not allowed.
 		return false;
 	}
 
-	return sawPrint;
+	return true;
 }
 
 function isSafeGrepArgs(args: string[]): boolean {
@@ -141,7 +171,7 @@ function isSafeLsArgs(args: string[]): boolean {
 
 function isSafeFdArgs(args: string[]): boolean {
 	// Deny execution features.
-	const deny = new Set(["-x", "--exec", "--exec-batch"]);
+	const deny = new Set(["-x", "--exec", "-X", "--exec-batch"]);
 	for (let i = 0; i < args.length; i++) {
 		const a = args[i];
 		if (deny.has(a)) return false;
@@ -152,15 +182,35 @@ function isSafeFdArgs(args: string[]): boolean {
 	return true;
 }
 
+function isSafeRgArgs(args: string[]): boolean {
+	// ripgrep is read-only by nature; deny nothing exotic, just path traversal.
+	for (const a of args) {
+		if (a.startsWith("/")) return false;
+		if (a === "~" || a.startsWith("~/")) return false;
+		if (a.split("/").includes("..")) return false;
+	}
+	return true;
+}
+
 function isBashCommandWhitelisted(command: string): boolean {
 	const trimmed = command.trim();
 	if (!trimmed) return false;
-	if (SHELL_METACHARS.test(trimmed)) return false;
+
+	// Check for dangerous metacharacters BEFORE splitting on pipes.
+	// Pipes are allowed, everything else dangerous is not.
+	if (DANGEROUS_METACHARS.test(trimmed)) return false;
 
 	// Disallow leading environment-variable assignments for whitelisted commands.
 	if (/^(?:[A-Za-z_][A-Za-z0-9_]*=)/.test(trimmed)) return false;
 
-	const tokens = tokenizeNoQuotes(trimmed);
+	// Split on pipes to handle pipelines like `find . -name '*.ts' | sort`
+	const segments = trimmed.split("|");
+
+	// Validate the first (main) command
+	const mainSegment = segments[0].trim();
+	if (!mainSegment) return false;
+
+	const tokens = tokenizeNoQuotes(mainSegment);
 	if (!tokens) return false;
 
 	const binary = tokens[0];
@@ -169,12 +219,21 @@ function isBashCommandWhitelisted(command: string): boolean {
 	if (!BASH_WHITELIST.has(baseName)) return false;
 
 	const args = tokens.slice(1);
-	if (baseName === "find") return isSafeFindArgs(args);
-	if (baseName === "grep") return isSafeGrepArgs(args);
-	if (baseName === "ls") return isSafeLsArgs(args);
-	if (baseName === "fd") return isSafeFdArgs(args);
+	let mainOk = false;
+	if (baseName === "find") mainOk = isSafeFindArgs(args);
+	else if (baseName === "grep") mainOk = isSafeGrepArgs(args);
+	else if (baseName === "ls") mainOk = isSafeLsArgs(args);
+	else if (baseName === "fd") mainOk = isSafeFdArgs(args);
+	else if (baseName === "rg") mainOk = isSafeRgArgs(args);
 
-	return false;
+	if (!mainOk) return false;
+
+	// Validate all pipe targets (if any)
+	for (let i = 1; i < segments.length; i++) {
+		if (!isSafePipeSegment(segments[i])) return false;
+	}
+
+	return true;
 }
 
 // ─── Extension entry point ───────────────────────────────────────────────

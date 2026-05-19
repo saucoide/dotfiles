@@ -81,9 +81,10 @@ in
     pkgs.podman-compose
     pkgs.terraform
     pkgs.vault-bin
+    pkgs.teamcity-cli
 
     # GUIs
-    pkgs.zeal
+    # pkgs.zeal
     pkgs.slack
     pkgs.vscode
     pkgs.iina
