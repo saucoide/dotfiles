@@ -60,8 +60,22 @@ function isSafePipeSegment(segment: string): boolean {
 	const binary = (tokens[0].split("/").pop() ?? tokens[0]).trim();
 	if (!SAFE_PIPE_TARGETS.has(binary)) return false;
 
-	// xargs can execute arbitrary commands — only allow very limited usage
+	// xargs can execute arbitrary commands — disallow.
 	if (binary === "xargs") return false;
+
+	// For a couple of common viewers/limiters, keep flags numeric-only / simple.
+	// This avoids needing full shell parsing while still allowing typical usage.
+	if (binary === "head" || binary === "tail") {
+		for (const a of tokens.slice(1)) {
+			if (a.startsWith("-")) {
+				// allow -n, -c, and forms like -n10 / -c100
+				if (!/^-([nc]|n\d+|c\d+)$/.test(a)) return false;
+				continue;
+			}
+			// No file arguments in pipe segments.
+			return false;
+		}
+	}
 
 	return true;
 }
