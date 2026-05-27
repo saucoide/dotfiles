@@ -65,6 +65,7 @@ in
     pkgs.codex
     pkgs.opencode
     pkgs.gemini-cli
+    pkgs.openscad
 
     pkgs.azure-cli
     pkgs.nodejs_25

@@ -161,6 +161,7 @@
 
     # claude-code
     # opencode
+    openscad
   ];
 
   # Nix settings
