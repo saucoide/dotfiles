@@ -1,7 +1,7 @@
 return {
-	{
-		"tpope/vim-sleuth",
-		enabled = true,
-		event = "BufReadPre",
-	}
+  {
+    "tpope/vim-sleuth",
+    enabled = true,
+    event = "BufReadPre",
+  },
 }
