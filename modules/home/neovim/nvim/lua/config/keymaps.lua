@@ -37,6 +37,19 @@ vim.keymap.set("n", "<leader>bk",
   function()
     local force_close = vim.bo.filetype == "terminal"
     local buff = vim.api.nvim_get_current_buf()
+
+    if vim.bo[buff].modified and not force_close then
+      local choice = vim.fn.confirm(
+        "Buffer has unsaved changes. Close anyway?",
+        "&Yes\n&No",
+        2
+      )
+      if choice ~= 1 then
+        return
+      end
+      force_close = true
+    end
+
     local ok, _ = pcall(vim.cmd, "buffer #")
     if not ok then
       vim.cmd("enew")
@@ -44,6 +57,29 @@ vim.keymap.set("n", "<leader>bk",
     vim.api.nvim_buf_delete(buff, { force = force_close })
   end,
   { desc = "Kill Buffer" }
+)
+
+vim.keymap.set("n", "gr", 
+  function()
+    vim.cmd("checktime")
+
+    -- reload filetype/syntax
+    vim.cmd("filetype detect")
+    vim.cmd("syntax sync fromstart")
+    vim.cmd("syntax enable")
+
+    -- restart treesitter highlight if available
+    pcall(vim.treesitter.stop)
+    pcall(vim.treesitter.start)
+
+    -- restart LSP only if attached
+    local clients = vim.lsp.get_clients({ bufnr = 0 })
+    if #clients > 0 then
+      vim.cmd("LspRestart")
+    end
+    vim.cmd("redraw!")
+  end,
+  { desc = "Refresh buffer & related stuff" }
 )
 
 vim.keymap.set("n", "<leader>bK", "<cmd>%bd<CR>", { desc = "Kill All Buffers" })
@@ -63,6 +99,8 @@ vim.keymap.set("n", "<leader>cp", "<cmd>lua vim.diagnostic.goto_prev()<CR>", { d
 vim.keymap.set("n", "<leader>c<CR>", function() vim.lsp.buf.code_action() end, { desc = "code actions" })
 vim.keymap.set("n", "<leader>cd", "<cmd>Telescope lsp_definitions<CR>", { desc = "goto [d]efinitions" })
 vim.keymap.set("n", "<leader>cr", "<cmd>Telescope lsp_references<CR>", { desc = "goto [r]eferences" })
+vim.keymap.set("n", "<leader>cR", function() vim.lsp.buf.rename() end, { desc = "[R]ename" })
+vim.keymap.set("n", "<leader>ci", "<cmd>Telescope lsp_implementations<CR>", { desc = "goto [i]mplementations" })
 vim.keymap.set("i", "<C-h>", function() vim.lsp.buf.signature_help() end, { desc = "Show signature help" })
 vim.keymap.set("n", "<C-down>", "<cmd>cnext<CR>", { desc = "next quickfix" })
 vim.keymap.set("n", "<C-up>", "<cmd>cprevious<CR>", { desc = "previous quickfix" })
@@ -73,3 +111,19 @@ vim.keymap.set("x", "p", "P", { desc = "Do not loose the yank when pasting over 
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear highlights on search when pressing <Esc> in normal mode" })
 vim.keymap.set("v", "<M-Up>", ":m '<-2<CR>gv=gv", { desc = "Shift selection UP" })
 vim.keymap.set("v", "<M-Down>", ":m '>+1<CR>gv=gv'", { desc = "Shift selection DOWN" })
+-- treesitter fancy selections
+vim.keymap.set({ 'x', 'o' }, '<Space>', function()
+  require('vim.treesitter._select').select_parent(vim.v.count1)
+end, { desc = 'Treesitter: Expand selection' })
+
+vim.keymap.set({ 'x', 'o' }, '<BS>', function()
+  require('vim.treesitter._select').select_child(vim.v.count1)
+end, { desc = 'Treesitter: Shrink selection' })
+
+vim.keymap.set({ 'x', 'o' }, '<Tab>', function()
+  require('vim.treesitter._select').select_next(vim.v.count1)
+end, { desc = 'Treesitter: Select next node' })
+
+vim.keymap.set({ 'x', 'o' }, '<S-Tab>', function()
+  require('vim.treesitter._select').select_prev(vim.v.count1)
+end, { desc = 'Treesitter: Select prev node' })
