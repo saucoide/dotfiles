@@ -39,6 +39,7 @@
     ../../modules/home/fortune/fortune.nix
     # ../../modules/home/kubernetes/kubernetes.nix
     ../../modules/home/themes.nix
+    ../../modules/home/thunar.nix
     ../../modules/home/custom-scripts.nix
   ];
 

@@ -16,6 +16,7 @@
   };
   xdg.userDirs = {
     enable = true;
+    setSessionVariables = true;
     createDirectories = false;
     desktop = "${config.home.homeDirectory}/desktop";
     download = "${config.home.homeDirectory}/downloads";
@@ -42,6 +43,7 @@
     ../../modules/home/fortune/fortune.nix
     # ../../modules/home/kubernetes/kubernetes.nix
     ../../modules/home/themes.nix
+    ../../modules/home/thunar.nix
     ../../modules/home/custom-scripts.nix
   ];
 
@@ -76,17 +78,17 @@
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;
-    matchBlocks."*" = {
-      forwardAgent = false;
-      addKeysToAgent = "yes";
-      compression = false;
-      serverAliveInterval = 0;
-      serverAliveCountMax = 3;
-      hashKnownHosts = false;
-      userKnownHostsFile = "~/.ssh/known_hosts";
-      controlMaster = "no";
-      controlPath = "~/.ssh/master-%r@%n:%p";
-      controlPersist = "no";
+    settings."*" = {
+      ForwardAgent = false;
+      AddKeysToAgent = "yes";
+      Compression = false;
+      ServerAliveInterval = 0;
+      ServerAliveCountMax = 3;
+      HashKnownHosts = false;
+      UserKnownHostsFile = "~/.ssh/known_hosts";
+      ControlMaster = "no";
+      ControlPath = "~/.ssh/master-%r@%n:%p";
+      ControlPersist = "no";
     };
     extraConfig = ''
       IdentityFile ~/.ssh/id_ed25519
@@ -95,7 +97,6 @@
 
   services.ssh-agent = {
     enable = true;
-    enableFishIntegration = true;
     defaultMaximumIdentityLifetime = 600;
   };
 

@@ -2,10 +2,11 @@
   config,
   pkgs,
   ...
-}: {
+}:
+{
   services.swayidle = {
     enable = true;
-    systemdTarget = "sway-session.target";
+    systemdTargets = [ "sway-session.target" ];
     timeouts = [
       {
         timeout = 600;

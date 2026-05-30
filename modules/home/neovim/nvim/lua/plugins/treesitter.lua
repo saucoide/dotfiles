@@ -25,6 +25,7 @@ return {
         "vim",
         "vimdoc",
         "yaml",
+        "xml",
       }
 
       require("nvim-treesitter").install(ensure_installed)

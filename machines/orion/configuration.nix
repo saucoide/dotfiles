@@ -89,7 +89,7 @@
     ];
   };
 
-  boot.resumeDevice = "/dev/sdb3"; # for hibernation - result of swapon -s
+  boot.resumeDevice = "/dev/disk/by-uuid/fdd7aa56-f2bf-46d6-9f29-3f65297c254c"; # for hibernation - result of swapon -s but by uuid
   powerManagement.enable = true;
   systemd.sleep.settings.Sleep = {
     HibernateDelaySec = "10m";
@@ -205,6 +205,7 @@
     vim
     git
     curl
+    wget
     wl-clipboard # copy/paste
     nixos-firewall-tool # to temporarily open ports
     usbutils

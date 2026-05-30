@@ -262,6 +262,7 @@
     vim
     git
     curl
+    wget
     wl-clipboard # copy/paste
     nixos-firewall-tool # temporarily open ports
     usbutils

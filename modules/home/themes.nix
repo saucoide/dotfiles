@@ -1,4 +1,5 @@
-{pkgs, ...}: {
+{ pkgs, config, ... }:
+{
   # GTK programs
   gtk = {
     enable = true;
@@ -13,6 +14,9 @@
     font = {
       name = "Noto Sans";
       size = 11;
+    };
+    gtk4 = {
+      theme = config.gtk.theme;
     };
   };
 
@@ -32,7 +36,7 @@
   home.packages = with pkgs; [
     qogir-kde # Qt/Kvantum assets for Qogir
     libsForQt5.qtstyleplugin-kvantum # Qt5 engine
-    kdePackages.qtstyleplugin-kvantum # Qt6 engine 
+    kdePackages.qtstyleplugin-kvantum # Qt6 engine
   ];
 
   # Cursor
