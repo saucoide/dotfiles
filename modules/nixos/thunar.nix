@@ -9,6 +9,7 @@
       pkgs.thunar-archive-plugin
       pkgs.thunar-volman
       # pkgs.dropbox-plugin
+      pkgs.zenity
     ];
   };
   environment.systemPackages = [

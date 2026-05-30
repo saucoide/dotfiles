@@ -12,6 +12,7 @@
     (pkgs.writeScriptBin "beep" (builtins.readFile ../../scripts/beep.py))
     (pkgs.writeScriptBin "weather" (builtins.readFile ../../scripts/weather.fish))
     (pkgs.writeScriptBin "webcam" (builtins.readFile ../../scripts/webcam.sh))
+    (pkgs.writeScriptBin "open-subtitles-download" (builtins.readFile ../../scripts/open_subtitles_download.py))
     # (pkgs.writeShellScriptBin "my-hello" '' echo "Hello, ${config.home.username}!" '')
   ]
   # Laptop-only scripts
