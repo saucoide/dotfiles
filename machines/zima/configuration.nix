@@ -94,7 +94,7 @@
     HandleLidSwitchDocked = "ignore";
   };
   systemd.sleep.extraConfig = ''
-    HibernateDelaySec=10m
+    HibernateDelaySec=60m
   '';
   powerManagement.enable = true;
   services.thermald.enable = true;

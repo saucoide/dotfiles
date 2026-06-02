@@ -70,12 +70,13 @@ APP_API_KEY = "FNyoC96mlztsk3ALgNdhfSNapfFY9lOi"
 # Can be overridden at run time with 'OSD_ENV_USERNAME' and 'OSD_ENV_PASSWORD' environment variables.
 
 
-def get_credentials():
-    subprocess.check_output(
+def _get_credentials_from_pwstore():
+    creds = subprocess.check_output(
         ["pass", "show", "opensubtitles/credentials"], text=True
-    ).strip().split()
+    ).strip()
+    return creds.split()
 
-osd_username, osd_password = get_credentials()
+osd_username, osd_password = _get_credentials_from_pwstore()
 
 # ==== Language settings =======================================================
 
@@ -864,7 +865,6 @@ def getUserToken(username, password):
             "Content-Type": "application/json",
         }
         payload = {"username": username, "password": password}
-
         data = json.dumps(payload).encode("utf-8")
         req = urllib_request_Request(API_URL_LOGIN, data=data, headers=headers)
         with urllib_request_urlopen(req) as response:
@@ -878,7 +878,10 @@ def getUserToken(username, password):
         superPrint(
             "error",
             "OpenSubtitles.com login error!",
-            "An error occurred while connecting to the OpenSubtitles.com server",
+            "An error occurred while connecting to the OpenSubtitles.com server "
+            + str(err.code)
+            + " "
+            + str(err.reason),
         )
         sys.exit(2)
     except Exception:
@@ -930,7 +933,6 @@ def searchSubtitles(**kwargs):
             "User-Agent": f"{APP_NAME} v{APP_VERSION}",
             "Api-key": f"{APP_API_KEY}",
         }
-
         query_params = urllib.parse.urlencode(kwargs)
         url = f"{API_URL_SEARCH}?{query_params}"
         req = urllib_request_Request(url, headers=headers)
