@@ -61,21 +61,21 @@ in
 
   home.packages = [
     # slop
-    pkgs.claude-code
+    pkgs.unstable.claude-code
     pkgs.codex
     pkgs.opencode
     pkgs.gemini-cli
     pkgs.openscad
 
     pkgs.azure-cli
-    pkgs.nodejs_25
-    pkgs.texliveTeTeX  # for pandoc
+    pkgs.nodejs
+    pkgs.texliveTeTeX # for pandoc
 
     (pkgs.writeScriptBin "micronix" (builtins.readFile ../../scripts/micronix.fish))
-    (pkgs.writeScriptBin "beep" (builtins.replaceStrings
-      ["@soundfiles@"]
-      ["${../../scripts/soundfiles}"]
-      (builtins.readFile ../../scripts/beep.py)
+    (pkgs.writeScriptBin "beep" (
+      builtins.replaceStrings [ "@soundfiles@" ] [ "${../../scripts/soundfiles}" ] (
+        builtins.readFile ../../scripts/beep.py
+      )
     ))
 
     # infra
@@ -103,17 +103,17 @@ in
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;
-    matchBlocks."*" = {
-      forwardAgent = false;
-      addKeysToAgent = "yes";
-      compression = false;
-      serverAliveInterval = 0;
-      serverAliveCountMax = 3;
-      hashKnownHosts = false;
-      userKnownHostsFile = "~/.ssh/known_hosts";
-      controlMaster = "no";
-      controlPath = "~/.ssh/master-%r@%n:%p";
-      controlPersist = "no";
+    settings."*" = {
+      ForwardAgent = false;
+      AddKeysToAgent = "yes";
+      Compression = false;
+      ServerAliveInterval = 0;
+      ServerAliveCountMax = 3;
+      HashKnownHosts = false;
+      UserKnownHostsFile = "~/.ssh/known_hosts";
+      ControlMaster = "no";
+      ControlPath = "~/.ssh/master-%r@%n:%p";
+      ControlPersist = "no";
     };
     extraConfig = ''
       UseKeychain yes

@@ -2,13 +2,14 @@
   description = "saucoides dotfiles flake";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     nix-darwin = {
-      url = "github:nix-darwin/nix-darwin/master";
+      url = "github:nix-darwin/nix-darwin/nix-darwin-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager = {
-      url = "github:nix-community/home-manager";
+      url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nur = {
@@ -44,6 +45,10 @@
     overlays = [
       (final: prev: {
         teamcity-cli = final.callPackage ./pkgs/teamcity-cli.nix { };
+        unstable = import inputs.nixpkgs-unstable {
+          inherit (prev.stdenv.hostPlatform) system;
+          inherit (prev) config;
+        };
       })
     ];
   in {
@@ -75,7 +80,6 @@
       system = "aarch64-darwin";
       modules = [
         nix-config
-        ({ ... }: { nixpkgs.overlays = overlays; })
         ./machines/macflop/configuration.nix
         inputs.home-manager.darwinModules.home-manager
       ];
@@ -92,6 +96,7 @@
       };
       modules = [
         inputs.microvm.nixosModules.microvm
+        { nixpkgs.overlays = [ self.overlays.default ]; }
         ./machines/microvms/micronix.nix
       ];
     };

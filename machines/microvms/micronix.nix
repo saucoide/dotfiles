@@ -157,7 +157,7 @@
     just
     python3
     nodejs
-    pi-coding-agent
+    unstable.pi-coding-agent
 
     # claude-code
     # opencode

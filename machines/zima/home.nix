@@ -93,7 +93,6 @@
 
   services.ssh-agent = {
     enable = true;
-    enableFishIntegration = true;
     defaultMaximumIdentityLifetime = 600;
   };
 

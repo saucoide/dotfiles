@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 let
   isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
 in
@@ -36,4 +36,5 @@ in
   };
 
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.overlays = [ inputs.self.overlays.default ];
 }

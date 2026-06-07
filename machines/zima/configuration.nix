@@ -93,9 +93,9 @@
     HandleLidSwitchExternalPower = "suspend-then-hibernate";
     HandleLidSwitchDocked = "ignore";
   };
-  systemd.sleep.extraConfig = ''
-    HibernateDelaySec=60m
-  '';
+  systemd.sleep.settings.Sleep = {
+    HibernateDelaySec = "60m";
+  };
   powerManagement.enable = true;
   services.thermald.enable = true;
   services.tlp = {
