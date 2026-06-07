@@ -26,6 +26,7 @@
     pkgs.dust # disk space
     pkgs.rmlint # find duplicates etc
     pkgs.imagemagick # img transformation
+    pkgs.shellcheck # shell linting
 
     # pkgs.mtr
     pkgs.nmap
