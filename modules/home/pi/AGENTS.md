@@ -11,3 +11,5 @@ activating environments.
 reading a whole file unless its extremely large
 - dont be overly conservative with `| head` and `| tail`, prefer reading bigger
 chunks, of the whole output
+- When running cli programs, default to always using the long version of the
+arguments e.g. --all vs -a

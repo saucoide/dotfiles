@@ -48,7 +48,6 @@ in
     ../../modules/home/neovim/neovim.nix
     ../../modules/home/fortune/fortune.nix
     ../../modules/home/python/python.nix
-    ../../modules/home/rust/rust.nix
     ../../modules/home/kubernetes/kubernetes.nix
     ../../modules/home/darwin/sketchybar/sketchybar.nix
   ];
