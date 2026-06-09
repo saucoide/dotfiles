@@ -24,6 +24,7 @@
             pkgs.cargo
             pkgs.rust-analyzer
             pkgs.clippy
+            pkgs.rustfmt
           ];
 
           # Libs to link agaisnt
