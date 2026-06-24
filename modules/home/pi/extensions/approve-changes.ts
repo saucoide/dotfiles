@@ -11,6 +11,34 @@
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { isToolCallEventType } from "@mariozechner/pi-coding-agent";
 
+// Quote-aware argv parsing (simple single/double quotes; no escapes).
+// We keep this local because @earendil-works/pi-agent-core does not export
+// internal harness helpers via package exports.
+function parseCommandArgs(argsString: string): string[] {
+	const args: string[] = [];
+	let current = "";
+	let inQuote: string | null = null;
+
+	for (let i = 0; i < argsString.length; i++) {
+		const char = argsString[i]!;
+		if (inQuote) {
+			if (char === inQuote) inQuote = null;
+			else current += char;
+		} else if (char === '"' || char === "'") {
+			inQuote = char;
+		} else if (char === " " || char === "\t") {
+			if (current) {
+				args.push(current);
+				current = "";
+			}
+		} else {
+			current += char;
+		}
+	}
+	if (current) args.push(current);
+	return args;
+}
+
 // ─── Bash command whitelist ───────────────────────────────────
 //
 // Goal: allow a very small, *read-only* subset of bash usage without UI approval.
@@ -22,7 +50,11 @@ const BASH_WHITELIST = new Set(["ls", "grep", "find", "fd", "rg"]);
 // Metacharacters that are NEVER allowed (even inside pipeline segments).
 // Note: pipe '|' is handled separately by splitting into pipeline stages.
 const DANGEROUS_METACHARS = /[\r\n;&(){}$`<>]/;
-const SHELL_QUOTES_OR_ESCAPES = /['"\\]/;
+// Quotes are not inherently dangerous, but they require parsing to understand argv.
+// Backslashes are still treated as "needs approval" because they can participate in
+// line continuations and escape sequences depending on shell context.
+const SHELL_QUOTES = /['"]/;
+const SHELL_ESCAPES = /[\\]/;
 
 // Commands that are safe to appear on the *right* side of a pipe.
 // These are read-only transformers / viewers that cannot cause side effects.
@@ -35,10 +67,27 @@ const SAFE_PIPE_TARGETS = new Set([
 ]);
 
 function tokenizeNoQuotes(input: string): string[] | null {
-	// Reject anything that would require shell parsing to reason about safely.
-	if (SHELL_QUOTES_OR_ESCAPES.test(input)) return null;
 	// Split on whitespace; no quoting supported by design.
+	// Keep this for commands where we want to reject any quoting entirely.
+	if (SHELL_QUOTES.test(input)) return null;
+	if (SHELL_ESCAPES.test(input)) return null;
 	const tokens = input.trim().split(/\s+/).filter(Boolean);
+	return tokens.length ? tokens : null;
+}
+
+function tokenizeWithQuotes(input: string): string[] | null {
+	// Allow simple single/double quotes and return argv-like tokens.
+	// NOTE: parseCommandArgs does not implement escapes.
+	// We keep a separate escape gate so specific commands (like rg) can opt into
+	// allowing backslashes without enabling other shell metacharacters.
+	if (SHELL_ESCAPES.test(input)) return null;
+	const tokens = parseCommandArgs(input.trim()).filter(Boolean);
+	return tokens.length ? tokens : null;
+}
+
+function tokenizeWithQuotesAndBackslashes(input: string): string[] | null {
+	// Same as tokenizeWithQuotes, but allows backslashes.
+	const tokens = parseCommandArgs(input.trim()).filter(Boolean);
 	return tokens.length ? tokens : null;
 }
 
@@ -54,7 +103,10 @@ function isSafePipeSegment(segment: string): boolean {
 	if (!trimmed) return false;
 	if (DANGEROUS_METACHARS.test(trimmed)) return false;
 
-	const tokens = tokenizeNoQuotes(trimmed);
+	// Pipe segments are allowed to contain simple quotes for things like:
+	//   rg ... | sed 's/foo/bar/'
+	// but still forbid backslashes.
+	const tokens = tokenizeWithQuotes(trimmed);
 	if (!tokens) return false;
 
 	const binary = (tokens[0].split("/").pop() ?? tokens[0]).trim();
@@ -196,8 +248,13 @@ function isSafeFdArgs(args: string[]): boolean {
 	return true;
 }
 
-function isSafeRgArgs(_args: string[]): boolean {
-	// ripgrep is read-only; allow all arguments.
+function isSafeRgArgs(args: string[]): boolean {
+	// ripgrep is read-only, but it can spawn external processes via --pre.
+	// Keep those behind explicit approval.
+	for (const a of args) {
+		if (a === "--pre" || a.startsWith("--pre=")) return false;
+		if (a === "--pre-glob" || a.startsWith("--pre-glob=")) return false;
+	}
 	return true;
 }
 
@@ -219,7 +276,11 @@ function isBashCommandWhitelisted(command: string): boolean {
 	const mainSegment = segments[0].trim();
 	if (!mainSegment) return false;
 
-	const tokens = tokenizeNoQuotes(mainSegment);
+	// For rg: allow single/double quotes *and* backslashes (common in regexes).
+	// For other whitelisted commands, remain conservative.
+	const tokens = baseName === "rg"
+		? tokenizeWithQuotesAndBackslashes(mainSegment)
+		: tokenizeNoQuotes(mainSegment);
 	if (!tokens) return false;
 
 	const binary = tokens[0];
