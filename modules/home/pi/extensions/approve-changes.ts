@@ -49,7 +49,10 @@ const BASH_WHITELIST = new Set(["ls", "grep", "find", "fd", "rg"]);
 
 // Metacharacters that are NEVER allowed (even inside pipeline segments).
 // Note: pipe '|' is handled separately by splitting into pipeline stages.
-const DANGEROUS_METACHARS = /[\r\n;&(){}$`<>]/;
+// Shell metacharacters that can introduce side effects or unpredictable evaluation.
+// Note: parentheses are intentionally NOT included because they are common in regex
+// patterns (e.g. rg '\(') and are only special to the shell in specific contexts.
+const DANGEROUS_METACHARS = /[\r\n;&{}$`<>]/;
 // Quotes are not inherently dangerous, but they require parsing to understand argv.
 // Backslashes are still treated as "needs approval" because they can participate in
 // line continuations and escape sequences depending on shell context.
@@ -151,12 +154,13 @@ function isSafeFindArgs(args: string[]): boolean {
 		if (denyFlags.has(a)) return false;
 	}
 
-	// Optional starting path(s): allow '.' or relative paths without '..' or absolute paths.
+	// Optional starting path(s): allow '.', relative paths, and ~ / ~/... home paths.
+	// Still reject absolute paths and any '..' traversal.
 	let i = 0;
 	while (i < args.length && args[i] && !args[i].startsWith("-")) {
 		const p = args[i];
 		if (p.startsWith("/")) return false;
-		if (p === "~" || p.startsWith("~/")) return false;
+		// Allow ~ expansion (read-only); keep '..' blocked.
 		if (p.split("/").includes("..")) return false;
 		i++;
 	}
@@ -276,16 +280,20 @@ function isBashCommandWhitelisted(command: string): boolean {
 	const mainSegment = segments[0].trim();
 	if (!mainSegment) return false;
 
+	// Tokenize first so we can determine base command name.
+	const probeTokens = tokenizeWithQuotesAndBackslashes(mainSegment);
+	if (!probeTokens) return false;
+
+	const binary = probeTokens[0];
+	if (!binary) return false;
+	const baseName = (binary.split("/").pop() ?? binary).trim();
+
 	// For rg: allow single/double quotes *and* backslashes (common in regexes).
 	// For other whitelisted commands, remain conservative.
 	const tokens = baseName === "rg"
-		? tokenizeWithQuotesAndBackslashes(mainSegment)
+		? probeTokens
 		: tokenizeNoQuotes(mainSegment);
 	if (!tokens) return false;
-
-	const binary = tokens[0];
-	if (!binary) return false;
-	const baseName = (binary.split("/").pop() ?? binary).trim();
 	if (!BASH_WHITELIST.has(baseName)) return false;
 
 	const args = tokens.slice(1);

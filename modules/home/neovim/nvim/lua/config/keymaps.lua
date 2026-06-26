@@ -75,7 +75,7 @@ vim.keymap.set("n", "gr",
     -- restart LSP only if attached
     local clients = vim.lsp.get_clients({ bufnr = 0 })
     if #clients > 0 then
-      vim.cmd("LspRestart")
+      vim.cmd("lsp restart")
     end
     vim.cmd("redraw!")
   end,
