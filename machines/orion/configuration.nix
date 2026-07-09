@@ -167,6 +167,14 @@
     variant = "";
   };
 
+  services.libinput = {
+    enable = true;
+    mouse = {
+      accelProfile = "flat";
+      accelSpeed = "-0.2";
+    };
+  };
+
   security.polkit.enable = true;
   programs.fish.enable = true;
   programs.dconf.enable = true;
