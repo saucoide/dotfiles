@@ -50,6 +50,15 @@ return {
           javascript = { require("formatter.filetypes.javascript").prettier },
           typescript = { require("formatter.filetypes.typescript").prettier },
           rust = { require("formatter.filetypes.rust").rustfmt },
+          rust = {
+            function()
+              return {
+                exe = "rustfmt",
+                -- args = { "-" },
+                stdin = true,
+              }
+            end,
+          },
           c = { require("formatter.filetypes.c").clangformat },
           ["*"] = { require("formatter.filetypes.any").remove_trailing_whitespace },
         },
