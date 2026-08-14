@@ -2,7 +2,8 @@
   config,
   pkgs,
   ...
-}: {
+}:
+{
   # The actual sway config is in modules/home/sway
   programs.sway = {
     enable = true;
@@ -11,13 +12,23 @@
 
   xdg.portal = {
     enable = true;
-    wlr.enable = true;
-    extraPortals = [pkgs.xdg-desktop-portal-gtk];
+    wlr = {
+      enable = true;
+      settings = {
+        screencast = {
+          chooser_type = "dmenu";
+          chooser_cmd = "${pkgs.rofi}/bin/rofi -dmenu -p 'Window/Screen to Share'";
+        };
+      };
+    };
+    extraPortals = [
+      pkgs.xdg-desktop-portal-gtk
+    ];
     config = {
       common = {
-        default = ["gtk"];
-        "org.freedesktop.impl.portal.Screencast" = ["wlr"];
-        "org.freedesktop.impl.portal.Screenshot" = ["wlr"];
+        default = [ "gtk" ];
+        "org.freedesktop.impl.portal.Screencast" = [ "wlr" ];
+        "org.freedesktop.impl.portal.Screenshot" = [ "wlr" ];
       };
     };
   };
