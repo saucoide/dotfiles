@@ -37,4 +37,6 @@ in
 
   nixpkgs.config.allowUnfree = true;
   nixpkgs.overlays = [ inputs.self.overlays.default ];
+
+  nix.registry.unstable.flake = inputs.nixpkgs-unstable;
 }

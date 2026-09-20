@@ -13,6 +13,7 @@
     EDITOR = "nvim";
     XDG_CURRENT_DESKTOP = "sway";
     MANPAGER = "bat -plman";
+    NIXPKGS_ALLOW_UNFREE = "1";
   };
   xdg.userDirs = {
     enable = true;
