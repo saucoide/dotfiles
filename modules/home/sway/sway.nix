@@ -130,7 +130,7 @@
       terminal = "wezterm-gui start --always-new-process";
       output = {
         "*" = {
-          bg = "${../../../wallpapers/cat.jpg} stretch";
+          bg = "${config.custom-options.wallpaper} ${config.custom-options.wallpaperMode}";
         };
       };
       bars = [ ];

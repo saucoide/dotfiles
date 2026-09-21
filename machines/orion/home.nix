@@ -50,7 +50,9 @@
 
   # enable/disable imported module options
   # modules.sway.kanshi.enable = true;
-  custom-options.laptop = true;
+  custom-options.laptop = false;
+  custom-options.wallpaper = "../../wallpapers/tree-island-ultrawide.png";
+  custom-options.wallpaperMode = "fill";
 
   home.packages = [
     # Images
