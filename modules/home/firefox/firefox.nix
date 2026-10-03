@@ -60,8 +60,27 @@ in
             visibility: visible !important;
           }
 
-          #sidebar-header {
-            display: none;
+          #sidebar-header,
+          #sidebar-panel-header {
+            display: none !important;
+          }
+
+          /* Firefox 157: collapse anything left of the Sidebery panel */
+          #sidebar-container,
+          #sidebar-launcher-splitter {
+            width: 0 !important;
+            min-width: 0 !important;
+            max-width: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+          }
+          #sidebar-box,
+          #sidebar-box .sidebar-browser-stack,
+          #sidebar {
+            margin-inline-start: 0 !important;
+            padding-inline-start: 0 !important;
+            border-inline-start: none !important;
           }
         '';
         search = {
