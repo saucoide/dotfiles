@@ -1,7 +1,5 @@
 # micronix - lightweight microvm for coding agents
 # Runs isolated with project directory mounted at ~/workspace
-# because of how the mounting works, we have to build a new derivation
-# everytime, so not adding it to a particular host for now
 {
   config,
   pkgs,
@@ -42,7 +40,7 @@
       }
       {
         tag = "workspace";
-        source = "/tmp/microvm-workspace";
+        source = "workspace"; # relative to the runner's working directory
         mountPoint = "/home/saucoide/workspace";
         proto = "virtiofs";
       }
@@ -54,7 +52,7 @@
       }
       {
         tag = "env";
-        source = "/tmp/microvm-env";
+        source = "env"; # relative to the runner's working directory
         mountPoint = "/run/host-env";
         proto = "virtiofs";
       }
@@ -97,6 +95,7 @@
   environment.variables.COLORTERM = "truecolor";
   programs.fish = {
     enable = true;
+    shellAliases.exit = "sudo poweroff";
     vendor = {
       completions.enable = true;
       config.enable = true;
