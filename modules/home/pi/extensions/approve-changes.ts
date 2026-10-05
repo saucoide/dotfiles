@@ -8,8 +8,10 @@
  * only adds the approve/reject gate.
  */
 
+import { stripVTControlCharacters } from "node:util";
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import { isToolCallEventType } from "@mariozechner/pi-coding-agent";
+import { truncateToWidth } from "@mariozechner/pi-tui";
 
 // Quote-aware argv parsing (simple single/double quotes; no escapes).
 // We keep this local because @earendil-works/pi-agent-core does not export
@@ -314,6 +316,22 @@ function isBashCommandWhitelisted(command: string): boolean {
 	return true;
 }
 
+function formatBashApproval(command: string): string {
+	const lines = command.split(/\r\n|\r|\n/);
+	// Tall approval titles hide the active spinner and force full redraws on every tick.
+	const firstLine = stripVTControlCharacters(lines[0]);
+	const preview = stripVTControlCharacters(truncateToWidth(firstLine, 60, ""));
+	const omittedCharacters = Array.from(firstLine).length - Array.from(preview).length;
+	const omissions: string[] = [];
+	if (omittedCharacters > 0) omissions.push(`${omittedCharacters} first-line characters omitted`);
+	if (lines.length > 1) omissions.push(`${lines.length - 1} additional lines omitted`);
+
+	const label = `Bash: ${preview}${omittedCharacters > 0 ? "…" : ""}`;
+	return omissions.length
+		? `${label}\n${omissions.join("; ")}. Full command in tool preview.`
+		: label;
+}
+
 // ─── Extension entry point ───────────────────────────────────────────────
 
 export default function (pi: ExtensionAPI) {
@@ -328,7 +346,7 @@ export default function (pi: ExtensionAPI) {
 		} else if (isToolCallEventType("write", event)) {
 			label = `Write: ${event.input.path}`;
 		} else if (isToolCallEventType("bash", event)) {
-			label = `Bash: ${event.input.command}`;
+			label = formatBashApproval(event.input.command);
 		} else {
 			label = `Tool: ${event.toolName}`;
 		}
@@ -349,3 +367,4 @@ export default function (pi: ExtensionAPI) {
 		}
 	});
 }
+
